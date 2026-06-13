@@ -3,12 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { X, ChevronRight } from "@/components/icons";
-
-const NAV_FUNDING = [
-  { label: "국민내일배움카드 안내", href: "/funding#nbcard" },
-  { label: "훈련참여절차", href: "/funding#process" },
-  { label: "산재노동자 직업훈련", href: "/funding#sanjae" },
-];
+import { NAV_FUNDING } from "@/lib/data/site";
 
 interface MobileMenuProps {
   active?: string;

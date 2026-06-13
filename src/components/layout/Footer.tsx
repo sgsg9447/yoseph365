@@ -1,21 +1,10 @@
 // Server component — footer with business info and awards.
 
 import Image from "next/image";
+import { AWARDS } from "@/lib/data/awards";
+import { BUSINESS_INFO_ROWS, CONSULT_HOURS } from "@/lib/data/site";
 
-const AWARDS = [
-  { year: "2022", label: "고용노동부 우수훈련기관" },
-  { year: "2023", label: "경기도일자리재단 우수훈련기관" },
-  { year: "2023", label: "경기도지사표창 훈련기관" },
-  { year: "2024", label: "이수자평가 A등급" },
-  { year: "2025", label: "고용노동부 3년인증 · 이수자평가 A등급" },
-];
-
-const rows: [string, string][][] = [
-  [["회사명", "주식회사 성요셉목수학교"], ["대표이사", "박경수"], ["개인정보책임자", "김버나"]],
-  [["소재지", "경기도 부천시 성고로 69, 2층 · 4층"]],
-  [["사업자등록번호", "679-88-00935"], ["평생직업교육원 등록번호", "제 6223호"]],
-  [["전화", "032-678-3650"]],
-];
+const rows = BUSINESS_INFO_ROWS;
 
 export function Footer() {
   return (
@@ -48,7 +37,7 @@ export function Footer() {
             </div>
           ))}
           <span className="text-[13.5px] text-muted mt-[2px]">
-            상담시간 — 평일 9:30~18:00, 점심시간 12:00~13:00
+            상담시간 — {CONSULT_HOURS}
           </span>
         </div>
       </div>

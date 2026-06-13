@@ -1,8 +1,10 @@
 // Server component — SNS social links + awards horizontal strip.
 
 import { Award } from "@/components/icons";
+import { AWARDS } from "@/lib/data/awards";
 
-const SNS_LINKS = [
+// SNS 아이콘 노드는 렌더링 전용이므로 여기서만 정의 (site.ts는 직렬화 가능한 데이터만)
+const SNS_WITH_NODES = [
   {
     name: "유튜브",
     href: "https://www.youtube.com",
@@ -62,18 +64,10 @@ const SNS_LINKS = [
   },
 ];
 
-const AWARDS = [
-  { year: "2022", label: "고용노동부 우수훈련기관" },
-  { year: "2023", label: "경기도일자리재단 우수훈련기관" },
-  { year: "2023", label: "경기도지사표창 훈련기관" },
-  { year: "2024", label: "이수자평가 A등급" },
-  { year: "2025", label: "고용노동부 3년인증 · 이수자평가 A등급" },
-];
-
 function SocialLinks({ size = 38 }: { size?: number }) {
   return (
     <div className="flex items-center gap-[10px]">
-      {SNS_LINKS.map((s) => (
+      {SNS_WITH_NODES.map((s) => (
         <a
           key={s.name}
           href={s.href}
