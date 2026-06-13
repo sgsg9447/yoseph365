@@ -19,8 +19,7 @@ export function Footer() {
           alt="성요셉목수학교"
           width={180}
           height={96}
-          className="footer-logo"
-          style={{ height: 72, width: "auto" }}
+          className="footer-logo w-auto"
         />
         <div className="flex flex-col gap-[9px]">
           {rows.map((row, ri) => (

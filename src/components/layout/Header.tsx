@@ -41,7 +41,6 @@ export function Header({ active }: HeaderProps) {
             height={36}
             width={140}
             className="h-9 w-auto block"
-            style={{ height: 36, width: "auto" }}
           />
         </Link>
 

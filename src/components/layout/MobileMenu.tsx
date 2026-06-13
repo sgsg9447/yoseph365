@@ -35,7 +35,6 @@ export function MobileMenu({ active, onClose }: MobileMenuProps) {
             height={32}
             width={120}
             className="h-8 w-auto"
-            style={{ height: 32, width: "auto" }}
           />
           <button
             onClick={onClose}
