@@ -18,6 +18,7 @@ interface HeaderProps {
   active?: string;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function Header({ onConsult, active }: HeaderProps) {
   const [drop, setDrop] = useState(false);
   const [menu, setMenu] = useState(false);
