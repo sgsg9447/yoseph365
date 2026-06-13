@@ -13,13 +13,11 @@ const NAV_FUNDING = [
 ];
 
 interface HeaderProps {
-  onConsult?: () => void;
   /** Current route, e.g. "/about", "/courses" */
   active?: string;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export function Header({ onConsult, active }: HeaderProps) {
+export function Header({ active }: HeaderProps) {
   const [drop, setDrop] = useState(false);
   const [menu, setMenu] = useState(false);
 

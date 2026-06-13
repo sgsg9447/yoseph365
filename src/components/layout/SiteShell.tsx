@@ -38,7 +38,7 @@ export function SiteShell({ children }: SiteShellProps) {
 
   return (
     <ConsultContext.Provider value={{ openConsult }}>
-      <Header onConsult={() => openConsult("consult")} active={pathname} />
+      <Header active={pathname} />
       <main>{children}</main>
       <Footer />
       <StickyBar onConsult={() => openConsult("consult")} />
