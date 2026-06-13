@@ -1,6 +1,6 @@
 // Server component — footer with business info and awards.
 
-import Image from "next/image";
+import { Logo } from "./Logo";
 import { AWARDS } from "@/lib/data/awards";
 import { BUSINESS_INFO_ROWS, CONSULT_HOURS } from "@/lib/data/site";
 
@@ -14,13 +14,7 @@ export function Footer() {
     >
       {/* Business info grid */}
       <div className="wrap band footer-grid" style={{ paddingBottom: 26 }}>
-        <Image
-          src="/logo/logo-primary.png"
-          alt="성요셉목수학교"
-          width={180}
-          height={96}
-          className="footer-logo w-auto"
-        />
+        <Logo className="footer-logo w-auto" />
         <div className="flex flex-col gap-[9px]">
           {rows.map((row, ri) => (
             <div key={ri} className="flex flex-wrap gap-x-[22px] gap-y-1">

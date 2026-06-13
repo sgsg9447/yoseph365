@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 746 190" width="746" height="190">
+  <defs>
+    
+  </defs>
+  
+  <g transform="scale(1.97917)" fill="none" stroke="#2f6fd6" stroke-width="13" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M48 18 L16 82"></path>
+    <path d="M48 18 L80 82"></path>
+    <line x1="30" y1="84" x2="66" y2="84" opacity="0.34"></line>
+  </g>
+  
+  <text x="216" y="96" font-family="&#39;IBM Plex Sans KR&#39;, sans-serif" font-weight="700" font-size="72" letter-spacing="-0.72" fill="#1a1a18"><tspan font-weight="500" font-size="45">(주)</tspan>성요셉 목수학교</text>
+  <text x="216" y="157" font-family="&#39;IBM Plex Sans KR&#39;, sans-serif" font-weight="500" font-size="37.5" fill="#1a1a18" textLength="529" lengthAdjust="spacing">요셉인테리어기술건축학원</text>
+</svg>

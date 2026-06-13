@@ -17,6 +17,15 @@ export default function RootLayout({
           rel="stylesheet"
           href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
         />
+        {/* 로고 워드마크 전용 — IBM Plex Sans KR (Logo 컴포넌트 텍스트에만 사용).
+            App Router 루트 레이아웃의 <head> 폰트 링크는 전 페이지에 적용되므로
+            Pages Router용 no-page-custom-font 규칙은 여기선 오탐이다. */}
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        {/* eslint-disable-next-line @next/next/no-page-custom-font */}
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@500;700&display=swap"
+        />
       </head>
       <body className="min-h-full flex flex-col">{children}</body>
     </html>

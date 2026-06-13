@@ -1,10 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { ChevronRight } from "@/components/icons";
 import { MobileMenu } from "./MobileMenu";
+import { Logo } from "./Logo";
 import { NAV_FUNDING } from "@/lib/data/site";
 
 interface HeaderProps {
@@ -35,13 +35,7 @@ export function Header({ active }: HeaderProps) {
       <div className="wrap flex items-center justify-between h-[66px]">
         {/* Logo */}
         <Link href="/" className="inline-flex items-center">
-          <Image
-            src="/logo/logo-primary.png"
-            alt="성요셉목수학교"
-            height={36}
-            width={140}
-            className="h-9 w-auto block"
-          />
+          <Logo className="h-9 w-auto block" />
         </Link>
 
         {/* Desktop nav */}

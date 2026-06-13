@@ -1,8 +1,8 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { X, ChevronRight } from "@/components/icons";
+import { Logo } from "./Logo";
 import { NAV_FUNDING } from "@/lib/data/site";
 
 interface MobileMenuProps {
@@ -29,13 +29,7 @@ export function MobileMenu({ active, onClose }: MobileMenuProps) {
       >
         {/* Top row */}
         <div className="h-[54px] flex items-center justify-between">
-          <Image
-            src="/logo/logo-primary.png"
-            alt="성요셉목수학교"
-            height={32}
-            width={120}
-            className="h-8 w-auto"
-          />
+          <Logo className="h-8 w-auto" />
           <button
             onClick={onClose}
             aria-label="메뉴 닫기"
