@@ -6,6 +6,7 @@
 // - Schedule.onApply  → navigate to /apply?course=<encoded>
 
 import { useRouter } from "next/navigation";
+import type { ScheduleCourse } from "@/lib/queries/types";
 import { HeroIntent } from "./HeroIntent";
 import { Schedule } from "./Schedule";
 
@@ -24,12 +25,12 @@ export function HeroIntentSection() {
   );
 }
 
-export function ScheduleSection() {
+export function ScheduleSection({ courses }: { courses: ScheduleCourse[] }) {
   const router = useRouter();
 
   function handleApply(courseName: string) {
     router.push(`/apply?course=${encodeURIComponent(courseName)}`);
   }
 
-  return <Schedule onApply={handleApply} />;
+  return <Schedule courses={courses} onApply={handleApply} />;
 }

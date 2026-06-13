@@ -9,8 +9,18 @@ import { Barriers } from "@/components/sections/Barriers";
 import { SocialProof } from "@/components/sections/SocialProof";
 import { Videos } from "@/components/sections/Videos";
 import { ClosingCTA } from "@/components/sections/ClosingCTA";
+import { getScheduleCourses } from "@/lib/queries/courses";
+import type { ScheduleCourse } from "@/lib/queries/types";
 
-export default function HomePage() {
+export const revalidate = 3600;
+
+export default async function HomePage() {
+  let scheduleCourses: ScheduleCourse[];
+  try {
+    scheduleCourses = await getScheduleCourses();
+  } catch {
+    scheduleCourses = [];
+  }
   return (
     <>
       <Banner />
@@ -19,7 +29,7 @@ export default function HomePage() {
       <Barriers />
       <SocialProof />
       <Videos />
-      <ScheduleSection />
+      <ScheduleSection courses={scheduleCourses} />
       <ClosingCTA />
     </>
   );

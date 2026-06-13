@@ -7,13 +7,15 @@ import { Calendar } from "@/components/icons";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Card } from "@/components/ui/Card";
 import { CourseRow } from "@/components/ui/CourseRow";
-import { SCHEDULE_COURSES } from "@/lib/data/courses";
+import type { ScheduleCourse } from "@/lib/queries/types";
+import { PHONE_MAIN } from "@/lib/data/site";
 
 interface ScheduleProps {
+  courses: ScheduleCourse[];
   onApply?: (name: string) => void;
 }
 
-export function Schedule({ onApply }: ScheduleProps) {
+export function Schedule({ courses, onApply }: ScheduleProps) {
   return (
     <section
       id="schedule"
@@ -31,19 +33,25 @@ export function Schedule({ onApply }: ScheduleProps) {
           </span>
         </div>
         <SectionHeading align="center" title={<>운영중인 훈련과정</>} />
-        <Card
-          padding={8}
-          style={{ maxWidth: 760, margin: "32px auto 0", padding: "8px 20px" }}
-        >
-          {SCHEDULE_COURSES.map((c, i) => (
-            <CourseRow
-              key={i}
-              {...c}
-              last={i === SCHEDULE_COURSES.length - 1}
-              onClick={onApply ? () => onApply(c.name) : undefined}
-            />
-          ))}
-        </Card>
+        {courses.length > 0 ? (
+          <Card
+            padding={8}
+            style={{ maxWidth: 760, margin: "32px auto 0", padding: "8px 20px" }}
+          >
+            {courses.map((c, i) => (
+              <CourseRow
+                key={i}
+                {...c}
+                last={i === courses.length - 1}
+                onClick={onApply ? () => onApply(c.name) : undefined}
+              />
+            ))}
+          </Card>
+        ) : (
+          <p className="text-[15px] text-muted leading-[1.7] mt-8 mx-auto max-w-[760px] text-center break-keep">
+            현재 모집 중인 과정 안내는 전화({PHONE_MAIN})로 도와드립니다.
+          </p>
+        )}
         <p className="text-[14px] text-muted leading-[1.6] mt-4 mx-auto max-w-[760px] text-center break-keep">
           회차별 교육 내용과 개강일은 과정 안내에서 확인하세요.
         </p>
