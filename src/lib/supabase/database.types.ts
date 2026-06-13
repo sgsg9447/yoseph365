@@ -34,6 +34,68 @@ export type Database = {
   }
   public: {
     Tables: {
+      about_history: {
+        Row: {
+          created_at: string
+          display_order: number
+          id: number
+          updated_at: string
+          year: number
+        }
+        Insert: {
+          created_at?: string
+          display_order?: number
+          id?: never
+          updated_at?: string
+          year: number
+        }
+        Update: {
+          created_at?: string
+          display_order?: number
+          id?: never
+          updated_at?: string
+          year?: number
+        }
+        Relationships: []
+      }
+      about_history_item: {
+        Row: {
+          content: string
+          created_at: string
+          display_order: number
+          history_id: number
+          id: number
+          is_highlighted: boolean
+          updated_at: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          display_order?: number
+          history_id: number
+          id?: never
+          is_highlighted?: boolean
+          updated_at?: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          display_order?: number
+          history_id?: number
+          id?: never
+          is_highlighted?: boolean
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "about_history_item_history_id_fkey"
+            columns: ["history_id"]
+            isOneToOne: false
+            referencedRelation: "about_history"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       application: {
         Row: {
           additional_note: string | null
@@ -78,7 +140,6 @@ export type Database = {
           category: Database["public"]["Enums"]["course_category"]
           created_at: string
           duration_text: string | null
-          exam_schedule_id: string | null
           funding_type: Database["public"]["Enums"]["funding_type"]
           id: string
           is_deleted: boolean
@@ -93,6 +154,7 @@ export type Database = {
           sessions_total: number | null
           skills: string[]
           summary: string | null
+          total_hours: number | null
           tuition: string | null
           updated_at: string
         }
@@ -100,7 +162,6 @@ export type Database = {
           category: Database["public"]["Enums"]["course_category"]
           created_at?: string
           duration_text?: string | null
-          exam_schedule_id?: string | null
           funding_type: Database["public"]["Enums"]["funding_type"]
           id: string
           is_deleted?: boolean
@@ -115,6 +176,7 @@ export type Database = {
           sessions_total?: number | null
           skills?: string[]
           summary?: string | null
+          total_hours?: number | null
           tuition?: string | null
           updated_at?: string
         }
@@ -122,7 +184,6 @@ export type Database = {
           category?: Database["public"]["Enums"]["course_category"]
           created_at?: string
           duration_text?: string | null
-          exam_schedule_id?: string | null
           funding_type?: Database["public"]["Enums"]["funding_type"]
           id?: string
           is_deleted?: boolean
@@ -137,44 +198,78 @@ export type Database = {
           sessions_total?: number | null
           skills?: string[]
           summary?: string | null
+          total_hours?: number | null
           tuition?: string | null
           updated_at?: string
         }
+        Relationships: []
+      }
+      course_track: {
+        Row: {
+          course_id: string
+          description: string | null
+          id: string
+          name: string
+          price: number | null
+          schedule_summary: string[]
+          sessions_total: number | null
+          sort_order: number
+        }
+        Insert: {
+          course_id: string
+          description?: string | null
+          id: string
+          name: string
+          price?: number | null
+          schedule_summary?: string[]
+          sessions_total?: number | null
+          sort_order?: number
+        }
+        Update: {
+          course_id?: string
+          description?: string | null
+          id?: string
+          name?: string
+          price?: number | null
+          schedule_summary?: string[]
+          sessions_total?: number | null
+          sort_order?: number
+        }
         Relationships: [
           {
-            foreignKeyName: "course_exam_schedule_id_fkey"
-            columns: ["exam_schedule_id"]
+            foreignKeyName: "course_track_course_id_fkey"
+            columns: ["course_id"]
             isOneToOne: false
-            referencedRelation: "exam_schedule"
+            referencedRelation: "course"
             referencedColumns: ["id"]
           },
         ]
       }
       curriculum_item: {
         Row: {
-          content: string | null
+          contents: string[]
           course_id: string
-          hours: string | null
+          hours: number | null
           id: number
-          place: Database["public"]["Enums"]["curriculum_place"] | null
+          place: string | null
           round: number
           unit: string | null
         }
         Insert: {
-          content?: string | null
+          contents?: string[]
           course_id: string
-          hours?: string | null
+          hours?: number | null
           id?: never
-          place?: Database["public"]["Enums"]["curriculum_place"] | null
+          place?: string | null
           round: number
           unit?: string | null
         }
         Update: {
-          content?: string | null
+          contents?: string[]
           course_id?: string
-          hours?: string | null
+          hours?: number | null
           id?: never
-          place?: Database["public"]["Enums"]["curriculum_place"] | null
+          place?: string | null
           round?: number
           unit?: string | null
         }
@@ -190,54 +285,50 @@ export type Database = {
       }
       exam_schedule: {
         Row: {
-          apply_period: string | null
-          exam_date: string | null
-          exam_type: Database["public"]["Enums"]["exam_type"]
-          id: string
-          result_date1: string | null
-          result_date2: string | null
-          round: string
-          year: number
-        }
-        Insert: {
-          apply_period?: string | null
-          exam_date?: string | null
-          exam_type: Database["public"]["Enums"]["exam_type"]
-          id: string
-          result_date1?: string | null
-          result_date2?: string | null
-          round: string
-          year: number
-        }
-        Update: {
-          apply_period?: string | null
-          exam_date?: string | null
-          exam_type?: Database["public"]["Enums"]["exam_type"]
-          id?: string
-          result_date1?: string | null
-          result_date2?: string | null
-          round?: string
-          year?: number
-        }
-        Relationships: []
-      }
-      history: {
-        Row: {
+          apply_end: string | null
+          apply_start: string | null
+          exam_end: string | null
+          exam_start: string | null
           id: number
-          items: string[]
+          result_dates: string[]
+          round: string
+          sort_order: number
+          track_id: string
           year: number
         }
         Insert: {
+          apply_end?: string | null
+          apply_start?: string | null
+          exam_end?: string | null
+          exam_start?: string | null
           id?: never
-          items?: string[]
+          result_dates?: string[]
+          round: string
+          sort_order?: number
+          track_id: string
           year: number
         }
         Update: {
+          apply_end?: string | null
+          apply_start?: string | null
+          exam_end?: string | null
+          exam_start?: string | null
           id?: never
-          items?: string[]
+          result_dates?: string[]
+          round?: string
+          sort_order?: number
+          track_id?: string
           year?: number
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "exam_schedule_track_id_fkey"
+            columns: ["track_id"]
+            isOneToOne: false
+            referencedRelation: "course_track"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       inquiry: {
         Row: {
@@ -396,6 +487,27 @@ export type Database = {
           },
         ]
       }
+      site_section: {
+        Row: {
+          body: string[]
+          key: string
+          title: string | null
+          updated_at: string
+        }
+        Insert: {
+          body?: string[]
+          key: string
+          title?: string | null
+          updated_at?: string
+        }
+        Update: {
+          body?: string[]
+          key?: string
+          title?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       waitlist: {
         Row: {
           course_id: string | null
@@ -444,14 +556,12 @@ export type Database = {
     Enums: {
       application_status: "신규" | "상담중" | "등록확인" | "보류"
       course_category: "집수리" | "건축목공입문" | "인테리어필름입문" | "기능사"
-      curriculum_place: "강의실" | "실습실"
-      exam_type: "건축목공기능사" | "건축도장기능사"
       funding_type: "경기도무료" | "국비지원" | "자부담"
       inquiry_category: "국비지원" | "과정문의" | "기타"
       inquiry_status: "답변대기" | "답변완료"
       post_category: "훈련사진" | "수강일지" | "수료식"
       recruit_status: "모집예정" | "모집중" | "마감"
-      schedule_pattern: "평일주간" | "주말"
+      schedule_pattern: "평일주간" | "주말" | "단기"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -584,14 +694,12 @@ export const Constants = {
     Enums: {
       application_status: ["신규", "상담중", "등록확인", "보류"],
       course_category: ["집수리", "건축목공입문", "인테리어필름입문", "기능사"],
-      curriculum_place: ["강의실", "실습실"],
-      exam_type: ["건축목공기능사", "건축도장기능사"],
       funding_type: ["경기도무료", "국비지원", "자부담"],
       inquiry_category: ["국비지원", "과정문의", "기타"],
       inquiry_status: ["답변대기", "답변완료"],
       post_category: ["훈련사진", "수강일지", "수료식"],
       recruit_status: ["모집예정", "모집중", "마감"],
-      schedule_pattern: ["평일주간", "주말"],
+      schedule_pattern: ["평일주간", "주말", "단기"],
     },
   },
 } as const
