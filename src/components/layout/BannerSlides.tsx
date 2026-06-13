@@ -17,11 +17,11 @@ const TONE_BLUEGRAY = `${WASH}, #eef2f8`;
 const TONE_CENTER =
   "radial-gradient(125% 135% at 50% -20%, rgba(37,99,235,0.14), rgba(37,99,235,0.03) 50%, rgba(37,99,235,0) 75%), #ffffff";
 
-// 모든 배너 동일 높이: 모바일 자동 → xl에서 440px 고정. 콘텐츠는 세로 중앙.
-const FRAME = "relative flex items-center h-auto xl:h-[440px]";
+// 모든 배너 동일 높이: 모바일 660px 고정(콘텐츠 최댓값+버퍼) → xl에서 440px 고정. 콘텐츠 세로 중앙.
+const FRAME = "relative flex items-center h-[660px] xl:h-[440px]";
 // 내부 2단 컨테이너: 모바일 세로 스택 → xl에서 좌우 배치.
 const ROW =
-  "w-full flex flex-col xl:flex-row xl:items-center justify-between gap-[clamp(24px,4vw,48px)] px-[clamp(22px,5vw,64px)] py-[clamp(26px,4vw,32px)]";
+  "w-full flex flex-col xl:flex-row xl:items-center justify-between gap-[clamp(20px,4vw,48px)] px-[clamp(22px,5vw,64px)] py-[clamp(22px,4vw,32px)]";
 // 좌측 텍스트 컬럼 — xl에서 남는 폭을 채움.
 const LEFT = "w-full xl:flex-1 xl:min-w-0";
 
@@ -36,7 +36,7 @@ function Frame({ tone, children }: { tone: string; children: React.ReactNode }) 
 
 function Eyebrow({ children }: { children: React.ReactNode }) {
   return (
-    <span className="inline-flex items-center gap-[7px] px-4 py-[9px] rounded-full bg-white border border-hairline text-[clamp(13px,1.6vw,16px)] font-bold text-primary whitespace-nowrap shrink-0">
+    <span className="inline-flex items-center gap-[6px] xl:gap-[7px] px-2.5 xl:px-4 py-[8px] xl:py-[9px] rounded-full bg-white border border-hairline text-[clamp(12px,1.6vw,16px)] font-bold text-primary whitespace-nowrap shrink-0">
       {children}
     </span>
   );
@@ -155,7 +155,7 @@ function GradeBanner() {
 function PensionBanner() {
   return (
     <div
-      className="relative flex items-center justify-center h-auto xl:h-[440px]"
+      className="relative flex items-center justify-center h-[660px] xl:h-[440px]"
       style={{ background: TONE_CENTER }}
     >
       <div className="text-center px-[clamp(22px,5vw,64px)] py-[clamp(28px,5vw,40px)] max-w-[760px]">
@@ -187,14 +187,14 @@ function CoursesBanner() {
   return (
     <Frame tone={TONE_BLUEGRAY}>
       <div className={LEFT}>
-        <div className="flex flex-wrap xl:flex-nowrap gap-2 mb-5">
+        <div className="flex flex-nowrap gap-1 xl:gap-2 mb-3 xl:mb-5">
           <Eyebrow>국비지원 훈련생 환영</Eyebrow>
           <Eyebrow>
             <CreditCard size={15} strokeWidth={2.2} />
             내일배움카드 수강
           </Eyebrow>
         </div>
-        <h2 className="font-display font-bold text-ink leading-[1.16] tracking-[-1.6px] text-[clamp(32px,5.6vw,60px)] mb-7 break-keep">
+        <h2 className="font-display font-bold text-ink leading-[1.16] tracking-[-1.6px] text-[clamp(32px,5.6vw,60px)] mb-4 xl:mb-7 break-keep">
           새로운 도전을
           <br />
           응원합니다
@@ -217,7 +217,7 @@ function CoursesBanner() {
           <div
             key={`${name}-${idx}`}
             className={[
-              "flex items-center gap-4 py-[22px]",
+              "flex items-center gap-4 py-[15px] xl:py-[22px]",
               idx < rows.length - 1 ? "border-b border-hairline" : "",
             ].join(" ")}
           >
