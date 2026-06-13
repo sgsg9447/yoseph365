@@ -349,7 +349,7 @@ function CourseDetail({
                 color: "var(--color-muted)",
               }}
             >
-              NCS 교육과정 일정표
+              {course.tracks ? "실기 시험일정" : "NCS 교육과정 일정표"}
             </span>
           </h2>
           <span style={{ fontSize: 14.5, color: "var(--color-muted)" }}>{course.meta}</span>
