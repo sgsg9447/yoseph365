@@ -1,7 +1,7 @@
 // 홈 상단 캐러셀 배너 6종 — 핸드오프 "통일 배너 2톤 교차" 라이브 마크업 이식.
 // 디자인 레퍼런스: design_handoff_banners/banners-preview.html (hi-fi, 고정 height 540px)
 // - 화이트 톤(02·03·05) / 블루그레이 톤(01·04·06) 2톤 교차
-// - 데스크톱(lg≥1000px): 모든 배너 고정 540px 높이, 2단 좌우 배치, 콘텐츠 세로 중앙
+// - 데스크톱(xl≥1100px): 모든 배너 고정 440px 높이, 2단 좌우 배치, 콘텐츠 세로 중앙
 // - 모바일: 2단이 세로로 쌓이며 높이 자동(핸드오프 권장)
 // 백엔드 연결 지점: 가격·과정 텍스트는 추후 CMS/Supabase로 분리 가능.
 
@@ -17,13 +17,13 @@ const TONE_BLUEGRAY = `${WASH}, #eef2f8`;
 const TONE_CENTER =
   "radial-gradient(125% 135% at 50% -20%, rgba(37,99,235,0.14), rgba(37,99,235,0.03) 50%, rgba(37,99,235,0) 75%), #ffffff";
 
-// 모든 배너 동일 높이: 모바일 자동 → lg에서 540px 고정. 콘텐츠는 세로 중앙.
-const FRAME = "relative flex items-center h-auto lg:h-[540px]";
-// 내부 2단 컨테이너: 모바일 세로 스택 → lg에서 좌우 배치.
+// 모든 배너 동일 높이: 모바일 자동 → xl에서 440px 고정. 콘텐츠는 세로 중앙.
+const FRAME = "relative flex items-center h-auto xl:h-[440px]";
+// 내부 2단 컨테이너: 모바일 세로 스택 → xl에서 좌우 배치.
 const ROW =
-  "w-full flex flex-col lg:flex-row lg:items-center justify-between gap-[clamp(24px,4vw,48px)] px-[clamp(22px,5vw,64px)] py-[clamp(30px,5vw,56px)]";
-// 좌측 텍스트 컬럼 — lg에서 남는 폭을 채움.
-const LEFT = "w-full lg:flex-1 lg:min-w-0";
+  "w-full flex flex-col xl:flex-row xl:items-center justify-between gap-[clamp(24px,4vw,48px)] px-[clamp(22px,5vw,64px)] py-[clamp(26px,4vw,32px)]";
+// 좌측 텍스트 컬럼 — xl에서 남는 폭을 채움.
+const LEFT = "w-full xl:flex-1 xl:min-w-0";
 
 // ── 공통 레이아웃 조각 ─────────────────────────────────────────────────
 function Frame({ tone, children }: { tone: string; children: React.ReactNode }) {
@@ -65,7 +65,7 @@ function FeeBanner() {
         </p>
       </div>
 
-      <div className="w-full lg:flex-none lg:w-[440px] bg-white border border-hairline rounded-[20px] shadow-card px-[clamp(22px,3vw,30px)] py-7">
+      <div className="w-full xl:flex-none xl:w-[440px] bg-white border border-hairline rounded-[20px] shadow-card px-[clamp(22px,3vw,30px)] py-[clamp(20px,2.5vw,26px)]">
         <div className="flex items-baseline justify-between gap-[10px] pb-4 border-b-[1.5px] border-hairline">
           <span className="text-[clamp(18px,2vw,21px)] font-bold text-ink tracking-[-0.3px]">
             자기부담금 훈련비
@@ -78,7 +78,7 @@ function FeeBanner() {
           <div
             key={name}
             className={[
-              "flex items-center justify-between gap-3 py-[18px]",
+              "flex items-center justify-between gap-3 py-[15px]",
               idx < rows.length - 1 ? "border-b border-hairline" : "",
             ].join(" ")}
           >
@@ -136,7 +136,7 @@ function GradeBanner() {
         </p>
       </div>
 
-      <div className="w-full lg:w-auto lg:flex-none flex justify-center lg:justify-end lg:pr-[clamp(0px,6vw,96px)]">
+      <div className="w-full xl:w-auto xl:flex-none flex justify-center xl:justify-end xl:pr-[clamp(0px,6vw,96px)]">
         <div className="relative grid place-items-center w-[clamp(150px,18vw,210px)] aspect-square">
           <div
             className="absolute inset-0 rounded-full bg-primary"
@@ -155,10 +155,10 @@ function GradeBanner() {
 function PensionBanner() {
   return (
     <div
-      className="relative flex items-center justify-center h-auto lg:h-[540px]"
+      className="relative flex items-center justify-center h-auto xl:h-[440px]"
       style={{ background: TONE_CENTER }}
     >
-      <div className="text-center px-[clamp(22px,5vw,64px)] py-[clamp(30px,5vw,56px)] max-w-[760px]">
+      <div className="text-center px-[clamp(22px,5vw,64px)] py-[clamp(28px,5vw,40px)] max-w-[760px]">
         <p className="inline-flex items-center gap-[14px] text-[clamp(16px,2.2vw,22px)] font-bold tracking-[0.5px] text-primary mb-6 break-keep">
           <span className="w-7 h-[1.5px] bg-primary opacity-45" />
           기술이 곧 연금이다
@@ -212,7 +212,7 @@ function CoursesBanner() {
         </a>
       </div>
 
-      <div className="w-full lg:flex-none lg:w-[480px] bg-white border border-hairline rounded-[20px] shadow-card px-[clamp(20px,3vw,28px)] py-2">
+      <div className="w-full xl:flex-none xl:w-[480px] bg-white border border-hairline rounded-[20px] shadow-card px-[clamp(20px,3vw,28px)] py-1">
         {rows.map(([name, desc], idx) => (
           <div
             key={`${name}-${idx}`}
@@ -257,7 +257,7 @@ function StarbucksBanner() {
         </p>
       </div>
 
-      <div className="w-full lg:w-auto lg:flex-none flex justify-center lg:justify-end lg:pr-[clamp(0px,6vw,96px)]">
+      <div className="w-full xl:w-auto xl:flex-none flex justify-center xl:justify-end xl:pr-[clamp(0px,6vw,96px)]">
         <div className="relative w-[clamp(150px,20vw,230px)] aspect-square rounded-full bg-white border border-hairline shadow-card overflow-hidden">
           <Image
             src="/banners/starbucks.png"
@@ -309,7 +309,7 @@ function FaqBanner() {
         </div>
       </div>
 
-      <div className="w-full lg:flex-none lg:w-[480px] bg-white border border-hairline rounded-[20px] shadow-card px-[clamp(22px,3vw,32px)] py-[30px] flex flex-col justify-center gap-5">
+      <div className="w-full xl:flex-none xl:w-[480px] bg-white border border-hairline rounded-[20px] shadow-card px-[clamp(22px,3vw,32px)] py-6 flex flex-col justify-center gap-4">
         <div className="flex items-start gap-3">
           <span className="flex-none font-display font-bold leading-none text-primary tracking-[-1px] text-[clamp(28px,4vw,36px)]">
             A.
