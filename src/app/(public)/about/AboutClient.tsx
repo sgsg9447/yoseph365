@@ -8,6 +8,7 @@ import { Users, Award, CheckCircle } from "@/components/icons";
 import { PhotoSlot } from "@/components/ui/PhotoSlot";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { LocationInfo } from "@/components/sections/LocationInfo";
+import type { AboutHistoryView, SiteSectionView } from "@/lib/queries/types";
 
 // ── 학원소개 ──────────────────────────────────────────────────────────────────
 
@@ -141,32 +142,27 @@ function AboutIntro() {
 
 // ── 훈련기관 연혁 ─────────────────────────────────────────────────────────────
 
-function AboutHistory() {
-  const eras = [
-    {
-      era: "2024 — 현재",
-      items: [
-        { y: "2026", e: "집수리·인테리어반 신설, 연 5개 과정 운영" },
-        { y: "2025", e: "누적 수료생 1,200명 달성" },
-        { y: "2024", e: "고용노동부 우수훈련기관 지정" },
-      ],
-    },
-    {
-      era: "2020 — 2023",
-      items: [
-        { y: "2023", e: "경기도지사 표창 수상 · 이수자평가 A등급" },
-        { y: "2022", e: "실습동 확장 이전 (1인 1작업대 체제)" },
-        { y: "2020", e: "건축목공 자격대비반 개설" },
-      ],
-    },
-    {
-      era: "2015 — 2019",
-      items: [
-        { y: "2018", e: "국민내일배움카드 국비지원 과정 승인" },
-        { y: "2015", e: "성요셉목수학교 설립 · 목공 기초반 첫 개강" },
-      ],
-    },
-  ];
+function AboutHistory({
+  intro,
+  histories,
+}: {
+  intro: SiteSectionView | null;
+  histories: AboutHistoryView[];
+}) {
+  if (histories.length === 0) {
+    return (
+      <p
+        style={{
+          textAlign: "center",
+          fontSize: 15.5,
+          color: "var(--color-muted)",
+          lineHeight: 1.7,
+        }}
+      >
+        연혁 정보를 준비 중입니다.
+      </p>
+    );
+  }
 
   return (
     <div
@@ -175,91 +171,129 @@ function AboutHistory() {
         margin: "0 auto",
         display: "flex",
         flexDirection: "column",
-        gap: 40,
+        gap: 36,
       }}
     >
-      {eras.map((g, gi) => (
-        <div key={gi}>
-          <span
-            style={{
-              display: "inline-block",
-              fontSize: 13.5,
-              fontWeight: 800,
-              letterSpacing: "0.6px",
-              color: "var(--color-primary)",
-              background: "var(--color-primary-soft)",
-              border: "1px solid var(--color-primary-border)",
-              padding: "6px 14px",
-              borderRadius: 9999,
-              marginBottom: 18,
-            }}
-          >
-            {g.era}
-          </span>
-          <div
-            style={{
-              borderLeft: "2px solid var(--color-hairline)",
-              marginLeft: 9,
-              display: "flex",
-              flexDirection: "column",
-            }}
-          >
-            {g.items.map((it, i) => (
-              <div
-                key={i}
-                style={{
-                  display: "flex",
-                  alignItems: "baseline",
-                  gap: 18,
-                  padding: "12px 0 12px 22px",
-                  position: "relative",
-                }}
-              >
-                <span
-                  style={{
-                    position: "absolute",
-                    left: -6,
-                    top: 19,
-                    width: 10,
-                    height: 10,
-                    borderRadius: 9999,
-                    background: "var(--color-surface-card)",
-                    border: "2px solid var(--color-primary)",
-                  }}
-                />
-                <span
-                  style={{
-                    flex: "0 0 auto",
-                    fontSize: 15,
-                    fontWeight: 800,
-                    color: "var(--color-ink)",
-                    fontVariantNumeric: "tabular-nums",
-                  }}
-                >
-                  {it.y}
+      {intro && (
+        <div
+          style={{
+            textAlign: "center",
+            display: "flex",
+            flexDirection: "column",
+            gap: 10,
+          }}
+        >
+          {intro.title && (
+            <h2
+              style={{
+                fontFamily: "var(--font-display)",
+                fontSize: "clamp(22px, 2.6vw, 28px)",
+                fontWeight: 700,
+                color: "var(--color-ink)",
+                letterSpacing: "-0.5px",
+                margin: 0,
+              }}
+            >
+              {intro.title}
+            </h2>
+          )}
+          {intro.body.length > 0 && (
+            <p
+              style={{
+                fontSize: 15.5,
+                color: "var(--color-body)",
+                lineHeight: 1.8,
+                margin: 0,
+                wordBreak: "keep-all",
+              }}
+            >
+              {intro.body.map((line, i) => (
+                <span key={i} style={{ display: "block" }}>
+                  {line}
                 </span>
+              ))}
+            </p>
+          )}
+        </div>
+      )}
+
+      <div
+        style={{
+          borderLeft: "2px solid var(--color-hairline)",
+          marginLeft: 9,
+          display: "flex",
+          flexDirection: "column",
+        }}
+      >
+        {histories.map((h) => (
+          <div
+            key={h.year}
+            style={{
+              padding: "14px 0 14px 24px",
+              position: "relative",
+            }}
+          >
+            <span
+              style={{
+                position: "absolute",
+                left: -6,
+                top: 20,
+                width: 10,
+                height: 10,
+                borderRadius: 9999,
+                background: "var(--color-surface-card)",
+                border: "2px solid var(--color-primary)",
+              }}
+            />
+            <span
+              style={{
+                fontSize: 16,
+                fontWeight: 800,
+                color: "var(--color-ink)",
+                fontVariantNumeric: "tabular-nums",
+              }}
+            >
+              {h.year}
+            </span>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: 5,
+                marginTop: 7,
+              }}
+            >
+              {h.items.map((it, i) => (
                 <span
+                  key={i}
                   style={{
-                    fontSize: 15.5,
-                    color: "var(--color-body)",
+                    fontSize: 15,
                     lineHeight: 1.6,
                     wordBreak: "keep-all",
+                    color: it.isHighlighted ? "var(--color-primary)" : "var(--color-body)",
+                    fontWeight: it.isHighlighted ? 700 : 500,
                   }}
                 >
-                  {it.e}
+                  {it.content}
                 </span>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
   );
 }
 
 // ── 탭 래퍼 ──────────────────────────────────────────────────────────────────
 
-export function AboutClient() {
+export function AboutClient({
+  intro,
+  histories,
+}: {
+  intro: SiteSectionView | null;
+  histories: AboutHistoryView[];
+}) {
   const tabs = ["학원소개", "훈련기관 연혁"];
   const [tab, setTab] = useState(0);
 
@@ -300,7 +334,7 @@ export function AboutClient() {
           </button>
         ))}
       </div>
-      {tab === 0 ? <AboutIntro /> : <AboutHistory />}
+      {tab === 0 ? <AboutIntro /> : <AboutHistory intro={intro} histories={histories} />}
     </section>
   );
 }
