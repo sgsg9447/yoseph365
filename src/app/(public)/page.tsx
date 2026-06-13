@@ -4,7 +4,7 @@
 
 import { Banner } from "@/components/layout/Banner";
 import { AwardsStrip } from "@/components/layout/AwardsStrip";
-import { HomeInteractive } from "@/components/sections/HomeInteractive";
+import { HeroIntentSection, ScheduleSection } from "@/components/sections/HomeInteractive";
 import { Barriers } from "@/components/sections/Barriers";
 import { SocialProof } from "@/components/sections/SocialProof";
 import { Videos } from "@/components/sections/Videos";
@@ -15,10 +15,11 @@ export default function HomePage() {
     <>
       <Banner />
       <AwardsStrip />
-      <HomeInteractive />
+      <HeroIntentSection />
       <Barriers />
       <SocialProof />
       <Videos />
+      <ScheduleSection />
       <ClosingCTA />
     </>
   );
