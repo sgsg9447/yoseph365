@@ -60,7 +60,7 @@ export function CourseRow({
     <button
       type="button"
       onClick={onClick}
-      className={[commonClass, "bg-transparent border-none cursor-pointer"].join(" ")}
+      className={[commonClass, "bg-transparent cursor-pointer"].join(" ")}
     >
       {inner}
     </button>
