@@ -9,11 +9,12 @@ import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Phone, Clipboard, Wallet, Award } from "@/components/icons";
-import { CATALOG_COURSES, type CatalogCourse } from "@/lib/data/courses";
+import type { CatalogCourse, CourseDay, TrackView } from "@/lib/queries/types";
+import { PHONE_MAIN } from "@/lib/data/site";
 
 // ── DayChip: 평일(primary-soft) / 주말(mint) ──────────────────────
 // handoff: --color-tint-mint 미정의 → arbitrary mint #e8f4ed / border #cfe5d8
-function DayChip({ day }: { day: "평일" | "주말" }) {
+function DayChip({ day }: { day: CourseDay }) {
   const isWeekend = day === "주말";
   return (
     <span
@@ -37,17 +38,43 @@ function DayChip({ day }: { day: "평일" | "주말" }) {
 }
 
 // ── CourseGrid: .g-2 카드 그리드 ─────────────────────────────────
-function CourseGrid({ onSelect }: { onSelect: (id: string) => void }) {
+function CourseGrid({
+  courses,
+  onSelect,
+}: {
+  courses: CatalogCourse[];
+  onSelect: (id: string) => void;
+}) {
+  if (courses.length === 0) {
+    return (
+      <section className="wrap band" style={{ paddingBottom: 24, textAlign: "center" }}>
+        <SectionHeading align="center" eyebrow="2026년" title="운영중인 훈련과정" />
+        <p
+          style={{
+            fontSize: 15.5,
+            color: "var(--color-muted)",
+            lineHeight: 1.7,
+            margin: "24px 0 0",
+            wordBreak: "keep-all",
+          }}
+        >
+          현재 안내해 드릴 과정 정보를 준비 중입니다.
+          <br />
+          개설 과정은 전화({PHONE_MAIN})로 바로 안내해 드립니다.
+        </p>
+      </section>
+    );
+  }
   return (
     <section className="wrap band" style={{ paddingBottom: 24 }}>
       <SectionHeading
         align="center"
         eyebrow="2026년"
         title="운영중인 훈련과정"
-        sub="현재 5개 과정을 운영하고 있습니다. 과정을 누르면 회차별 교육 내용을 볼 수 있습니다."
+        sub="과정을 누르면 회차별 교육 내용을 볼 수 있습니다."
       />
       <div className="grid g-2" style={{ marginTop: 36 }}>
-        {CATALOG_COURSES.map((c) => (
+        {courses.map((c) => (
           <Card
             key={c.id}
             interactive
@@ -142,6 +169,96 @@ function CourseGrid({ onSelect }: { onSelect: (id: string) => void }) {
         ))}
       </div>
     </section>
+  );
+}
+
+// ── CourseTracks: 자격증 과정 트랙별 카드 + 실기 시험일정 ──────────
+const trackGrid = "1fr 1.3fr 1.3fr 1.4fr";
+
+function CourseTracks({ tracks }: { tracks: TrackView[] }) {
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 22 }}>
+      {tracks.map((t) => (
+        <Card key={t.name} padding={0} style={{ overflow: "hidden" }}>
+          {/* 트랙 헤더: 이름 + 수강료·회차 */}
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              alignItems: "center",
+              justifyContent: "space-between",
+              gap: 8,
+              padding: "16px 18px",
+              background: "var(--color-primary-soft)",
+              borderBottom: "1px solid var(--color-hairline)",
+            }}
+          >
+            <span style={{ fontSize: 17, fontWeight: 700, color: "var(--color-ink)" }}>
+              {t.name}
+            </span>
+            <span style={{ fontSize: 15, fontWeight: 700, color: "var(--color-primary)" }}>
+              {t.priceText}
+              {t.sessionsText ? ` · ${t.sessionsText}` : ""}
+            </span>
+          </div>
+
+          {/* 일정 요약 */}
+          {t.scheduleSummary.length > 0 && (
+            <div
+              style={{
+                padding: "12px 18px",
+                fontSize: 14,
+                color: "var(--color-muted)",
+                lineHeight: 1.6,
+                borderBottom: "1px solid var(--color-hairline)",
+              }}
+            >
+              {t.scheduleSummary.map((s, i) => (
+                <div key={i}>· {s}</div>
+              ))}
+            </div>
+          )}
+
+          {/* 실기 시험일정 */}
+          {t.exams.length > 0 && (
+            <>
+              <div className="ncs-row ncs-head" style={{ gridTemplateColumns: trackGrid }}>
+                <span>회차</span>
+                <span>실기 접수</span>
+                <span>실기 시험</span>
+                <span>합격 발표</span>
+              </div>
+              {t.exams.map((e, i) => (
+                <div key={i} className="ncs-row" style={{ gridTemplateColumns: trackGrid }}>
+                  <span
+                    style={{
+                      fontWeight: 800,
+                      color: "var(--color-ink)",
+                      fontVariantNumeric: "tabular-nums",
+                    }}
+                  >
+                    {e.round}
+                  </span>
+                  <span style={{ color: "var(--color-body)" }}>{e.applyPeriod}</span>
+                  <span style={{ color: "var(--color-body)" }}>{e.examPeriod}</span>
+                  <span className="ncs-sub">{e.resultDates}</span>
+                </div>
+              ))}
+            </>
+          )}
+        </Card>
+      ))}
+      <p
+        style={{
+          fontSize: 13,
+          color: "var(--color-muted-soft)",
+          textAlign: "center",
+          margin: 0,
+        }}
+      >
+        시험일정은 큐넷(Q-net) 공고 기준이며 변동될 수 있습니다.
+      </p>
+    </div>
   );
 }
 
@@ -246,35 +363,50 @@ function CourseDetail({
         </button>
       </div>
 
-      {/* NCS 일정표 */}
-      <Card padding={0} style={{ overflow: "hidden" }}>
-        <div className="ncs-row ncs-head">
-          <span>회차</span>
-          <span>능력단위</span>
-          <span>훈련내용</span>
-          <span>시간</span>
-          <span>교육장소</span>
-        </div>
-        {course.table.map((r, i) => (
-          <div key={i} className="ncs-row">
-            <span
-              style={{
-                fontWeight: 800,
-                color: "var(--color-ink)",
-                fontVariantNumeric: "tabular-nums",
-              }}
-            >
-              {r[0]}
-            </span>
-            <span style={{ fontWeight: 600, color: "var(--color-body-strong)" }}>{r[1]}</span>
-            <span style={{ color: "var(--color-body)" }}>{r[2]}</span>
-            <span className="ncs-sub" style={{ fontVariantNumeric: "tabular-nums" }}>
-              8H
-            </span>
-            <span className="ncs-sub">{r[3]}</span>
+      {/* 자격증 과정: 트랙·시험일정 / 정규 과정: NCS 회차표 */}
+      {course.tracks ? (
+        <CourseTracks tracks={course.tracks} />
+      ) : course.table.length > 0 ? (
+        <Card padding={0} style={{ overflow: "hidden" }}>
+          <div className="ncs-row ncs-head">
+            <span>회차</span>
+            <span>능력단위</span>
+            <span>훈련내용</span>
+            <span>시간</span>
+            <span>교육장소</span>
           </div>
-        ))}
-      </Card>
+          {course.table.map((r, i) => (
+            <div key={i} className="ncs-row">
+              <span
+                style={{
+                  fontWeight: 800,
+                  color: "var(--color-ink)",
+                  fontVariantNumeric: "tabular-nums",
+                }}
+              >
+                {r[0]}
+              </span>
+              <span style={{ fontWeight: 600, color: "var(--color-body-strong)" }}>{r[1]}</span>
+              <span style={{ color: "var(--color-body)", whiteSpace: "pre-line" }}>{r[2]}</span>
+              <span className="ncs-sub" style={{ fontVariantNumeric: "tabular-nums" }}>
+                8H
+              </span>
+              <span className="ncs-sub">{r[3]}</span>
+            </div>
+          ))}
+        </Card>
+      ) : (
+        <p
+          style={{
+            fontSize: 14.5,
+            color: "var(--color-muted)",
+            textAlign: "center",
+            margin: "8px 0 0",
+          }}
+        >
+          회차별 교육 내용은 상담 시 일정표로 안내드립니다.
+        </p>
+      )}
 
       {/* 추가 안내 */}
       {course.moreNote && (
@@ -417,10 +549,10 @@ function EnrollSteps() {
 }
 
 // ── CourseCatalog: 메인 클라이언트 컴포넌트 ─────────────────────────
-export function CourseCatalog() {
+export function CourseCatalog({ courses }: { courses: CatalogCourse[] }) {
   const [sel, setSel] = useState<string | null>(null);
   const router = useRouter();
-  const course = CATALOG_COURSES.find((c) => c.id === sel) ?? null;
+  const course = courses.find((c) => c.id === sel) ?? null;
 
   const handleApply = (name: string) => {
     router.push(`/apply?course=${encodeURIComponent(name)}`);
@@ -440,7 +572,7 @@ export function CourseCatalog() {
           onApply={handleApply}
         />
       ) : (
-        <CourseGrid onSelect={handleSelect} />
+        <CourseGrid courses={courses} onSelect={handleSelect} />
       )}
       <EnrollSteps />
     </>
