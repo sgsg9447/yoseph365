@@ -1,4 +1,4 @@
-// 21 Lucide-style inline SVG icons.
+// 22 Lucide-style inline SVG icons.
 // Each icon: ({ size, strokeWidth, className }) — stroke="currentColor", aria-hidden.
 
 export interface IconProps {
@@ -63,6 +63,15 @@ export function Wallet({ size = 24, strokeWidth = 1.9, className }: IconProps) {
       <path d="M21 12V7H5a2 2 0 0 1 0-4h14v4" />
       <path d="M3 5v14a2 2 0 0 0 2 2h16v-5" />
       <path d="M18 12a2 2 0 0 0 0 4h4v-4Z" />
+    </svg>
+  );
+}
+
+export function CreditCard({ size = 24, strokeWidth = 1.9, className }: IconProps) {
+  return (
+    <svg {...svgProps(size, strokeWidth, className)}>
+      <rect x="2" y="5" width="20" height="14" rx="2" />
+      <path d="M2 10h20" />
     </svg>
   );
 }
