@@ -13,77 +13,61 @@ const STEP_LABELS = ["모집안내", "신청서 작성", "접수완료"];
 
 function ApplySteps({ current }: { current: number }) {
   return (
-    <>
-      {/* CSS: render step label text via pseudo-element so DOM text node is absent.
-          This prevents RTL getByText(/모집안내/) from finding TWO elements (step label
-          + info box header) and throwing getMultipleElementsFoundError. */}
-      <style>{`.apply-step-label::before { content: attr(data-label); }`}</style>
-      <nav
-        aria-label="신청 진행 단계"
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: 6,
-          marginBottom: 20,
-        }}
-      >
-        {STEP_LABELS.map((s, i) => (
-          <span key={s} style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+    <nav
+      aria-label="신청 진행 단계"
+      className="flex items-center justify-center gap-[6px] mb-5"
+    >
+      {STEP_LABELS.map((s, i) => (
+        <span key={s} className="inline-flex items-center gap-[6px]">
+          <span
+            aria-current={i === current ? "step" : undefined}
+            className="inline-flex items-center gap-[6px]"
+          >
+            {/* Number bubble */}
             <span
-              aria-current={i === current ? "step" : undefined}
               style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: 6,
+                width: 22,
+                height: 22,
+                display: "grid",
+                placeItems: "center",
+                borderRadius: 9999,
+                fontSize: 12,
+                fontWeight: 800,
+                background:
+                  i <= current ? "var(--color-primary)" : "var(--color-canvas-soft)",
+                color: i <= current ? "#fff" : "var(--color-muted-soft)",
+                border:
+                  i <= current
+                    ? "1px solid var(--color-primary)"
+                    : "1px solid var(--color-hairline-strong)",
               }}
             >
-              {/* Number bubble */}
-              <span
-                style={{
-                  width: 22,
-                  height: 22,
-                  display: "grid",
-                  placeItems: "center",
-                  borderRadius: 9999,
-                  fontSize: 12,
-                  fontWeight: 800,
-                  background: i <= current ? "var(--color-primary)" : "var(--color-canvas-soft)",
-                  color: i <= current ? "#fff" : "var(--color-muted-soft)",
-                  border:
-                    i <= current
-                      ? "1px solid var(--color-primary)"
-                      : "1px solid var(--color-hairline-strong)",
-                }}
-              >
-                {i + 1}
-              </span>
-              {/* Step label via CSS ::before content to avoid DOM text node that
-                  would collide with info-box heading in RTL text queries */}
-              <span
-                className="apply-step-label"
-                data-label={s}
-                aria-label={s}
-                style={{
-                  fontSize: 13,
-                  fontWeight: i === current ? 700 : 500,
-                  color: i === current ? "var(--color-ink)" : "var(--color-muted-soft)",
-                }}
-              />
+              {i + 1}
             </span>
-            {i < STEP_LABELS.length - 1 && (
-              <span
-                style={{
-                  width: 18,
-                  height: 1,
-                  background: "var(--color-hairline-strong)",
-                }}
-              />
-            )}
+            {/* Step label — real text node for accessibility */}
+            <span
+              style={{
+                fontSize: 13,
+                fontWeight: i === current ? 700 : 500,
+                color:
+                  i === current ? "var(--color-ink)" : "var(--color-muted-soft)",
+              }}
+            >
+              {s}
+            </span>
           </span>
-        ))}
-      </nav>
-    </>
+          {i < STEP_LABELS.length - 1 && (
+            <span
+              style={{
+                width: 18,
+                height: 1,
+                background: "var(--color-hairline-strong)",
+              }}
+            />
+          )}
+        </span>
+      ))}
+    </nav>
   );
 }
 
@@ -316,9 +300,11 @@ const inputBase: React.CSSProperties = {
 function ApplyFormStep({
   course,
   onSubmit,
+  onBack,
 }: {
   course: string;
   onSubmit: () => void;
+  onBack: () => void;
 }) {
   const [agree, setAgree] = useState(false);
   const [gender, setGender] = useState<string | null>(null);
@@ -473,6 +459,29 @@ function ApplyFormStep({
         style={agree ? undefined : { opacity: 0.45, cursor: "not-allowed" }}
       >
         신청서 제출하기
+      </button>
+
+      {/* 모집안내 다시 보기 (handoff apply.jsx lines 57-61) */}
+      <button
+        type="button"
+        onClick={onBack}
+        className="inline-flex items-center justify-center gap-[6px] text-[14px] font-semibold text-muted bg-transparent border-none cursor-pointer p-0 mx-auto"
+        style={{ color: "var(--color-muted)" }}
+      >
+        <svg
+          width="14"
+          height="14"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2.2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden
+        >
+          <path d="m15 18-6-6 6-6" />
+        </svg>
+        모집안내 다시 보기
       </button>
     </div>
   );
@@ -635,6 +644,7 @@ export function ApplyFlow({ course, onSubmitted }: ApplyFlowProps) {
             setStep(2);
             onSubmitted?.();
           }}
+          onBack={() => setStep(0)}
         />
       )}
       {step === 2 && (
