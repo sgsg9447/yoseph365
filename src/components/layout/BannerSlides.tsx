@@ -36,7 +36,7 @@ function Frame({ tone, children }: { tone: string; children: React.ReactNode }) 
 
 function Eyebrow({ children }: { children: React.ReactNode }) {
   return (
-    <span className="inline-flex items-center gap-[7px] px-4 py-[9px] rounded-full bg-white border border-hairline text-[clamp(13px,1.6vw,16px)] font-bold text-primary">
+    <span className="inline-flex items-center gap-[7px] px-4 py-[9px] rounded-full bg-white border border-hairline text-[clamp(13px,1.6vw,16px)] font-bold text-primary whitespace-nowrap shrink-0">
       {children}
     </span>
   );
@@ -187,7 +187,7 @@ function CoursesBanner() {
   return (
     <Frame tone={TONE_BLUEGRAY}>
       <div className={LEFT}>
-        <div className="flex flex-wrap gap-2 mb-5">
+        <div className="flex flex-wrap xl:flex-nowrap gap-2 mb-5">
           <Eyebrow>국비지원 훈련생 환영</Eyebrow>
           <Eyebrow>
             <CreditCard size={15} strokeWidth={2.2} />
