@@ -3,7 +3,7 @@
 // 참조: HANDOFF/ui_kits/website/funding.jsx 전체
 // 탭 전환 로직이 필요하므로 'use client'.
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Phone } from "@/components/icons";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
@@ -1093,6 +1093,17 @@ function FundTabs({
 export function FundingClient({ initialTab }: { initialTab: TabId }) {
   const [tab, setTab] = useState<TabId>(initialTab);
   const { openConsult } = useConsult();
+
+  // Header 드롭다운(/funding#process, #sanjae)으로 진입 시 해당 탭 활성화 + 해시 변경 추적
+  useEffect(() => {
+    const fromHash = () => {
+      const h = (window.location.hash || "").replace("#", "");
+      if (FUNDING_TABS.some((t) => t.id === h)) setTab(h as TabId);
+    };
+    fromHash();
+    window.addEventListener("hashchange", fromHash);
+    return () => window.removeEventListener("hashchange", fromHash);
+  }, []);
 
   const onTab = (id: TabId) => {
     setTab(id);
