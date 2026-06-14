@@ -80,3 +80,19 @@ export interface SiteSectionView {
   title: string | null;
   body: string[];
 }
+
+export interface NoticeListItem {
+  id: number;
+  title: string;
+  publishedAt: string | null;
+  isPinned: boolean;
+}
+
+export interface NoticeDetail {
+  id: number;
+  title: string;
+  body: string;
+  images: string[];
+  tags: string[];
+  publishedAt: string | null;
+}

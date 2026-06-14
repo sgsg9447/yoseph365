@@ -75,6 +75,9 @@ export function MobileMenu({ active, onClose }: MobileMenuProps) {
           <Link href="/photos" className={itemCls("/photos")} onClick={onClose}>
             훈련 사진 <ChevronRight size={17} className="text-muted-soft" />
           </Link>
+          <Link href="/notice" className={itemCls("/notice")} onClick={onClose}>
+            공지사항 <ChevronRight size={17} className="text-muted-soft" />
+          </Link>
           <Link
             href="/inquiry"
             className={[itemCls("/inquiry"), "border-b-0"].join(" ")}

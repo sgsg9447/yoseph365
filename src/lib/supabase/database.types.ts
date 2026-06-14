@@ -442,6 +442,48 @@ export type Database = {
           },
         ]
       }
+      notice: {
+        Row: {
+          body: string
+          created_at: string
+          id: number
+          images: string[]
+          is_deleted: boolean
+          is_pinned: boolean
+          is_published: boolean
+          published_at: string | null
+          tags: string[]
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          body?: string
+          created_at?: string
+          id?: never
+          images?: string[]
+          is_deleted?: boolean
+          is_pinned?: boolean
+          is_published?: boolean
+          published_at?: string | null
+          tags?: string[]
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: never
+          images?: string[]
+          is_deleted?: boolean
+          is_pinned?: boolean
+          is_published?: boolean
+          published_at?: string | null
+          tags?: string[]
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       popup: {
         Row: {
           created_at: string

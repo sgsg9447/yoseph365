@@ -80,6 +80,7 @@ export function Header({ active }: HeaderProps) {
           </span>
 
           <Link href="/photos" className={linkCls("/photos")}>훈련 사진</Link>
+          <Link href="/notice" className={linkCls("/notice")}>공지사항</Link>
           <Link href="/inquiry" className={linkCls("/inquiry")}>상담문의</Link>
         </nav>
 

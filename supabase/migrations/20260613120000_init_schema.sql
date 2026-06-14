@@ -183,6 +183,23 @@ create table post (
 create trigger post_set_updated_at before update on post
   for each row execute function set_updated_at();
 
+-- ---------- Notice — 공지사항 게시판 ----------
+create table notice (
+  id           bigint generated always as identity primary key,
+  title        text not null,
+  body         text not null default '',
+  images       text[] not null default '{}',   -- S3 객체 키/URL 배열(추후)
+  tags         text[] not null default '{}',
+  published_at date,
+  is_pinned    boolean not null default false,
+  is_published boolean not null default true,
+  is_deleted   boolean not null default false,
+  created_at   timestamptz not null default now(),
+  updated_at   timestamptz not null default now()
+);
+create trigger notice_set_updated_at before update on notice
+  for each row execute function set_updated_at();
+
 -- ---------- AboutHistory — 연혁(연도) ----------
 create table about_history (
   id            bigint generated always as identity primary key,
@@ -242,6 +259,7 @@ alter table application        enable row level security;
 alter table inquiry            enable row level security;
 alter table waitlist           enable row level security;
 alter table post               enable row level security;
+alter table notice             enable row level security;
 alter table about_history      enable row level security;
 alter table about_history_item enable row level security;
 alter table site_section       enable row level security;
@@ -265,6 +283,9 @@ create policy "apply_info admin all"   on course_apply_info for all    to authen
 
 create policy "post public read"     on post     for select to anon using (is_published = true and is_deleted = false);
 create policy "post admin all"       on post     for all    to authenticated using (true) with check (true);
+
+create policy "notice public read"   on notice   for select to anon using (is_published = true and is_deleted = false);
+create policy "notice admin all"     on notice   for all    to authenticated using (true) with check (true);
 
 create policy "about_history public read" on about_history for select to anon using (true);
 create policy "about_history admin all"   on about_history for all    to authenticated using (true) with check (true);
@@ -305,7 +326,7 @@ create policy "waitlist admin delete"     on waitlist for delete to authenticate
 grant usage on schema public to anon, authenticated;
 
 -- 공개 콘텐츠: anon은 읽기만
-grant select on course, course_track, exam_schedule, curriculum_item, course_apply_info, post, about_history, about_history_item, site_section, popup to anon;
+grant select on course, course_track, exam_schedule, curriculum_item, course_apply_info, post, notice, about_history, about_history_item, site_section, popup to anon;
 -- 제출 테이블: anon은 INSERT만 (읽기·수정 권한 없음 → RLS 이전에 차단)
 grant insert on application, inquiry, waitlist to anon;
 grant usage, select on all sequences in schema public to anon;
