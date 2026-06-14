@@ -51,6 +51,11 @@ export async function getCatalogCourses(): Promise<CatalogCourse[]> {
   });
 }
 
+export async function getCourseById(id: string): Promise<CatalogCourse | null> {
+  const all = await getCatalogCourses();
+  return all.find((c) => c.id === id) ?? null;
+}
+
 export async function getScheduleCourses(): Promise<ScheduleCourse[]> {
   const sb = createPublicClient();
   const { data } = await sb
