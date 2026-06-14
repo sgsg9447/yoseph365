@@ -7,6 +7,7 @@ import { useState } from "react";
 import { Check } from "@/components/icons";
 import type { ApplyInfoView, RecruitStatus } from "@/lib/queries/types";
 import { PHONE_MAIN } from "@/lib/data/site";
+import { submitApplication } from "@/lib/actions/submit";
 
 // ── 진행 단계 표시 ──────────────────────────────────────────────────
 const STEP_LABELS = ["모집안내", "신청서 작성", "접수완료"];
@@ -411,8 +412,36 @@ function ApplyFormStep({
   onSubmit: () => void;
   onBack: () => void;
 }) {
-  const [agree, setAgree] = useState(false);
+  const [name, setName] = useState("");
+  const [birth, setBirth] = useState("");
   const [gender, setGender] = useState<string | null>(null);
+  const [phone, setPhone] = useState("");
+  const [address, setAddress] = useState("");
+  const [career, setCareer] = useState("");
+  const [motivation, setMotivation] = useState("");
+  const [agree, setAgree] = useState(false);
+  const [pending, setPending] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleSubmit = async () => {
+    if (!agree || pending) return;
+    setError(null);
+    setPending(true);
+    const res = await submitApplication({
+      name,
+      phone,
+      course,
+      birth,
+      gender: gender ?? "",
+      address,
+      career,
+      motivation,
+      privacyAgreed: agree,
+    });
+    setPending(false);
+    if (res.ok) onSubmit();
+    else setError(res.error);
+  };
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
@@ -434,14 +463,25 @@ function ApplyFormStep({
       {/* 성명 */}
       <label style={{ display: "flex", flexDirection: "column", gap: 7 }}>
         <ReqLabel>성명</ReqLabel>
-        <input placeholder="홍길동" style={inputBase} />
+        <input
+          placeholder="홍길동"
+          style={inputBase}
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+        />
       </label>
 
       {/* 생년월일 + 성별 */}
       <div style={{ display: "grid", gridTemplateColumns: "1fr 130px", gap: 10 }}>
         <label style={{ display: "flex", flexDirection: "column", gap: 7 }}>
           <ReqLabel>생년월일</ReqLabel>
-          <input placeholder="1970.01.01" inputMode="numeric" style={inputBase} />
+          <input
+            placeholder="1970.01.01"
+            inputMode="numeric"
+            style={inputBase}
+            value={birth}
+            onChange={(e) => setBirth(e.target.value)}
+          />
         </label>
         <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
           <ReqLabel>성별</ReqLabel>
@@ -482,13 +522,24 @@ function ApplyFormStep({
       {/* 연락처 */}
       <label style={{ display: "flex", flexDirection: "column", gap: 7 }}>
         <ReqLabel>연락처</ReqLabel>
-        <input type="tel" placeholder="010-0000-0000" style={inputBase} />
+        <input
+          type="tel"
+          placeholder="010-0000-0000"
+          style={inputBase}
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
+        />
       </label>
 
       {/* 주소 */}
       <label style={{ display: "flex", flexDirection: "column", gap: 7 }}>
-        <ReqLabel>주소</ReqLabel>
-        <input placeholder="경기도 부천시 ○○로 00" style={inputBase} />
+        <ReqLabel optional>주소</ReqLabel>
+        <input
+          placeholder="경기도 부천시 ○○로 00"
+          style={inputBase}
+          value={address}
+          onChange={(e) => setAddress(e.target.value)}
+        />
       </label>
 
       {/* 관련 경력 (선택) */}
@@ -497,6 +548,8 @@ function ApplyFormStep({
         <input
           placeholder="예: 인테리어 현장 보조 6개월 (없으면 비워두세요)"
           style={inputBase}
+          value={career}
+          onChange={(e) => setCareer(e.target.value)}
         />
       </label>
 
@@ -513,6 +566,8 @@ function ApplyFormStep({
             resize: "vertical",
             lineHeight: 1.6,
           }}
+          value={motivation}
+          onChange={(e) => setMotivation(e.target.value)}
         />
       </label>
 
@@ -556,14 +611,21 @@ function ApplyFormStep({
         </span>
       </label>
 
-      {/* 제출 — 동의 전에는 클릭해도 onSubmit 호출 안 함 */}
+      {error && (
+        <p style={{ fontSize: 13.5, color: "var(--color-error)", lineHeight: 1.5, margin: 0 }}>
+          {error}
+        </p>
+      )}
+
+      {/* 제출 — 동의 전/전송 중에는 비활성 */}
       <button
         type="button"
-        onClick={() => agree && onSubmit()}
+        onClick={handleSubmit}
+        disabled={!agree || pending}
         className="inline-flex items-center justify-center gap-2 rounded-button font-semibold leading-none tracking-[-0.2px] whitespace-nowrap transition active:scale-[0.98] w-full h-14 px-[26px] text-[18px] bg-primary text-white border border-primary hover:bg-primary-hover"
-        style={agree ? undefined : { opacity: 0.45, cursor: "not-allowed" }}
+        style={!agree || pending ? { opacity: 0.45, cursor: "not-allowed" } : undefined}
       >
-        신청서 제출하기
+        {pending ? "접수 중…" : "신청서 제출하기"}
       </button>
 
       {/* 모집안내 다시 보기 (handoff apply.jsx lines 57-61) */}

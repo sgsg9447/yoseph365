@@ -54,15 +54,17 @@ function ApplyCoursePicker({
 export function ApplyClient({ courses }: { courses: ApplyCourse[] }) {
   const params = useSearchParams();
   const fromUrl = params.get("course") ?? "";
-  const [courseId, setCourseId] = useState(fromUrl || courses[0]?.id || "");
+  // 수강신청 버튼으로 직접 진입(파라미터 없음) 시에는 모집중 과정만 선택지로 노출
+  const openCourses = courses.filter((c) => c.recruitStatus === "모집중");
+  const [courseId, setCourseId] = useState(fromUrl || openCourses[0]?.id || "");
 
   const selected = courses.find((c) => c.id === courseId) ?? null;
 
   return (
     <Card padding={0} style={{ padding: "clamp(20px, 3.5vw, 32px)" }}>
-      {/* 과정 선택기: ?course= 파라미터가 없을 때만 표시 */}
-      {!fromUrl && courses.length > 0 && (
-        <ApplyCoursePicker courses={courses} courseId={courseId} onChange={setCourseId} />
+      {/* 과정 선택기: ?course= 파라미터가 없을 때만 표시 (모집중 과정만) */}
+      {!fromUrl && openCourses.length > 0 && (
+        <ApplyCoursePicker courses={openCourses} courseId={courseId} onChange={setCourseId} />
       )}
       <ApplyFlow
         course={selected?.name ?? ""}

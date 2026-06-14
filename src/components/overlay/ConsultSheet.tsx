@@ -1,12 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { BottomSheet } from "./BottomSheet";
 import { Button } from "@/components/ui/Button";
 import { Field } from "@/components/ui/Field";
+import { ReqLabel } from "@/components/ui/Field";
 import { Phone, Check } from "@/components/icons";
+import { PHONE_MAIN } from "@/lib/data/site";
+import { createClient } from "@/lib/supabase/client";
+import { submitConsult } from "@/lib/actions/submit";
 
-const PHONE = "031-123-4567";
+const PHONE = PHONE_MAIN;
 
 const INQUIRY_COURSES = [
   "[평일] 집수리과정",
@@ -121,6 +125,85 @@ function InquiryForm({ onSubmit }: { onSubmit: () => void }) {
   );
 }
 
+// ── ConsultForm (상담신청) ────────────────────────────────────────────────────
+
+function ConsultForm({ onDone }: { onDone: () => void }) {
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [courseId, setCourseId] = useState("");
+  const [courses, setCourses] = useState<{ id: string; name: string }[]>([]);
+  const [pending, setPending] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // 관심 과정: 전체 과정(모집중 아니어도)
+  useEffect(() => {
+    const sb = createClient();
+    sb.from("course")
+      .select("id, name")
+      .eq("is_deleted", false)
+      .order("sort_order")
+      .then(({ data }) => setCourses(data ?? []));
+  }, []);
+
+  const handleSubmit = async () => {
+    if (pending) return;
+    setError(null);
+    setPending(true);
+    const res = await submitConsult({ name, phone, courseId });
+    setPending(false);
+    if (res.ok) onDone();
+    else setError(res.error);
+  };
+
+  return (
+    <div className="flex flex-col gap-[14px]">
+      {/* Phone info block */}
+      <div className="flex items-center gap-3 px-4 py-[14px] bg-surface-strong border border-hairline rounded-button">
+        <span className="text-ink"><Phone size={20} strokeWidth={2.2} /></span>
+        <div className="flex-1">
+          <div className="text-[15px] text-muted">바로 통화를 원하시면</div>
+          <a href={`tel:${PHONE}`} className="text-[19px] font-bold text-ink no-underline">
+            {PHONE}
+          </a>
+        </div>
+      </div>
+
+      <Field label="이름" placeholder="홍길동" required value={name} onChange={(e) => setName(e.target.value)} />
+      <Field label="연락처" type="tel" placeholder="010-0000-0000" required value={phone} onChange={(e) => setPhone(e.target.value)} />
+
+      <label className="flex flex-col gap-[7px]">
+        <ReqLabel optional>관심 과정</ReqLabel>
+        <select
+          value={courseId}
+          onChange={(e) => setCourseId(e.target.value)}
+          className="h-[52px] w-full bg-surface-card text-ink text-[17px] font-[inherit] rounded-button outline-none border border-hairline-strong px-4 cursor-pointer"
+        >
+          <option value="">선택 안 함</option>
+          {courses.map((c) => (
+            <option key={c.id} value={c.id}>{c.name}</option>
+          ))}
+        </select>
+      </label>
+
+      {error && <p className="text-[13.5px] text-error leading-[1.5] m-0">{error}</p>}
+
+      <Button
+        variant="primary"
+        size="lg"
+        fullWidth
+        leftIcon={<Phone size={19} strokeWidth={2.2} />}
+        onClick={handleSubmit}
+        disabled={pending}
+      >
+        {pending ? "접수 중…" : "상담 신청하기"}
+      </Button>
+      <p className="text-[13px] text-muted-soft text-center m-0 leading-[1.5]">
+        입력하신 정보는 상담 목적으로만 사용됩니다.
+      </p>
+    </div>
+  );
+}
+
 // ── ConsultSheet ──────────────────────────────────────────────────────────────
 
 interface ConsultSheetProps {
@@ -165,36 +248,7 @@ export function ConsultSheet({ open, onClose, mode }: ConsultSheetProps) {
       ) : isInquiry ? (
         <InquiryForm onSubmit={() => setDone(true)} />
       ) : (
-        /* Consult form */
-        <div className="flex flex-col gap-[14px]">
-          {/* Phone info block */}
-          <div className="flex items-center gap-3 px-4 py-[14px] bg-surface-strong border border-hairline rounded-button">
-            <span className="text-ink"><Phone size={20} strokeWidth={2.2} /></span>
-            <div className="flex-1">
-              <div className="text-[15px] text-muted">바로 통화를 원하시면</div>
-              <a href={`tel:${PHONE}`} className="text-[19px] font-bold text-ink no-underline">
-                {PHONE}
-              </a>
-            </div>
-          </div>
-
-          <Field label="이름" placeholder="홍길동" />
-          <Field label="연락처" type="tel" placeholder="010-0000-0000" />
-          <Field label="관심 과정 (선택)" placeholder="예: 집수리·인테리어반" />
-
-          <Button
-            variant="primary"
-            size="lg"
-            fullWidth
-            leftIcon={<Phone size={19} strokeWidth={2.2} />}
-            onClick={() => setDone(true)}
-          >
-            상담 신청하기
-          </Button>
-          <p className="text-[13px] text-muted-soft text-center m-0 leading-[1.5]">
-            입력하신 정보는 상담 목적으로만 사용됩니다.
-          </p>
-        </div>
+        <ConsultForm onDone={() => setDone(true)} />
       )}
     </BottomSheet>
   );
