@@ -10,6 +10,7 @@ interface CourseRowProps {
   open?: boolean;
   last?: boolean;
   href?: string;
+  highlighted?: boolean;
   onClick?: () => void;
 }
 
@@ -21,6 +22,7 @@ export function CourseRow({
   open = true,
   last,
   href,
+  highlighted,
   onClick,
 }: CourseRowProps) {
   const inner = (
@@ -42,8 +44,9 @@ export function CourseRow({
   );
 
   const commonClass = [
-    "flex items-center gap-3 w-full py-[18px] px-[2px] text-left",
+    "flex items-center gap-3 w-full py-[18px] px-[12px] text-left transition-colors",
     last ? "" : "border-b border-hairline",
+    highlighted ? "course-row-highlight" : "",
   ]
     .filter(Boolean)
     .join(" ");

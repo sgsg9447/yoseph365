@@ -1,11 +1,11 @@
 // Home page (server component).
-// Interactive sections (HeroIntent + Schedule) are isolated in HomeInteractive ('use client').
-// Section order: Banner → AwardsStrip → HeroIntent → Barriers → SocialProof → Videos → Schedule → ClosingCTA
+// 목적(HeroIntent)+운영중인 훈련과정(Schedule)은 HomeIntentSchedule('use client')로 묶여 있고
+// 목적 선택 시 매칭 과정이 하이라이트된다.
+// Section order: Banner → AwardsStrip → HeroIntent → Schedule → Barriers → SocialProof → Videos → ClosingCTA
 
 import { Banner } from "@/components/layout/Banner";
 import { AwardsStrip } from "@/components/layout/AwardsStrip";
-import { HeroIntentSection } from "@/components/sections/HomeInteractive";
-import { Schedule } from "@/components/sections/Schedule";
+import { HomeIntentSchedule } from "@/components/sections/HomeIntentSchedule";
 import { Barriers } from "@/components/sections/Barriers";
 import { SocialProof } from "@/components/sections/SocialProof";
 import { Videos } from "@/components/sections/Videos";
@@ -26,11 +26,10 @@ export default async function HomePage() {
     <>
       <Banner />
       <AwardsStrip />
-      <HeroIntentSection />
+      <HomeIntentSchedule courses={scheduleCourses} />
       <Barriers />
       <SocialProof />
       <Videos />
-      <Schedule courses={scheduleCourses} />
       <ClosingCTA />
     </>
   );

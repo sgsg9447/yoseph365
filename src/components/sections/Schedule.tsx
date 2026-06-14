@@ -3,7 +3,6 @@
 // Per domain rule: no real calendar dates — only "평일반" / "주말반".
 
 import Link from "next/link";
-import { Calendar } from "@/components/icons";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Card } from "@/components/ui/Card";
 import { CourseRow } from "@/components/ui/CourseRow";
@@ -12,9 +11,13 @@ import { PHONE_MAIN } from "@/lib/data/site";
 
 interface ScheduleProps {
   courses: ScheduleCourse[];
+  /** 하이라이트할 과정 id (목적 선택 시) */
+  highlightedIds?: string[];
+  /** 같은 목적 재클릭 시 애니메이션 재실행용 카운터 */
+  pulse?: number;
 }
 
-export function Schedule({ courses }: ScheduleProps) {
+export function Schedule({ courses, highlightedIds = [], pulse = 0 }: ScheduleProps) {
   return (
     <section
       id="schedule"
@@ -25,30 +28,29 @@ export function Schedule({ courses }: ScheduleProps) {
       }}
     >
       <div className="wrap band">
-        <div className="text-center mb-2">
-          <span className="inline-flex items-center gap-2 text-muted">
-            <Calendar size={18} strokeWidth={2.1} />
-            <span className="text-[13px] font-bold tracking-[0.3px]">2026년 7–8월 모집</span>
-          </span>
-        </div>
         <SectionHeading align="center" title={<>운영중인 훈련과정</>} />
         {courses.length > 0 ? (
           <Card
             padding={8}
             style={{ maxWidth: 760, margin: "32px auto 0", padding: "8px 20px" }}
           >
-            {courses.map((c, i) => (
-              <CourseRow
-                key={c.id}
-                name={c.name}
-                startDate={c.startDate}
-                meta={c.meta}
-                open={c.open}
-                status={c.open ? "모집중" : "모집마감"}
-                last={i === courses.length - 1}
-                href={`/courses/${c.id}`}
-              />
-            ))}
+            {courses.map((c, i) => {
+              const isHighlighted = highlightedIds.includes(c.id);
+              return (
+                <CourseRow
+                  // 하이라이트 시 pulse를 key에 포함해 애니메이션을 재실행
+                  key={isHighlighted ? `${c.id}-${pulse}` : c.id}
+                  name={c.name}
+                  startDate={c.startDate}
+                  meta={c.meta}
+                  open={c.open}
+                  status={c.open ? "모집중" : "모집마감"}
+                  last={i === courses.length - 1}
+                  href={`/courses/${c.id}`}
+                  highlighted={isHighlighted}
+                />
+              );
+            })}
           </Card>
         ) : (
           <p className="text-[15px] text-muted leading-[1.7] mt-8 mx-auto max-w-[760px] text-center break-keep">

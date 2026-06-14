@@ -1,5 +1,5 @@
-// Server component — hero section with intent cards.
-// onPick is passed down from a client wrapper (HomeInteractive) in the home page.
+// Hero section with intent cards.
+// onPick is passed down from the client wrapper (HomeIntentSchedule) on the home page.
 
 import { Users, TrendingUp, Home, Award } from "@/components/icons";
 import { IntentCard } from "@/components/ui/IntentCard";
@@ -56,7 +56,7 @@ export function HeroIntent({ onPick }: HeroIntentProps) {
           배우시려고 하나요?
         </h1>
         <p className="text-[18px] text-body leading-[1.7] mx-auto mb-8 break-keep max-w-[560px]">
-          목적에 맞는 과정을 골라보세요. 내일배움카드가 있다면 수강료는 0원입니다.
+          목적에 맞는 과정을 골라보세요. 내일배움카드로 수강료 부담을 덜 수 있습니다.
         </p>
         <div className="grid g-intent text-left">
           {intents.map((it, i) => (
