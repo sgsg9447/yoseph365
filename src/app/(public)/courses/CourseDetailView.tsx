@@ -13,18 +13,21 @@ function ApplyCtaButton({
   open,
   onClick,
   label = "수강신청하기",
+  size = "lg",
 }: {
   open: boolean;
   onClick: () => void;
   label?: string;
+  size?: "lg" | "sm";
 }) {
+  const sizeCls = size === "sm" ? "h-[42px] px-[18px] text-[15px]" : "h-14 px-[26px] text-[18px]";
   if (!open) {
     return (
       <button
         type="button"
         disabled
         aria-disabled
-        className="inline-flex items-center justify-center gap-2 rounded-button font-semibold leading-none tracking-[-0.2px] whitespace-nowrap h-14 px-[26px] text-[18px]"
+        className={`inline-flex items-center justify-center gap-2 rounded-button font-semibold leading-none tracking-[-0.2px] whitespace-nowrap ${sizeCls}`}
         style={{
           background: "var(--color-canvas-soft)",
           color: "var(--color-muted-soft)",
@@ -40,7 +43,7 @@ function ApplyCtaButton({
     <button
       type="button"
       onClick={onClick}
-      className="inline-flex items-center justify-center gap-2 rounded-button font-semibold leading-none tracking-[-0.2px] whitespace-nowrap transition active:scale-[0.98] h-14 px-[26px] text-[18px] bg-primary text-white border border-primary hover:bg-primary-hover"
+      className={`inline-flex items-center justify-center gap-2 rounded-button font-semibold leading-none tracking-[-0.2px] whitespace-nowrap transition active:scale-[0.98] bg-primary text-white border border-primary hover:bg-primary-hover ${sizeCls}`}
     >
       {label}
     </button>
@@ -175,40 +178,54 @@ export function CourseDetailView({ course }: { course: CatalogCourse }) {
   return (
     <section className="wrap band" style={{ paddingBottom: 24 }}>
       {/* 뒤로가기 */}
-      <Link
-        href="/courses"
+      {/* 상단바: 과정 목록(좌) ↔ 수강신청(우) 대칭 */}
+      <div
         style={{
-          display: "inline-flex",
+          display: "flex",
           alignItems: "center",
-          gap: 6,
-          height: 38,
-          padding: "0 14px 0 10px",
-          borderRadius: 9999,
-          border: "1px solid var(--color-hairline-strong)",
-          background: "var(--color-surface-card)",
-          fontFamily: "var(--font-sans)",
-          fontSize: 14,
-          fontWeight: 600,
-          color: "var(--color-body-strong)",
-          textDecoration: "none",
-          marginBottom: 26,
+          justifyContent: "space-between",
+          gap: 12,
+          marginBottom: 24,
         }}
       >
-        <svg
-          width="16"
-          height="16"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2.2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          aria-hidden
+        <Link
+          href="/courses"
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 6,
+            height: 42,
+            padding: "0 16px 0 12px",
+            borderRadius: 9999,
+            border: "1px solid var(--color-hairline-strong)",
+            background: "var(--color-surface-card)",
+            fontFamily: "var(--font-sans)",
+            fontSize: 14,
+            fontWeight: 600,
+            color: "var(--color-body-strong)",
+            textDecoration: "none",
+            flex: "0 0 auto",
+          }}
         >
-          <path d="m15 18-6-6 6-6" />
-        </svg>
-        과정 목록
-      </Link>
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden
+          >
+            <path d="m15 18-6-6 6-6" />
+          </svg>
+          과정 목록
+        </Link>
+        {!course.tracks && (
+          <ApplyCtaButton open={isOpen} onClick={() => goApply(course.id)} size="sm" />
+        )}
+      </div>
 
       {/* 헤더 행 */}
       <div
@@ -248,9 +265,6 @@ export function CourseDetailView({ course }: { course: CatalogCourse }) {
           </h2>
           <span style={{ fontSize: 14.5, color: "var(--color-muted)" }}>{course.meta}</span>
         </div>
-        {!course.tracks && (
-          <ApplyCtaButton open={isOpen} onClick={() => goApply(course.id)} />
-        )}
       </div>
 
       {/* 자격증: 트랙·시험일정 / 정규: NCS 회차표 */}

@@ -31,9 +31,9 @@ export function CourseRow({
         <span className="text-[18px] font-semibold text-ink tracking-[-0.3px]">{name}</span>
         <span className="flex items-center gap-2 flex-wrap">
           {startDate && (
-            <span className="text-[15px] font-semibold text-primary">{startDate} 개강</span>
+            <span className="text-[15px] font-semibold text-primary whitespace-nowrap">{startDate} 개강</span>
           )}
-          {meta && <span className="text-[14px] text-muted">· {meta}</span>}
+          {meta && <span className="text-[14px] text-muted whitespace-nowrap">· {meta}</span>}
         </span>
       </span>
       <Badge tone={open ? "success" : "neutral"} dot={open}>
