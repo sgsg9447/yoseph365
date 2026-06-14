@@ -26,7 +26,7 @@ export default async function AboutPage() {
       <PageHero
         eyebrow="학원소개"
         title="성요셉목수학교"
-        sub="손으로 배우고 기술로 다시 서는 곳 — 고용노동부 지정 직업능력개발 훈련기관입니다."
+        sub="고용노동부 지정 직업능력개발 훈련기관입니다."
       />
       <AboutClient intro={history.intro} histories={history.histories} />
     </>

@@ -147,6 +147,9 @@
   .fund-tabs::-webkit-scrollbar { display: none; }
   .drop-link:hover { background: var(--color-primary-soft); }
   .pay-row { display: grid; grid-template-columns: 1fr; gap: 4px; }
+  /* 산재 훈련절차 단계 헤더: 모바일은 제목/기관칩 줄바꿈, 데스크탑은 한 줄 */
+  .proc-head { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; }
+  .proc-head-orgs { display: flex; gap: 6px; flex-wrap: wrap; }
   .footer-grid { display: grid; grid-template-columns: 1fr; gap: 22px; align-items: start; }
   .footer-logo { height: 72px; width: auto; justify-self: start; }
   .banner-art { display: none; position: absolute; right: clamp(28px, 8vw, 110px); top: 50%; transform: translateY(-50%); width: clamp(160px, 22vw, 250px); aspect-ratio: 1 / 1; border-radius: 9999px; background: rgba(255,255,255,0.55); box-shadow: 0 18px 40px rgba(26,26,24,0.10), inset 0 1px 0 rgba(255,255,255,0.85); place-items: center; z-index: 1; pointer-events: none; user-select: none; }
@@ -178,6 +181,7 @@
     .board-cat { display: block; }
     .fund-tabs { justify-content: center; }
     .pay-row { grid-template-columns: 320px 1fr; gap: 16px; align-items: baseline; }
+    .proc-head { flex-direction: row; align-items: center; gap: 8px; flex-wrap: wrap; }
     .footer-grid { grid-template-columns: auto 1fr; gap: 44px; align-items: center; }
     .footer-logo { height: 96px; }
   }
@@ -205,8 +209,8 @@
     /* 진입 시 톤+링이 번쩍 들어왔다가 투명으로 사라짐 */
     .course-row-highlight { animation: courseHighlight 1.5s ease-out; }
     @keyframes courseHighlight {
-      0%   { background-color: var(--color-primary-soft); box-shadow: inset 0 0 0 2px var(--color-primary-border); }
-      55%  { background-color: var(--color-primary-soft); box-shadow: inset 0 0 0 2px var(--color-primary-border); }
+      0%   { background-color: var(--color-primary-softer); box-shadow: inset 0 0 0 2px var(--color-primary-border); }
+      55%  { background-color: var(--color-primary-softer); box-shadow: inset 0 0 0 2px var(--color-primary-border); }
       100% { background-color: transparent; box-shadow: inset 0 0 0 2px transparent; }
     }
   }

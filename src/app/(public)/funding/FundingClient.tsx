@@ -315,7 +315,7 @@ function NbCardTab({ onConsult }: { onConsult: () => void }) {
             }}
           >
             지원 범위 내에서 훈련비의 45~85%가 국비로 지원됩니다.
-            <br className="only-desktop" />
+            <br />
             최소한의 자비부담으로 원하는 훈련에 참여해 보세요.
           </p>
         </div>
@@ -468,7 +468,7 @@ function ProcessTab() {
               style={{
                 display: "flex",
                 alignItems: "center",
-                gap: 12,
+                gap: 10,
                 padding: "14px 16px",
                 background: "var(--color-canvas-soft)",
                 border: "1px solid var(--color-hairline)",
@@ -483,16 +483,9 @@ function ProcessTab() {
                   display: "grid",
                   placeItems: "center",
                   borderRadius: 9999,
-                  background:
-                    i === steps.length - 1
-                      ? "var(--color-primary)"
-                      : "var(--color-surface-card)",
-                  color:
-                    i === steps.length - 1 ? "#fff" : "var(--color-primary)",
-                  border:
-                    i === steps.length - 1
-                      ? "none"
-                      : "1px solid var(--color-primary-border)",
+                  background: "var(--color-surface-card)",
+                  color: "var(--color-primary)",
+                  border: "1px solid var(--color-primary-border)",
                   fontSize: 14,
                   fontWeight: 800,
                 }}
@@ -501,25 +494,18 @@ function ProcessTab() {
               </span>
               <span
                 style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: 4,
+                  flex: 1,
                   minWidth: 0,
+                  fontSize: 15,
+                  fontWeight: 700,
+                  color: "var(--color-ink)",
+                  letterSpacing: "-0.2px",
+                  wordBreak: "keep-all",
                 }}
               >
-                <span
-                  style={{
-                    fontSize: 15.5,
-                    fontWeight: 700,
-                    color: "var(--color-ink)",
-                    letterSpacing: "-0.2px",
-                    wordBreak: "keep-all",
-                  }}
-                >
-                  {s.t}
-                </span>
-                <OrgChip name={s.org} />
+                {s.t}
               </span>
+              <OrgChip name={s.org} />
             </div>
           ))}
         </div>
@@ -577,6 +563,8 @@ function ProcessTab() {
               style={{
                 display: "flex",
                 flexDirection: "column",
+                alignItems: "center",
+                textAlign: "center",
                 gap: 12,
                 padding: "16px",
                 border: "1px solid var(--color-hairline)",
@@ -587,6 +575,7 @@ function ProcessTab() {
                 style={{
                   display: "flex",
                   alignItems: "center",
+                  justifyContent: "center",
                   gap: 8,
                   flexWrap: "wrap",
                 }}
@@ -943,14 +932,7 @@ function SanjaeTab({ onConsult }: { onConsult: () => void }) {
                     minWidth: 0,
                   }}
                 >
-                  <span
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 8,
-                      flexWrap: "wrap",
-                    }}
-                  >
+                  <span className="proc-head">
                     <span
                       style={{
                         fontSize: 16,
@@ -962,13 +944,15 @@ function SanjaeTab({ onConsult }: { onConsult: () => void }) {
                     >
                       {s.t}
                     </span>
-                    {orgs.map((org) => {
-                      // Map "산재근로자" → 신청인 chip (closest match in ORG_TINTS)
-                      const chipName = org.includes("산재")
-                        ? "신청인"
-                        : org.trim();
-                      return <OrgChip key={org} name={chipName} />;
-                    })}
+                    <span className="proc-head-orgs">
+                      {orgs.map((org) => {
+                        // Map "산재근로자" → 신청인 chip (closest match in ORG_TINTS)
+                        const chipName = org.includes("산재")
+                          ? "신청인"
+                          : org.trim();
+                        return <OrgChip key={org} name={chipName} />;
+                      })}
+                    </span>
                   </span>
                   <span
                     style={{

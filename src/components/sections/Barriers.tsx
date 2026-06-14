@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { CheckCircle, Wallet, Clipboard, Phone } from "@/components/icons";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Card } from "@/components/ui/Card";
@@ -38,6 +39,12 @@ const steps = [
 
 export function Barriers() {
   const { openConsult } = useConsult();
+  // 신청 절차: 시간에 따라 활성 단계가 이동(다른 단계는 옅게)
+  const [active, setActive] = useState(0);
+  useEffect(() => {
+    const id = setInterval(() => setActive((p) => (p + 1) % steps.length), 1800);
+    return () => clearInterval(id);
+  }, []);
 
   return (
     <section
@@ -95,17 +102,27 @@ export function Barriers() {
             </span>
             <div className="steps">
               {steps.map((s, idx) => {
-                const last = idx === steps.length - 1;
+                const on = idx === active;
                 return (
-                  <div key={s.n} className="step">
+                  <div
+                    key={s.n}
+                    className="step"
+                    style={{
+                      opacity: on ? 1 : 0.42,
+                      transition: "opacity .45s ease",
+                    }}
+                  >
                     <div className="step-top">
                       <span
                         className="w-[34px] h-[34px] flex-[0_0_auto] grid place-items-center rounded-full text-[15px] font-[800] leading-none relative z-[1]"
                         style={{
-                          background: last
-                            ? "var(--color-primary)"
+                          background: on
+                            ? "linear-gradient(135deg, var(--color-primary), #1b46c2)"
                             : "var(--color-primary-softer)",
-                          color: last ? "#fff" : "var(--color-primary)",
+                          color: on ? "#fff" : "var(--color-primary)",
+                          boxShadow: on ? "0 6px 16px rgba(37,99,235,0.35)" : "none",
+                          transform: on ? "scale(1.12)" : "scale(1)",
+                          transition: "transform .45s ease, box-shadow .45s ease, background .45s ease",
                         }}
                       >
                         {s.n}

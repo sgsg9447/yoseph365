@@ -8,7 +8,7 @@ import { FundingClient } from "./FundingClient";
 export const metadata: Metadata = {
   title: "국비지원 안내 — 성요셉목수학교",
   description:
-    "국민내일배움카드 발급부터 훈련 참여 절차, 산재노동자 직업훈련까지 — 지원 제도를 한눈에 정리했습니다.",
+    "국민내일배움카드 발급, 훈련 참여 절차, 산재노동자 직업훈련까지 한눈에 정리했습니다.",
 };
 
 // 탭 ID 유효성 검사
@@ -28,7 +28,7 @@ export default function FundingPage() {
       <PageHero
         eyebrow="국비지원"
         title="국비지원 안내"
-        sub="내일배움카드 발급부터 훈련 참여 절차, 산재노동자 직업훈련까지 — 지원 제도를 한눈에 정리했습니다."
+        sub="내일배움카드 발급, 훈련 참여 절차, 산재노동자 직업훈련까지 한눈에 정리했습니다."
       />
       <FundingClient initialTab={initialTab} />
     </>

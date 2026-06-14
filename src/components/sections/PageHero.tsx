@@ -34,7 +34,8 @@ export function PageHero({ eyebrow, title, sub }: PageHeroProps) {
         style={{
           position: "relative",
           zIndex: 1,
-          padding: "48px 0 40px",
+          paddingTop: 48,
+          paddingBottom: 40,
           textAlign: "center",
         }}
       >
