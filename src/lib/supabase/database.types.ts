@@ -204,6 +204,56 @@ export type Database = {
         }
         Relationships: []
       }
+      course_apply_info: {
+        Row: {
+          capacity: string | null
+          cost: string | null
+          cost_notes: string[]
+          course_id: string
+          exclusions: string[]
+          qualifications: string[]
+          recruit_period: string | null
+          steps: string[]
+          training_period: string | null
+          training_time: string[]
+          updated_at: string
+        }
+        Insert: {
+          capacity?: string | null
+          cost?: string | null
+          cost_notes?: string[]
+          course_id: string
+          exclusions?: string[]
+          qualifications?: string[]
+          recruit_period?: string | null
+          steps?: string[]
+          training_period?: string | null
+          training_time?: string[]
+          updated_at?: string
+        }
+        Update: {
+          capacity?: string | null
+          cost?: string | null
+          cost_notes?: string[]
+          course_id?: string
+          exclusions?: string[]
+          qualifications?: string[]
+          recruit_period?: string | null
+          steps?: string[]
+          training_period?: string | null
+          training_time?: string[]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "course_apply_info_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: true
+            referencedRelation: "course"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       course_track: {
         Row: {
           course_id: string
@@ -211,6 +261,7 @@ export type Database = {
           id: string
           name: string
           price: number | null
+          recruit_status: Database["public"]["Enums"]["recruit_status"]
           schedule_summary: string[]
           sessions_total: number | null
           sort_order: number
@@ -221,6 +272,7 @@ export type Database = {
           id: string
           name: string
           price?: number | null
+          recruit_status?: Database["public"]["Enums"]["recruit_status"]
           schedule_summary?: string[]
           sessions_total?: number | null
           sort_order?: number
@@ -231,6 +283,7 @@ export type Database = {
           id?: string
           name?: string
           price?: number | null
+          recruit_status?: Database["public"]["Enums"]["recruit_status"]
           schedule_summary?: string[]
           sessions_total?: number | null
           sort_order?: number

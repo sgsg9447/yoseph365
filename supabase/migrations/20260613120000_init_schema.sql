@@ -62,6 +62,7 @@ create table course_track (
   sessions_total   integer,
   schedule_summary text[] not null default '{}',
   price            integer,
+  recruit_status   recruit_status not null default '모집중',  -- 트랙별 모집상태(운영자 수동)
   sort_order       integer not null default 0
 );
 create index on course_track (course_id);
@@ -93,6 +94,23 @@ create table curriculum_item (
   unique (course_id, round)
 );
 create index on curriculum_item (course_id);
+
+-- ---------- CourseApplyInfo — 과정별 모집안내(신청 페이지, 1:1) ----------
+create table course_apply_info (
+  course_id       text primary key references course(id) on delete cascade,
+  qualifications  text[] not null default '{}',  -- 신청자격
+  recruit_period  text,                          -- 모집기간(빈 가능)
+  training_period text,                           -- 훈련기간
+  training_time   text[] not null default '{}',  -- 훈련시간(여러 줄)
+  capacity        text,                           -- 모집인원
+  cost            text,                           -- 훈련비용
+  cost_notes      text[] not null default '{}',  -- 자비부담 등 비고
+  steps           text[] not null default '{}',  -- 진행순서/등록방법
+  exclusions      text[] not null default '{}',  -- 신청제외대상
+  updated_at      timestamptz not null default now()
+);
+create trigger course_apply_info_set_updated_at before update on course_apply_info
+  for each row execute function set_updated_at();
 
 -- ---------- Schedule — 개강일정 (운영자용, 사용자 미표시 §7) ----------
 create table schedule (
@@ -216,6 +234,7 @@ alter table course             enable row level security;
 alter table course_track       enable row level security;
 alter table exam_schedule      enable row level security;
 alter table curriculum_item    enable row level security;
+alter table course_apply_info  enable row level security;
 alter table schedule           enable row level security;
 alter table application        enable row level security;
 alter table inquiry            enable row level security;
@@ -238,6 +257,9 @@ create policy "exam admin all"       on exam_schedule for all    to authenticate
 
 create policy "curriculum public read" on curriculum_item for select to anon using (true);
 create policy "curriculum admin all"   on curriculum_item for all    to authenticated using (true) with check (true);
+
+create policy "apply_info public read" on course_apply_info for select to anon using (true);
+create policy "apply_info admin all"   on course_apply_info for all    to authenticated using (true) with check (true);
 
 create policy "post public read"     on post     for select to anon using (is_published = true and is_deleted = false);
 create policy "post admin all"       on post     for all    to authenticated using (true) with check (true);
@@ -281,7 +303,7 @@ create policy "waitlist admin delete"     on waitlist for delete to authenticate
 grant usage on schema public to anon, authenticated;
 
 -- 공개 콘텐츠: anon은 읽기만
-grant select on course, course_track, exam_schedule, curriculum_item, post, about_history, about_history_item, site_section, popup to anon;
+grant select on course, course_track, exam_schedule, curriculum_item, course_apply_info, post, about_history, about_history_item, site_section, popup to anon;
 -- 제출 테이블: anon은 INSERT만 (읽기·수정 권한 없음 → RLS 이전에 차단)
 grant insert on application, inquiry, waitlist to anon;
 grant usage, select on all sequences in schema public to anon;
