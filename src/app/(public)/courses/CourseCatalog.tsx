@@ -181,10 +181,55 @@ function CourseGrid({
   );
 }
 
-// ── CourseTracks: 자격증 과정 트랙별 카드 + 실기 시험일정 ──────────
+// ── ApplyCtaButton: 모집상태에 따라 활성/비활성되는 수강신청 버튼 ──────
+function ApplyCtaButton({
+  open,
+  onClick,
+  label = "수강신청하기",
+}: {
+  open: boolean;
+  onClick: () => void;
+  label?: string;
+}) {
+  if (!open) {
+    return (
+      <button
+        type="button"
+        disabled
+        aria-disabled
+        className="inline-flex items-center justify-center gap-2 rounded-button font-semibold leading-none tracking-[-0.2px] whitespace-nowrap h-14 px-[26px] text-[18px]"
+        style={{
+          background: "var(--color-canvas-soft)",
+          color: "var(--color-muted-soft)",
+          border: "1px solid var(--color-hairline-strong)",
+          cursor: "not-allowed",
+        }}
+      >
+        모집마감
+      </button>
+    );
+  }
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="inline-flex items-center justify-center gap-2 rounded-button font-semibold leading-none tracking-[-0.2px] whitespace-nowrap transition active:scale-[0.98] h-14 px-[26px] text-[18px] bg-primary text-white border border-primary hover:bg-primary-hover"
+    >
+      {label}
+    </button>
+  );
+}
+
+// ── CourseTracks: 자격증 과정 트랙별 카드 + 실기 시험일정 + 트랙별 신청 ──
 const trackGrid = "1fr 1.3fr 1.3fr 1.4fr";
 
-function CourseTracks({ tracks }: { tracks: TrackView[] }) {
+function CourseTracks({
+  tracks,
+  onApply,
+}: {
+  tracks: TrackView[];
+  onApply: (name: string) => void;
+}) {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 22 }}>
       {tracks.map((t) => (
@@ -255,6 +300,29 @@ function CourseTracks({ tracks }: { tracks: TrackView[] }) {
               ))}
             </>
           )}
+
+          {/* 트랙별 수강신청 (모집상태에 따라 활성/비활성) */}
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 12,
+              padding: "16px 18px",
+              borderTop: "1px solid var(--color-hairline)",
+            }}
+          >
+            <ApplyCtaButton
+              open={t.recruitStatus === "모집중"}
+              onClick={() => onApply(t.name)}
+              label={`${t.name} 신청`}
+            />
+            {t.recruitStatus !== "모집중" && (
+              <span style={{ fontSize: 13.5, color: "var(--color-muted)" }}>
+                현재 모집 중이 아닙니다
+              </span>
+            )}
+          </div>
         </Card>
       ))}
       <p
@@ -282,6 +350,7 @@ function CourseDetail({
   onApply: (name: string) => void;
 }) {
   const applyName = course.name + (course.day === "주말" ? " (주말)" : "");
+  const isOpen = course.recruitStatus === "모집중";
 
   return (
     <section className="wrap band" style={{ paddingBottom: 24 }}>
@@ -362,18 +431,15 @@ function CourseDetail({
           </h2>
           <span style={{ fontSize: 14.5, color: "var(--color-muted)" }}>{course.meta}</span>
         </div>
-        <button
-          type="button"
-          onClick={() => onApply(applyName)}
-          className="inline-flex items-center justify-center gap-2 rounded-button font-semibold leading-none tracking-[-0.2px] whitespace-nowrap transition active:scale-[0.98] h-14 px-[26px] text-[18px] bg-primary text-white border border-primary hover:bg-primary-hover"
-        >
-          수강신청하기
-        </button>
+        {/* 자격증 과정은 트랙별 신청 버튼을 쓰므로 단일 버튼 미표시 */}
+        {!course.tracks && (
+          <ApplyCtaButton open={isOpen} onClick={() => onApply(applyName)} />
+        )}
       </div>
 
       {/* 자격증 과정: 트랙·시험일정 / 정규 과정: NCS 회차표 */}
       {course.tracks ? (
-        <CourseTracks tracks={course.tracks} />
+        <CourseTracks tracks={course.tracks} onApply={onApply} />
       ) : course.table.length > 0 ? (
         <Card padding={0} style={{ overflow: "hidden" }}>
           <div className="ncs-row ncs-head">
@@ -430,28 +496,26 @@ function CourseDetail({
         </p>
       )}
 
-      {/* 하단 신청 버튼 + 개강일 안내 */}
-      <div
-        style={{
-          display: "flex",
-          flexWrap: "wrap",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: "10px 16px",
-          marginTop: 30,
-        }}
-      >
-        <button
-          type="button"
-          onClick={() => onApply(applyName)}
-          className="inline-flex items-center justify-center gap-2 rounded-button font-semibold leading-none tracking-[-0.2px] whitespace-nowrap transition active:scale-[0.98] h-14 px-[26px] text-[18px] bg-primary text-white border border-primary hover:bg-primary-hover"
+      {/* 하단 신청 버튼 + 개강일 안내 (정규 과정만; 자격증은 트랙별 버튼) */}
+      {!course.tracks && (
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: "10px 16px",
+            marginTop: 30,
+          }}
         >
-          수강신청하기
-        </button>
-        <span style={{ fontSize: 14, color: "var(--color-muted)" }}>
-          개강일·잔여석은 신청 시 바로 안내드립니다
-        </span>
-      </div>
+          <ApplyCtaButton open={isOpen} onClick={() => onApply(applyName)} />
+          <span style={{ fontSize: 14, color: "var(--color-muted)" }}>
+            {isOpen
+              ? "개강일·잔여석은 신청 시 바로 안내드립니다"
+              : "다음 모집 일정은 전화로 안내해 드립니다"}
+          </span>
+        </div>
+      )}
     </section>
   );
 }
