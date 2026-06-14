@@ -1,4 +1,10 @@
-import type { CourseDay, TrackView, AboutHistoryView } from "./types";
+import type {
+  CourseDay,
+  RecruitStatus,
+  TrackView,
+  AboutHistoryView,
+  ApplyInfoView,
+} from "./types";
 
 export function patternToDay(p: string | null): CourseDay {
   if (p === "주말") return "주말";
@@ -38,6 +44,7 @@ interface TrackRow {
   sessions_total: number | null;
   schedule_summary: string[];
   price: number | null;
+  recruit_status: RecruitStatus;
 }
 
 interface ExamRow {
@@ -57,6 +64,7 @@ export function trackToView(track: TrackRow, exams: ExamRow[]): TrackView {
     priceText:
       track.price != null ? `${track.price.toLocaleString("ko-KR")}원` : "상담 안내",
     scheduleSummary: track.schedule_summary,
+    recruitStatus: track.recruit_status,
     exams: exams.map((e) => ({
       round: e.round,
       applyPeriod: `${md(e.apply_start)} ~ ${md(e.apply_end)}`,
@@ -92,4 +100,30 @@ export function historyToView(
         .sort((a, b) => a.display_order - b.display_order)
         .map((it) => ({ content: it.content, isHighlighted: it.is_highlighted })),
     }));
+}
+
+interface ApplyInfoRow {
+  qualifications: string[];
+  recruit_period: string | null;
+  training_period: string | null;
+  training_time: string[];
+  capacity: string | null;
+  cost: string | null;
+  cost_notes: string[];
+  steps: string[];
+  exclusions: string[];
+}
+
+export function applyInfoRowToView(row: ApplyInfoRow): ApplyInfoView {
+  return {
+    qualifications: row.qualifications,
+    recruitPeriod: row.recruit_period,
+    trainingPeriod: row.training_period,
+    trainingTime: row.training_time,
+    capacity: row.capacity,
+    cost: row.cost,
+    costNotes: row.cost_notes,
+    steps: row.steps,
+    exclusions: row.exclusions,
+  };
 }

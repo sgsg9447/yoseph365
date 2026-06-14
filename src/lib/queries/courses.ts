@@ -1,10 +1,11 @@
 import { createPublicClient } from "@/lib/supabase/public";
-import type { CatalogCourse, ScheduleCourse } from "./types";
+import type { ApplyCourse, CatalogCourse, ScheduleCourse } from "./types";
 import {
   patternToDay,
   patternToStartDate,
   curriculumToTable,
   trackToView,
+  applyInfoRowToView,
 } from "./mappers";
 
 export async function getCatalogCourses(): Promise<CatalogCourse[]> {
@@ -42,6 +43,7 @@ export async function getCatalogCourses(): Promise<CatalogCourse[]> {
       tags: c.skills ?? [],
       desc: c.summary ?? "",
       meta: metaParts.join(" · ") || (isCert ? "자격증 실기 속성 대비" : ""),
+      recruitStatus: c.recruit_status,
       table,
       tracks: trackViews,
     } satisfies CatalogCourse;
@@ -60,4 +62,25 @@ export async function getScheduleCourses(): Promise<ScheduleCourse[]> {
     meta: c.summary ?? "",
     open: c.recruit_status === "모집중",
   }));
+}
+
+export async function getApplyCourses(): Promise<ApplyCourse[]> {
+  const sb = createPublicClient();
+  const [{ data: courses }, { data: infos }] = await Promise.all([
+    sb
+      .from("course")
+      .select("id, name, recruit_status")
+      .eq("is_deleted", false)
+      .neq("category", "기능사"), // 자격증은 트랙별 신청(상세 페이지에서 처리)
+    sb.from("course_apply_info").select("*"),
+  ]);
+
+  return (courses ?? []).map((c) => {
+    const info = (infos ?? []).find((i) => i.course_id === c.id);
+    return {
+      name: c.name,
+      recruitStatus: c.recruit_status,
+      applyInfo: info ? applyInfoRowToView(info) : null,
+    };
+  });
 }

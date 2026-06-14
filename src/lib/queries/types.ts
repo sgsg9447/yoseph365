@@ -3,6 +3,8 @@
 
 export type CourseDay = "평일" | "주말" | "단기";
 
+export type RecruitStatus = "모집예정" | "모집중" | "마감";
+
 export interface TrackExamView {
   round: string;
   applyPeriod: string; // "02.02 ~ 02.05"
@@ -16,6 +18,7 @@ export interface TrackView {
   sessionsText: string; // "5회"
   priceText: string; // "600,000원"
   scheduleSummary: string[];
+  recruitStatus: RecruitStatus;
   exams: TrackExamView[];
 }
 
@@ -26,11 +29,30 @@ export interface CatalogCourse {
   tags: string[];
   desc: string;
   meta: string;
+  recruitStatus: RecruitStatus;
   /** 회차/능력단위/훈련내용/교육장소 — 정규 과정만 */
   table: string[][];
   /** 자격증 과정만 — 있으면 회차표 대신 트랙·시험일정 렌더 */
   tracks?: TrackView[];
   moreNote?: string;
+}
+
+export interface ApplyInfoView {
+  qualifications: string[];
+  recruitPeriod: string | null;
+  trainingPeriod: string | null;
+  trainingTime: string[];
+  capacity: string | null;
+  cost: string | null;
+  costNotes: string[];
+  steps: string[];
+  exclusions: string[];
+}
+
+export interface ApplyCourse {
+  name: string;
+  recruitStatus: RecruitStatus;
+  applyInfo: ApplyInfoView | null;
 }
 
 export interface ScheduleCourse {

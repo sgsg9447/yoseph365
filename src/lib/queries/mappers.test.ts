@@ -5,6 +5,7 @@ import {
   curriculumToTable,
   trackToView,
   historyToView,
+  applyInfoRowToView,
 } from "./mappers";
 
 describe("patternToDay", () => {
@@ -45,6 +46,7 @@ describe("trackToView", () => {
       sessions_total: 5,
       schedule_summary: ["4회 8h"],
       price: 600000,
+      recruit_status: "마감" as const,
     };
     const exams = [
       {
@@ -59,6 +61,7 @@ describe("trackToView", () => {
     const v = trackToView(track, exams);
     expect(v.priceText).toBe("600,000원");
     expect(v.sessionsText).toBe("5회");
+    expect(v.recruitStatus).toBe("마감");
     expect(v.exams[0].applyPeriod).toBe("02.02 ~ 02.05");
     expect(v.exams[0].examPeriod).toBe("03.14 ~ 04.01");
     expect(v.exams[0].resultDates).toBe("04.10, 04.17");
@@ -66,11 +69,45 @@ describe("trackToView", () => {
 
   it("falls back to 상담 안내 when price is null", () => {
     const v = trackToView(
-      { name: "X", description: null, sessions_total: null, schedule_summary: [], price: null },
+      {
+        name: "X",
+        description: null,
+        sessions_total: null,
+        schedule_summary: [],
+        price: null,
+        recruit_status: "모집중" as const,
+      },
       [],
     );
     expect(v.priceText).toBe("상담 안내");
     expect(v.sessionsText).toBe("");
+  });
+});
+
+describe("applyInfoRowToView", () => {
+  it("maps snake_case row to camelCase view", () => {
+    const row = {
+      qualifications: ["내일배움카드 보유자"],
+      recruit_period: null,
+      training_period: "26.08.24 ~ 26.10.13",
+      training_time: ["09:00 ~ 17:40"],
+      capacity: "16명",
+      cost: "1,950,480원",
+      cost_notes: ["최대자비부담금 780,170원"],
+      steps: ["등록 완료"],
+      exclusions: ["상용직 취업상태인 자"],
+    };
+    expect(applyInfoRowToView(row)).toEqual({
+      qualifications: ["내일배움카드 보유자"],
+      recruitPeriod: null,
+      trainingPeriod: "26.08.24 ~ 26.10.13",
+      trainingTime: ["09:00 ~ 17:40"],
+      capacity: "16명",
+      cost: "1,950,480원",
+      costNotes: ["최대자비부담금 780,170원"],
+      steps: ["등록 완료"],
+      exclusions: ["상용직 취업상태인 자"],
+    });
   });
 });
 
