@@ -61,8 +61,8 @@ export function CourseGrid({ courses }: { courses: CatalogCourse[] }) {
                   {c.days.map((d) => (
                     <DayChip key={d} day={d} />
                   ))}
-                  <RecruitBadge status={c.recruitStatus} />
                   <FundingBadge funding={c.funding} />
+                  <RecruitBadge status={c.recruitStatus} />
                 </span>
                 <svg
                   width="18"

@@ -1,14 +1,9 @@
 "use client";
 
-// Minimal client wrappers for home-page interactive sections.
-// Kept separate so the page can place each in the correct section order.
-// - HeroIntent.onPick → smooth-scroll to #schedule
-// - Schedule.onApply  → navigate to /apply?course=<encoded>
+// Minimal client wrapper for the home hero (smooth-scroll to #schedule).
+// 일정 섹션(Schedule)은 행이 Link라 클라이언트 핸들러가 필요 없어 page에서 직접 렌더.
 
-import { useRouter } from "next/navigation";
-import type { ScheduleCourse } from "@/lib/queries/types";
 import { HeroIntent } from "./HeroIntent";
-import { Schedule } from "./Schedule";
 
 export function HeroIntentSection() {
   function handlePick() {
@@ -23,14 +18,4 @@ export function HeroIntentSection() {
       <HeroIntent onPick={handlePick} />
     </div>
   );
-}
-
-export function ScheduleSection({ courses }: { courses: ScheduleCourse[] }) {
-  const router = useRouter();
-
-  function handleApply(courseName: string) {
-    router.push(`/apply?course=${encodeURIComponent(courseName)}`);
-  }
-
-  return <Schedule courses={courses} onApply={handleApply} />;
 }

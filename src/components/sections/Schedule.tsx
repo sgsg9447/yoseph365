@@ -1,5 +1,5 @@
 // Server component — current course schedule.
-// onApply is passed from HomeInteractive (client wrapper) in the home page.
+// 행 클릭 시 과정 상세(/courses/[id])로 이동.
 // Per domain rule: no real calendar dates — only "평일반" / "주말반".
 
 import Link from "next/link";
@@ -12,10 +12,9 @@ import { PHONE_MAIN } from "@/lib/data/site";
 
 interface ScheduleProps {
   courses: ScheduleCourse[];
-  onApply?: (name: string) => void;
 }
 
-export function Schedule({ courses, onApply }: ScheduleProps) {
+export function Schedule({ courses }: ScheduleProps) {
   return (
     <section
       id="schedule"
@@ -40,10 +39,14 @@ export function Schedule({ courses, onApply }: ScheduleProps) {
           >
             {courses.map((c, i) => (
               <CourseRow
-                key={i}
-                {...c}
+                key={c.id}
+                name={c.name}
+                startDate={c.startDate}
+                meta={c.meta}
+                open={c.open}
+                status={c.open ? "모집중" : "모집마감"}
                 last={i === courses.length - 1}
-                onClick={onApply ? () => onApply(c.name) : undefined}
+                href={`/courses/${c.id}`}
               />
             ))}
           </Card>

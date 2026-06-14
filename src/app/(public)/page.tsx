@@ -4,7 +4,8 @@
 
 import { Banner } from "@/components/layout/Banner";
 import { AwardsStrip } from "@/components/layout/AwardsStrip";
-import { HeroIntentSection, ScheduleSection } from "@/components/sections/HomeInteractive";
+import { HeroIntentSection } from "@/components/sections/HomeInteractive";
+import { Schedule } from "@/components/sections/Schedule";
 import { Barriers } from "@/components/sections/Barriers";
 import { SocialProof } from "@/components/sections/SocialProof";
 import { Videos } from "@/components/sections/Videos";
@@ -29,7 +30,7 @@ export default async function HomePage() {
       <Barriers />
       <SocialProof />
       <Videos />
-      <ScheduleSection courses={scheduleCourses} />
+      <Schedule courses={scheduleCourses} />
       <ClosingCTA />
     </>
   );

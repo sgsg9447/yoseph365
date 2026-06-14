@@ -55,12 +55,14 @@ export interface ApplyInfoView {
 }
 
 export interface ApplyCourse {
+  id: string;
   name: string;
   recruitStatus: RecruitStatus;
   applyInfo: ApplyInfoView | null;
 }
 
 export interface ScheduleCourse {
+  id: string;
   name: string;
   /** "평일반" | "주말반" | "단기" */
   startDate: string;

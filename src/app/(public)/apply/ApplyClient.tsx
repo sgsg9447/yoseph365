@@ -11,12 +11,12 @@ import type { ApplyCourse } from "@/lib/queries/types";
 
 function ApplyCoursePicker({
   courses,
-  course,
+  courseId,
   onChange,
 }: {
   courses: ApplyCourse[];
-  course: string;
-  onChange: (c: string) => void;
+  courseId: string;
+  onChange: (id: string) => void;
 }) {
   return (
     <label style={{ display: "flex", flexDirection: "column", gap: 7, marginBottom: 18 }}>
@@ -24,7 +24,7 @@ function ApplyCoursePicker({
         신청 과정 선택
       </span>
       <select
-        value={course}
+        value={courseId}
         onChange={(e) => onChange(e.target.value)}
         style={{
           height: 52,
@@ -41,7 +41,7 @@ function ApplyCoursePicker({
         }}
       >
         {courses.map((c) => (
-          <option key={c.name} value={c.name}>
+          <option key={c.id} value={c.id}>
             {c.name}
             {c.recruitStatus !== "모집중" ? " (모집마감)" : ""}
           </option>
@@ -54,18 +54,18 @@ function ApplyCoursePicker({
 export function ApplyClient({ courses }: { courses: ApplyCourse[] }) {
   const params = useSearchParams();
   const fromUrl = params.get("course") ?? "";
-  const [course, setCourse] = useState(fromUrl || courses[0]?.name || "");
+  const [courseId, setCourseId] = useState(fromUrl || courses[0]?.id || "");
 
-  const selected = courses.find((c) => c.name === course) ?? null;
+  const selected = courses.find((c) => c.id === courseId) ?? null;
 
   return (
     <Card padding={0} style={{ padding: "clamp(20px, 3.5vw, 32px)" }}>
       {/* 과정 선택기: ?course= 파라미터가 없을 때만 표시 */}
       {!fromUrl && courses.length > 0 && (
-        <ApplyCoursePicker courses={courses} course={course} onChange={setCourse} />
+        <ApplyCoursePicker courses={courses} courseId={courseId} onChange={setCourseId} />
       )}
       <ApplyFlow
-        course={course}
+        course={selected?.name ?? ""}
         applyInfo={selected?.applyInfo ?? null}
         recruitStatus={selected?.recruitStatus ?? "모집중"}
       />

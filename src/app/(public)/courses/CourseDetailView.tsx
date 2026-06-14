@@ -165,11 +165,11 @@ function CourseTracks({
 // ── CourseDetailView: 상세 본문 ─────────────────────────────────────
 export function CourseDetailView({ course }: { course: CatalogCourse }) {
   const router = useRouter();
-  const applyName = course.name + (course.day === "주말" ? " (주말)" : "");
   const isOpen = course.recruitStatus === "모집중";
 
-  const handleApply = (name: string) => {
-    router.push(`/apply?course=${encodeURIComponent(name)}`);
+  // 신청 식별은 과정 id로 통일(/apply?course=<id>).
+  const goApply = (courseId: string) => {
+    router.push(`/apply?course=${encodeURIComponent(courseId)}`);
   };
 
   return (
@@ -226,8 +226,8 @@ export function CourseDetailView({ course }: { course: CatalogCourse }) {
             {course.days.map((d) => (
               <DayChip key={d} day={d} />
             ))}
-            <RecruitBadge status={course.recruitStatus} />
             <FundingBadge funding={course.funding} />
+            <RecruitBadge status={course.recruitStatus} />
           </span>
           <h2
             style={{
@@ -249,13 +249,13 @@ export function CourseDetailView({ course }: { course: CatalogCourse }) {
           <span style={{ fontSize: 14.5, color: "var(--color-muted)" }}>{course.meta}</span>
         </div>
         {!course.tracks && (
-          <ApplyCtaButton open={isOpen} onClick={() => handleApply(applyName)} />
+          <ApplyCtaButton open={isOpen} onClick={() => goApply(course.id)} />
         )}
       </div>
 
       {/* 자격증: 트랙·시험일정 / 정규: NCS 회차표 */}
       {course.tracks ? (
-        <CourseTracks tracks={course.tracks} onApply={handleApply} />
+        <CourseTracks tracks={course.tracks} onApply={() => goApply(course.id)} />
       ) : course.table.length > 0 ? (
         <Card padding={0} style={{ overflow: "hidden" }}>
           <div className="ncs-row ncs-head">
@@ -323,7 +323,7 @@ export function CourseDetailView({ course }: { course: CatalogCourse }) {
             marginTop: 30,
           }}
         >
-          <ApplyCtaButton open={isOpen} onClick={() => handleApply(applyName)} />
+          <ApplyCtaButton open={isOpen} onClick={() => goApply(course.id)} />
           <span style={{ fontSize: 14, color: "var(--color-muted)" }}>
             {isOpen
               ? "개강일·잔여석은 신청 시 바로 안내드립니다"

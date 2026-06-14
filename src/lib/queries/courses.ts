@@ -63,9 +63,10 @@ export async function getScheduleCourses(): Promise<ScheduleCourse[]> {
   const sb = createPublicClient();
   const { data } = await sb
     .from("course")
-    .select("name, schedule_pattern, summary, recruit_status, is_deleted")
+    .select("id, name, schedule_pattern, summary, recruit_status, is_deleted")
     .eq("is_deleted", false);
   return (data ?? []).map((c) => ({
+    id: c.id,
     name: c.name,
     startDate: patternToStartDate(c.schedule_pattern),
     meta: c.summary ?? "",
@@ -87,6 +88,7 @@ export async function getApplyCourses(): Promise<ApplyCourse[]> {
   return (courses ?? []).map((c) => {
     const info = (infos ?? []).find((i) => i.course_id === c.id);
     return {
+      id: c.id,
       name: c.name,
       recruitStatus: c.recruit_status,
       applyInfo: info ? applyInfoRowToView(info) : null,
