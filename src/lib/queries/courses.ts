@@ -61,18 +61,28 @@ export async function getCourseById(id: string): Promise<CatalogCourse | null> {
 
 export async function getScheduleCourses(): Promise<ScheduleCourse[]> {
   const sb = createPublicClient();
-  const { data } = await sb
-    .from("course")
-    .select("id, name, schedule_pattern, summary, recruit_status, is_deleted")
-    .eq("is_deleted", false)
-    .order("sort_order");
-  return (data ?? []).map((c) => ({
-    id: c.id,
-    name: c.name,
-    startDate: patternToStartDate(c.schedule_pattern),
-    meta: c.summary ?? "",
-    open: c.recruit_status === "모집중",
-  }));
+  const [{ data: courses }, { data: tracks }] = await Promise.all([
+    sb
+      .from("course")
+      .select("id, name, schedule_pattern, summary, recruit_status, is_deleted")
+      .eq("is_deleted", false)
+      .order("sort_order"),
+    sb.from("course_track").select("course_id, recruit_status"),
+  ]);
+  return (courses ?? []).map((c) => {
+    // 자격증 과정은 트랙 모집상태까지 반영(카탈로그와 동일 기준)
+    const courseTracks = (tracks ?? [])
+      .filter((t) => t.course_id === c.id)
+      .map((t) => ({ recruitStatus: t.recruit_status }));
+    const status = courseRecruitStatus(c.recruit_status, courseTracks);
+    return {
+      id: c.id,
+      name: c.name,
+      startDate: patternToStartDate(c.schedule_pattern),
+      meta: c.summary ?? "",
+      open: status === "모집중",
+    };
+  });
 }
 
 export async function getApplyCourses(): Promise<ApplyCourse[]> {
