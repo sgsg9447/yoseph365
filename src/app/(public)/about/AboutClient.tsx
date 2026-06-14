@@ -4,37 +4,38 @@
 // 참조: HANDOFF/ui_kits/website/about.jsx
 
 import { useState } from "react";
-import { Users, Award, CheckCircle } from "@/components/icons";
-import { PhotoSlot } from "@/components/ui/PhotoSlot";
+import { Award, CheckCircle } from "@/components/icons";
+import { PhotoCarousel, type CarouselSlide } from "@/components/ui/PhotoCarousel";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { LocationInfo } from "@/components/sections/LocationInfo";
 import type { AboutHistoryView, SiteSectionView } from "@/lib/queries/types";
 
 // ── 학원소개 ──────────────────────────────────────────────────────────────────
 
+// 사진은 다음 작업에 주입(현재 플레이스홀더)
+const INTRO_SLIDES: CarouselSlide[] = [
+  { label: "학원 전경 · 실습장" },
+  { label: "목공 실습장" },
+  { label: "강의실" },
+  { label: "수강생 작품" },
+];
+
 function AboutIntro() {
   const points = [
     {
-      icon: <Users size={20} />,
-      t: "소수 정원 실습",
-      d: "과정당 12–16명, 1인 1작업대로 손에 익을 때까지",
+      icon: <CheckCircle size={20} />,
+      text: "국가직무 능력교육 NCS기반의 훈련과정과 현장실습 위주의 훈련진행.",
     },
     {
       icon: <Award size={20} />,
-      t: "현장 경력 강사진",
-      d: "건축목공·가구제작 현장 경력 평균 18년",
-    },
-    {
-      icon: <CheckCircle size={20} />,
-      t: "수료 후 연계",
-      d: "자격 취득·취업 알선·공방 창업까지 이어서 지원",
+      text: "40년 경력의 원장 직강 및 다수의 현장전문가 강사진 확보.",
     },
   ];
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 64 }}>
       <div className="grid g-2" style={{ alignItems: "center", gap: 40 }}>
-        <PhotoSlot ratio="4 / 3" label="학원 전경 · 실습장" radius={18} />
+        <PhotoCarousel slides={INTRO_SLIDES} ratio="4 / 3" radius={18} />
         <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
           <h2
             style={{
@@ -48,9 +49,7 @@ function AboutIntro() {
               wordBreak: "keep-all",
             }}
           >
-            손으로 배우고,
-            <br />
-            기술로 다시 서는 곳
+            손으로 배우고, 기술로 다시 서는 곳
           </h2>
           <p
             style={{
@@ -61,10 +60,9 @@ function AboutIntro() {
               wordBreak: "keep-all",
             }}
           >
-            성요셉목수학교는 고용노동부 지정 직업능력개발 훈련기관입니다.
-            목공 기초부터 집수리·인테리어, 가구 제작, 자격 대비까지 —
-            나이와 경력에 관계없이 누구나 기술 하나로 다시 시작할 수 있도록
-            처음부터 끝까지 손에 익을 때까지 가르칩니다.
+            NCS교육방식을 도입함으로써, 체계적인 교육과 더불어 현장전문가의 심도 깊은
+            직업훈련교육으로 현장과의 격차를 줄여, 현장투입이 가능한 목공기능, 필름기능인
+            양성을 목표로 합니다.
           </p>
           <div
             style={{ display: "flex", flexDirection: "column", gap: 14, marginTop: 6 }}
@@ -89,40 +87,19 @@ function AboutIntro() {
                   {p.icon}
                 </span>
                 <span
-                  style={{ display: "flex", flexDirection: "column", gap: 2 }}
+                  style={{
+                    fontSize: 15.5,
+                    color: "var(--color-body-strong)",
+                    lineHeight: 1.6,
+                    wordBreak: "keep-all",
+                    alignSelf: "center",
+                  }}
                 >
-                  <span
-                    style={{
-                      fontSize: 15.5,
-                      fontWeight: 700,
-                      color: "var(--color-ink)",
-                    }}
-                  >
-                    {p.t}
-                  </span>
-                  <span
-                    style={{
-                      fontSize: 14.5,
-                      color: "var(--color-muted)",
-                      lineHeight: 1.6,
-                      wordBreak: "keep-all",
-                    }}
-                  >
-                    {p.d}
-                  </span>
+                  {p.text}
                 </span>
               </div>
             ))}
           </div>
-        </div>
-      </div>
-
-      <div>
-        <SectionHeading align="center" title={<>학원 둘러보기</>} />
-        <div className="grid g-3" style={{ marginTop: 28 }}>
-          <PhotoSlot ratio="4 / 3" label="목공 실습장" />
-          <PhotoSlot ratio="4 / 3" label="강의실" />
-          <PhotoSlot ratio="4 / 3" label="수강생 작품" />
         </div>
       </div>
 

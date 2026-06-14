@@ -2,10 +2,7 @@
 // 참조: HANDOFF/ui_kits/website/sections.jsx:492-518
 
 import { MapPin, Phone, Calendar } from "@/components/icons";
-import { PhotoSlot } from "@/components/ui/PhotoSlot";
-import { PHONE_MAIN } from "@/lib/data/site";
-
-const ADDRESS = "경기도 성남시 중원구 OO로 00, 3층 (목공실습동)";
+import { PHONE_MAIN, ADDRESS, CONSULT_HOURS } from "@/lib/data/site";
 
 const rows = [
   {
@@ -21,14 +18,28 @@ const rows = [
   {
     icon: <Calendar size={20} />,
     label: "상담 시간",
-    value: "평일 09:00 – 18:00 · 점심 12:00 – 13:00",
+    value: CONSULT_HOURS,
   },
 ];
 
+const MAP_SRC = `https://maps.google.com/maps?q=${encodeURIComponent(ADDRESS)}&z=16&hl=ko&output=embed`;
+
 export function LocationInfo() {
   return (
-    <div className="grid g-2" style={{ alignItems: "start" }}>
-      <PhotoSlot ratio="4 / 3" label="약도 · 오시는 길" radius={16} />
+    <div className="grid g-2" style={{ alignItems: "center" }}>
+      <iframe
+        title="성요셉목수학교 약도"
+        src={MAP_SRC}
+        loading="lazy"
+        referrerPolicy="no-referrer-when-downgrade"
+        style={{
+          width: "100%",
+          aspectRatio: "4 / 3",
+          border: "1px solid var(--color-hairline)",
+          borderRadius: 16,
+          display: "block",
+        }}
+      />
       <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
         {rows.map((r, i) => (
           <div

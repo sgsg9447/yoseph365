@@ -3,8 +3,9 @@
 import { Phone } from "@/components/icons";
 import { Button } from "@/components/ui/Button";
 import { useConsult } from "@/components/layout/SiteShell";
+import { PHONE_MAIN } from "@/lib/data/site";
 
-const PHONE = "031-123-4567";
+const PHONE = PHONE_MAIN;
 
 export function ClosingCTA() {
   const { openConsult } = useConsult();
