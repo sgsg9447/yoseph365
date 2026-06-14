@@ -11,10 +11,21 @@ import { Phone, Clipboard, Wallet, Award } from "@/components/icons";
 import type { CatalogCourse, CourseDay, TrackView } from "@/lib/queries/types";
 import { PHONE_MAIN } from "@/lib/data/site";
 
-// ── DayChip: 평일(primary-soft) / 주말(mint) ──────────────────────
+// ── DayChip: 평일(primary) / 주말(mint) / 단기(amber) ──────────────
 // handoff: --color-tint-mint 미정의 → arbitrary mint #e8f4ed / border #cfe5d8
+// 단기는 평일·주말과 구분되도록 amber 톤 사용
+const DAY_CHIP_STYLES: Record<CourseDay, { bg: string; color: string; border: string }> = {
+  평일: {
+    bg: "var(--color-primary-soft)",
+    color: "var(--color-primary)",
+    border: "var(--color-primary-border)",
+  },
+  주말: { bg: "#e8f4ed", color: "#3f7d5f", border: "#cfe5d8" },
+  단기: { bg: "#fbeede", color: "#b06a13", border: "#f0d8b4" },
+};
+
 function DayChip({ day }: { day: CourseDay }) {
-  const isWeekend = day === "주말";
+  const s = DAY_CHIP_STYLES[day];
   return (
     <span
       style={{
@@ -26,9 +37,9 @@ function DayChip({ day }: { day: CourseDay }) {
         fontSize: 12.5,
         fontWeight: 700,
         letterSpacing: "0.2px",
-        background: isWeekend ? "#e8f4ed" : "var(--color-primary-soft)",
-        color: isWeekend ? "#3f7d5f" : "var(--color-primary)",
-        border: "1px solid " + (isWeekend ? "#cfe5d8" : "var(--color-primary-border)"),
+        background: s.bg,
+        color: s.color,
+        border: "1px solid " + s.border,
       }}
     >
       {day}
