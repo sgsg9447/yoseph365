@@ -6,6 +6,7 @@ import {
   trackToView,
   historyToView,
   applyInfoRowToView,
+  courseRecruitStatus,
 } from "./mappers";
 
 describe("patternToDay", () => {
@@ -81,6 +82,24 @@ describe("trackToView", () => {
     );
     expect(v.priceText).toBe("상담 안내");
     expect(v.sessionsText).toBe("");
+  });
+});
+
+describe("courseRecruitStatus", () => {
+  it("정규 과정은 코스 모집상태를 그대로 쓴다", () => {
+    expect(courseRecruitStatus("모집중", undefined)).toBe("모집중");
+    expect(courseRecruitStatus("마감", undefined)).toBe("마감");
+    expect(courseRecruitStatus("모집예정", undefined)).toBe("모집예정");
+  });
+  it("자격증 과정은 트랙 중 하나라도 모집중이면 모집중", () => {
+    expect(
+      courseRecruitStatus("모집중", [{ recruitStatus: "마감" }, { recruitStatus: "모집중" }]),
+    ).toBe("모집중");
+  });
+  it("자격증 과정은 트랙이 모두 마감이면 마감", () => {
+    expect(
+      courseRecruitStatus("모집중", [{ recruitStatus: "마감" }, { recruitStatus: "마감" }]),
+    ).toBe("마감");
   });
 });
 

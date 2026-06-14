@@ -114,6 +114,21 @@ interface ApplyInfoRow {
   exclusions: string[];
 }
 
+/**
+ * 카탈로그 카드에 표시할 모집상태.
+ * 자격증 과정(트랙 있음)은 트랙 중 하나라도 모집중이면 모집중, 아니면 마감.
+ * 정규 과정은 코스 모집상태를 그대로 사용한다.
+ */
+export function courseRecruitStatus(
+  courseStatus: RecruitStatus,
+  tracks: { recruitStatus: RecruitStatus }[] | undefined,
+): RecruitStatus {
+  if (tracks && tracks.length > 0) {
+    return tracks.some((t) => t.recruitStatus === "모집중") ? "모집중" : "마감";
+  }
+  return courseStatus;
+}
+
 export function applyInfoRowToView(row: ApplyInfoRow): ApplyInfoView {
   return {
     qualifications: row.qualifications,

@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 import { Card } from "@/components/ui/Card";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Phone, Clipboard, Wallet, Award } from "@/components/icons";
-import type { CatalogCourse, CourseDay, TrackView } from "@/lib/queries/types";
+import type { CatalogCourse, CourseDay, RecruitStatus, TrackView } from "@/lib/queries/types";
 import { PHONE_MAIN } from "@/lib/data/site";
 
 // ── DayChip: 평일(primary) / 주말(mint) / 단기(amber) ──────────────
@@ -43,6 +43,51 @@ function DayChip({ day }: { day: CourseDay }) {
       }}
     >
       {day}
+    </span>
+  );
+}
+
+// ── RecruitBadge: 모집중 / 모집마감 / 모집예정 ──────────────────────
+const RECRUIT_BADGE_STYLES: Record<
+  RecruitStatus,
+  { label: string; bg: string; color: string; border: string }
+> = {
+  모집중: { label: "모집중", bg: "#e6f4ea", color: "#1f7a43", border: "#bfe3cb" },
+  마감: { label: "모집마감", bg: "var(--color-canvas-soft)", color: "var(--color-muted-soft)", border: "var(--color-hairline-strong)" },
+  모집예정: { label: "모집예정", bg: "#fbeede", color: "#b06a13", border: "#f0d8b4" },
+};
+
+function RecruitBadge({ status }: { status: RecruitStatus }) {
+  const s = RECRUIT_BADGE_STYLES[status];
+  return (
+    <span
+      style={{
+        display: "inline-flex",
+        alignItems: "center",
+        gap: 5,
+        height: 26,
+        padding: "0 11px",
+        borderRadius: 9999,
+        fontSize: 12.5,
+        fontWeight: 700,
+        letterSpacing: "0.2px",
+        background: s.bg,
+        color: s.color,
+        border: "1px solid " + s.border,
+      }}
+    >
+      {status === "모집중" && (
+        <span
+          style={{
+            width: 6,
+            height: 6,
+            borderRadius: 9999,
+            background: "currentColor",
+            display: "inline-block",
+          }}
+        />
+      )}
+      {s.label}
     </span>
   );
 }
@@ -101,8 +146,9 @@ function CourseGrid({
                 gap: 10,
               }}
             >
-              <span style={{ display: "flex", gap: 6 }}>
+              <span style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
                 <DayChip day={c.day} />
+                <RecruitBadge status={c.recruitStatus} />
               </span>
               {/* 오른쪽 화살표 */}
               <svg

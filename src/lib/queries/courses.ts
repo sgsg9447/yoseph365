@@ -6,6 +6,7 @@ import {
   curriculumToTable,
   trackToView,
   applyInfoRowToView,
+  courseRecruitStatus,
 } from "./mappers";
 
 export async function getCatalogCourses(): Promise<CatalogCourse[]> {
@@ -43,7 +44,7 @@ export async function getCatalogCourses(): Promise<CatalogCourse[]> {
       tags: c.skills ?? [],
       desc: c.summary ?? "",
       meta: metaParts.join(" · ") || (isCert ? "자격증 실기 속성 대비" : ""),
-      recruitStatus: c.recruit_status,
+      recruitStatus: courseRecruitStatus(c.recruit_status, trackViews),
       table,
       tracks: trackViews,
     } satisfies CatalogCourse;
