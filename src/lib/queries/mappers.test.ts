@@ -7,6 +7,8 @@ import {
   historyToView,
   applyInfoRowToView,
   courseRecruitStatus,
+  fundingLabel,
+  courseDays,
 } from "./mappers";
 
 describe("patternToDay", () => {
@@ -82,6 +84,24 @@ describe("trackToView", () => {
     );
     expect(v.priceText).toBe("상담 안내");
     expect(v.sessionsText).toBe("");
+  });
+});
+
+describe("fundingLabel", () => {
+  it("funding_type을 표시 라벨로 변환", () => {
+    expect(fundingLabel("경기도무료")).toBe("경기도 전액지원");
+    expect(fundingLabel("국비지원")).toBe("국비지원");
+    expect(fundingLabel("자부담")).toBe("자부담");
+  });
+});
+
+describe("courseDays", () => {
+  it("정규 과정은 단일 day", () => {
+    expect(courseDays(false, "평일")).toEqual(["평일"]);
+    expect(courseDays(false, "주말")).toEqual(["주말"]);
+  });
+  it("자격증 과정은 단기 + 주말", () => {
+    expect(courseDays(true, "단기")).toEqual(["단기", "주말"]);
   });
 });
 

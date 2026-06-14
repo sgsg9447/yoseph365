@@ -5,6 +5,8 @@ export type CourseDay = "평일" | "주말" | "단기";
 
 export type RecruitStatus = "모집예정" | "모집중" | "마감";
 
+export type FundingType = "경기도무료" | "국비지원" | "자부담";
+
 export interface TrackExamView {
   round: string;
   applyPeriod: string; // "02.02 ~ 02.05"
@@ -25,11 +27,14 @@ export interface TrackView {
 export interface CatalogCourse {
   id: string;
   day: CourseDay;
+  /** 표시용 day 칩 목록(자격증은 단기+주말). day는 신청명 등 로직용. */
+  days: CourseDay[];
   name: string;
   tags: string[];
   desc: string;
   meta: string;
   recruitStatus: RecruitStatus;
+  funding: FundingType;
   /** 회차/능력단위/훈련내용/교육장소 — 정규 과정만 */
   table: string[][];
   /** 자격증 과정만 — 있으면 회차표 대신 트랙·시험일정 렌더 */

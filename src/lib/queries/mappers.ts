@@ -1,10 +1,26 @@
 import type {
   CourseDay,
   RecruitStatus,
+  FundingType,
   TrackView,
   AboutHistoryView,
   ApplyInfoView,
 } from "./types";
+
+const FUNDING_LABELS: Record<FundingType, string> = {
+  경기도무료: "경기도 전액지원",
+  국비지원: "국비지원",
+  자부담: "자부담",
+};
+
+export function fundingLabel(f: FundingType): string {
+  return FUNDING_LABELS[f];
+}
+
+/** 카드/상세에 표시할 day 칩 목록. 자격증 과정은 단기 + 주말 둘 다 표시. */
+export function courseDays(isCert: boolean, primaryDay: CourseDay): CourseDay[] {
+  return isCert ? ["단기", "주말"] : [primaryDay];
+}
 
 export function patternToDay(p: string | null): CourseDay {
   if (p === "주말") return "주말";

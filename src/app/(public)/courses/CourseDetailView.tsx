@@ -6,7 +6,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Card } from "@/components/ui/Card";
 import type { CatalogCourse, TrackView } from "@/lib/queries/types";
-import { DayChip } from "./chips";
+import { DayChip, RecruitBadge, FundingBadge } from "./chips";
 
 // ── ApplyCtaButton: 모집상태에 따라 활성/비활성 ──────────────────────
 function ApplyCtaButton({
@@ -222,8 +222,12 @@ export function CourseDetailView({ course }: { course: CatalogCourse }) {
         }}
       >
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-          <span style={{ display: "flex", gap: 6 }}>
-            <DayChip day={course.day} />
+          <span style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+            {course.days.map((d) => (
+              <DayChip key={d} day={d} />
+            ))}
+            <RecruitBadge status={course.recruitStatus} />
+            <FundingBadge funding={course.funding} />
           </span>
           <h2
             style={{

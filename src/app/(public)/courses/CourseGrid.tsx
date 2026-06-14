@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/Card";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import type { CatalogCourse } from "@/lib/queries/types";
 import { PHONE_MAIN } from "@/lib/data/site";
-import { DayChip, RecruitBadge } from "./chips";
+import { DayChip, RecruitBadge, FundingBadge } from "./chips";
 
 export function CourseGrid({ courses }: { courses: CatalogCourse[] }) {
   if (courses.length === 0) {
@@ -58,8 +58,11 @@ export function CourseGrid({ courses }: { courses: CatalogCourse[] }) {
                 }}
               >
                 <span style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-                  <DayChip day={c.day} />
+                  {c.days.map((d) => (
+                    <DayChip key={d} day={d} />
+                  ))}
                   <RecruitBadge status={c.recruitStatus} />
+                  <FundingBadge funding={c.funding} />
                 </span>
                 <svg
                   width="18"

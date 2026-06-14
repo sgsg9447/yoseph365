@@ -1,16 +1,16 @@
 // 과정 카드/상세 공용 칩 (DayChip · RecruitBadge) — 훅 없는 프레젠테이션 컴포넌트.
 // 서버/클라이언트 컴포넌트 양쪽에서 사용 가능.
 
-import type { CourseDay, RecruitStatus } from "@/lib/queries/types";
+import type { CourseDay, RecruitStatus, FundingType } from "@/lib/queries/types";
 
-// 평일(primary) / 주말(mint) / 단기(amber)
+// 평일(primary) / 주말(violet — 모집중 초록과 구분) / 단기(amber)
 const DAY_CHIP_STYLES: Record<CourseDay, { bg: string; color: string; border: string }> = {
   평일: {
     bg: "var(--color-primary-soft)",
     color: "var(--color-primary)",
     border: "var(--color-primary-border)",
   },
-  주말: { bg: "#e8f4ed", color: "#3f7d5f", border: "#cfe5d8" },
+  주말: { bg: "#f1ebfb", color: "#6d28d9", border: "#ddd0f5" },
   단기: { bg: "#fbeede", color: "#b06a13", border: "#f0d8b4" },
 };
 
@@ -82,6 +82,41 @@ export function RecruitBadge({ status }: { status: RecruitStatus }) {
         />
       )}
       {s.label}
+    </span>
+  );
+}
+
+// ── FundingBadge: 경기도 전액지원(teal) / 국비지원(rose) / 자부담(navy) ──
+// 셋은 서로 다른 색이며, day·모집 칩과도 겹치지 않도록 선택.
+const FUNDING_BADGE_STYLES: Record<
+  FundingType,
+  { bg: string; color: string; border: string }
+> = {
+  경기도무료: { bg: "#dff1f2", color: "#0d7682", border: "#bfe3e6" },
+  국비지원: { bg: "#fdeaf0", color: "#c02a63", border: "#f5cbdc" },
+  자부담: { bg: "#e9edf5", color: "#2f4a7c", border: "#cdd8ea" },
+};
+
+export function FundingBadge({ funding }: { funding: FundingType }) {
+  const s = FUNDING_BADGE_STYLES[funding];
+  const label = funding === "경기도무료" ? "경기도 전액지원" : funding;
+  return (
+    <span
+      style={{
+        display: "inline-flex",
+        alignItems: "center",
+        height: 26,
+        padding: "0 11px",
+        borderRadius: 9999,
+        fontSize: 12.5,
+        fontWeight: 700,
+        letterSpacing: "0.2px",
+        background: s.bg,
+        color: s.color,
+        border: "1px solid " + s.border,
+      }}
+    >
+      {label}
     </span>
   );
 }
