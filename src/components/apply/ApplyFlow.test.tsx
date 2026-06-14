@@ -6,6 +6,7 @@ import type { ApplyInfoView } from "@/lib/queries/types";
 
 const applyInfo: ApplyInfoView = {
   qualifications: ["내일배움카드 보유자"],
+  applyMethod: [],
   recruitPeriod: null,
   trainingPeriod: "26.07.11 ~ 26.09.13",
   trainingTime: ["토 09:00 ~ 17:40"],

@@ -45,6 +45,7 @@ create table course (
   self_pay         text,                           -- 개인별 상이 → "상담 안내" 가능
   seo_keywords     text[] not null default '{}',   -- 과정별 SEO(오가닉 유입)
   recruit_status   recruit_status not null default '모집예정',  -- 운영자 수동
+  sort_order       integer not null default 0,                  -- 카탈로그 노출 순서
   is_deleted       boolean not null default false,
   created_at       timestamptz not null default now(),
   updated_at       timestamptz not null default now()
@@ -99,6 +100,7 @@ create index on curriculum_item (course_id);
 create table course_apply_info (
   course_id       text primary key references course(id) on delete cascade,
   qualifications  text[] not null default '{}',  -- 신청자격
+  apply_method    text[] not null default '{}',  -- 지원방법(방문/이메일 등; 경기도 전액지원 과정)
   recruit_period  text,                          -- 모집기간(빈 가능)
   training_period text,                           -- 훈련기간
   training_time   text[] not null default '{}',  -- 훈련시간(여러 줄)

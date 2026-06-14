@@ -44,6 +44,7 @@ export interface CatalogCourse {
 
 export interface ApplyInfoView {
   qualifications: string[];
+  applyMethod: string[];
   recruitPeriod: string | null;
   trainingPeriod: string | null;
   trainingTime: string[];

@@ -153,6 +153,7 @@ export type Database = {
           session_hours: string | null
           sessions_total: number | null
           skills: string[]
+          sort_order: number
           summary: string | null
           total_hours: number | null
           tuition: string | null
@@ -175,6 +176,7 @@ export type Database = {
           session_hours?: string | null
           sessions_total?: number | null
           skills?: string[]
+          sort_order?: number
           summary?: string | null
           total_hours?: number | null
           tuition?: string | null
@@ -197,6 +199,7 @@ export type Database = {
           session_hours?: string | null
           sessions_total?: number | null
           skills?: string[]
+          sort_order?: number
           summary?: string | null
           total_hours?: number | null
           tuition?: string | null
@@ -206,6 +209,7 @@ export type Database = {
       }
       course_apply_info: {
         Row: {
+          apply_method: string[]
           capacity: string | null
           cost: string | null
           cost_notes: string[]
@@ -219,6 +223,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          apply_method?: string[]
           capacity?: string | null
           cost?: string | null
           cost_notes?: string[]
@@ -232,6 +237,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          apply_method?: string[]
           capacity?: string | null
           cost?: string | null
           cost_notes?: string[]

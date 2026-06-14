@@ -14,7 +14,7 @@ export async function getCatalogCourses(): Promise<CatalogCourse[]> {
   const sb = createPublicClient();
   const [{ data: courses }, { data: curricula }, { data: tracks }, { data: exams }] =
     await Promise.all([
-      sb.from("course").select("*").eq("is_deleted", false),
+      sb.from("course").select("*").eq("is_deleted", false).order("sort_order"),
       sb.from("curriculum_item").select("*"),
       sb.from("course_track").select("*").order("sort_order"),
       sb.from("exam_schedule").select("*").order("sort_order"),
@@ -64,7 +64,8 @@ export async function getScheduleCourses(): Promise<ScheduleCourse[]> {
   const { data } = await sb
     .from("course")
     .select("id, name, schedule_pattern, summary, recruit_status, is_deleted")
-    .eq("is_deleted", false);
+    .eq("is_deleted", false)
+    .order("sort_order");
   return (data ?? []).map((c) => ({
     id: c.id,
     name: c.name,
@@ -81,7 +82,8 @@ export async function getApplyCourses(): Promise<ApplyCourse[]> {
       .from("course")
       .select("id, name, recruit_status")
       .eq("is_deleted", false)
-      .neq("category", "기능사"), // 자격증은 트랙별 신청(상세 페이지에서 처리)
+      .neq("category", "기능사") // 자격증은 트랙별 신청(상세 페이지에서 처리)
+      .order("sort_order"),
     sb.from("course_apply_info").select("*"),
   ]);
 

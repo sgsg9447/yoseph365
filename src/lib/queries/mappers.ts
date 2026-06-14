@@ -120,6 +120,7 @@ export function historyToView(
 
 interface ApplyInfoRow {
   qualifications: string[];
+  apply_method: string[];
   recruit_period: string | null;
   training_period: string | null;
   training_time: string[];
@@ -148,6 +149,7 @@ export function courseRecruitStatus(
 export function applyInfoRowToView(row: ApplyInfoRow): ApplyInfoView {
   return {
     qualifications: row.qualifications,
+    applyMethod: row.apply_method,
     recruitPeriod: row.recruit_period,
     trainingPeriod: row.training_period,
     trainingTime: row.training_time,

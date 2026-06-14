@@ -198,6 +198,15 @@ function ApplyInfoStep({
             ))}
           </ApplyInfoRow>
         )}
+        {applyInfo.applyMethod.length > 0 && (
+          <ApplyInfoRow label="지원방법">
+            {applyInfo.applyMethod.map((m, i) => (
+              <span key={i} style={{ display: "block" }}>
+                · {m}
+              </span>
+            ))}
+          </ApplyInfoRow>
+        )}
         <ApplyInfoRow label="모집기간">
           {applyInfo.recruitPeriod || "신청 시 안내"}
         </ApplyInfoRow>

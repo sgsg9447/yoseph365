@@ -127,6 +127,7 @@ describe("applyInfoRowToView", () => {
   it("maps snake_case row to camelCase view", () => {
     const row = {
       qualifications: ["내일배움카드 보유자"],
+      apply_method: ["방문 접수"],
       recruit_period: null,
       training_period: "26.08.24 ~ 26.10.13",
       training_time: ["09:00 ~ 17:40"],
@@ -138,6 +139,7 @@ describe("applyInfoRowToView", () => {
     };
     expect(applyInfoRowToView(row)).toEqual({
       qualifications: ["내일배움카드 보유자"],
+      applyMethod: ["방문 접수"],
       recruitPeriod: null,
       trainingPeriod: "26.08.24 ~ 26.10.13",
       trainingTime: ["09:00 ~ 17:40"],
