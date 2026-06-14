@@ -213,7 +213,7 @@ select id, v.content, v.hl, v.ord from h, (values
 
 -- ---------- SiteSection — 연혁 소개 문구 ----------
 insert into site_section (key, title, body) values
-  ('about_history_intro', '성요셉목수학교 연혁',
+  ('about_history_intro', NULL,
     '{"다양한 공식인증을 받은 체계적인 교육기관에서 전문적인 훈련을 통해 실무 역량을 키우고 성공적인 미래를 준비하세요.","변화하는 시대에 맞춘 최신 커리큘럼으로, 자신만의 경쟁력을 높일 수 있습니다."}');
 
 -- ---------- CourseApplyInfo — 과정별 모집안내 (이미지 정본) ----------
