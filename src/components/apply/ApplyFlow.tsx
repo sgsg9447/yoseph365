@@ -5,7 +5,7 @@
 
 import { useState } from "react";
 import { Check } from "@/components/icons";
-import { APPLY_INFO } from "@/lib/data/courses";
+import type { ApplyInfoView, RecruitStatus } from "@/lib/queries/types";
 import { PHONE_MAIN } from "@/lib/data/site";
 
 // ── 진행 단계 표시 ──────────────────────────────────────────────────
@@ -109,9 +109,48 @@ function ApplyInfoRow({
   );
 }
 
-// ── 1단계: 모집안내 ─────────────────────────────────────────────────
-function ApplyInfoStep({ course, onNext }: { course: string; onNext: () => void }) {
-  const info = APPLY_INFO;
+// ── 1단계: 모집안내 (DB course_apply_info) ──────────────────────────
+function ApplyInfoStep({
+  course,
+  applyInfo,
+  recruitStatus,
+  onNext,
+}: {
+  course: string;
+  applyInfo: ApplyInfoView | null;
+  recruitStatus: RecruitStatus;
+  onNext: () => void;
+}) {
+  const isOpen = recruitStatus === "모집중";
+
+  // 모집안내 데이터가 없으면 상담 안내로 대체
+  if (!applyInfo) {
+    return (
+      <div style={{ display: "flex", flexDirection: "column", gap: 16, textAlign: "center" }}>
+        <p
+          style={{
+            fontSize: 15.5,
+            color: "var(--color-body)",
+            lineHeight: 1.7,
+            margin: 0,
+            wordBreak: "keep-all",
+          }}
+        >
+          <b style={{ color: "var(--color-ink)" }}>{course || "훈련과정"}</b>의 모집안내는
+          준비 중입니다.
+          <br />
+          전화({PHONE_MAIN})로 문의해 주시면 자세히 안내해 드립니다.
+        </p>
+        <a
+          href={`tel:${PHONE_MAIN}`}
+          className="inline-flex items-center justify-center gap-2 rounded-button font-semibold leading-none tracking-[-0.2px] whitespace-nowrap transition active:scale-[0.98] w-full h-14 px-[26px] text-[18px] bg-primary text-white border border-primary hover:bg-primary-hover"
+        >
+          전화 문의 {PHONE_MAIN}
+        </a>
+      </div>
+    );
+  }
+
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
       <p
@@ -150,92 +189,149 @@ function ApplyInfoStep({ course, onNext }: { course: string; onNext: () => void 
         >
           모집안내
         </div>
-        <ApplyInfoRow label="신청자격">
-          {info.qual.map((q, i) => (
-            <span key={i} style={{ display: "block" }}>
-              · {q}
-            </span>
-          ))}
+        {applyInfo.qualifications.length > 0 && (
+          <ApplyInfoRow label="신청자격">
+            {applyInfo.qualifications.map((q, i) => (
+              <span key={i} style={{ display: "block" }}>
+                · {q}
+              </span>
+            ))}
+          </ApplyInfoRow>
+        )}
+        <ApplyInfoRow label="모집기간">
+          {applyInfo.recruitPeriod || "신청 시 안내"}
         </ApplyInfoRow>
-        <ApplyInfoRow label="모집기간">{info.recruit}</ApplyInfoRow>
-        <ApplyInfoRow label="교육일정">{info.schedule}</ApplyInfoRow>
-        <ApplyInfoRow label="교육시간">{info.time}</ApplyInfoRow>
-        <ApplyInfoRow label="진행순서" last>
-          {info.order.map((o, i) => (
-            <span key={i} style={{ display: "block" }}>
-              {i + 1}. {o}
-              {i === 2 ? " (개별 문자안내)" : ""}
+        {applyInfo.trainingPeriod && (
+          <ApplyInfoRow label="훈련기간">{applyInfo.trainingPeriod}</ApplyInfoRow>
+        )}
+        {applyInfo.trainingTime.length > 0 && (
+          <ApplyInfoRow label="훈련시간">
+            {applyInfo.trainingTime.map((t, i) => (
+              <span key={i} style={{ display: "block" }}>
+                {t}
+              </span>
+            ))}
+          </ApplyInfoRow>
+        )}
+        {applyInfo.capacity && (
+          <ApplyInfoRow label="모집인원">{applyInfo.capacity}</ApplyInfoRow>
+        )}
+        {applyInfo.cost && (
+          <ApplyInfoRow label="훈련비용">
+            <span style={{ display: "block", fontWeight: 700, color: "var(--color-ink)" }}>
+              {applyInfo.cost}
             </span>
-          ))}
-        </ApplyInfoRow>
+            {applyInfo.costNotes.map((n, i) => (
+              <span
+                key={i}
+                style={{ display: "block", fontSize: 13, color: "var(--color-muted)" }}
+              >
+                * {n}
+              </span>
+            ))}
+          </ApplyInfoRow>
+        )}
+        {applyInfo.steps.length > 0 && (
+          <ApplyInfoRow label="진행순서" last>
+            {applyInfo.steps.map((o, i) => (
+              <span key={i} style={{ display: "block" }}>
+                {i + 1}. {o}
+              </span>
+            ))}
+          </ApplyInfoRow>
+        )}
       </div>
 
-      <details
-        style={{
-          border: "1px solid var(--color-hairline-strong)",
-          borderRadius: 14,
-          overflow: "hidden",
-        }}
-      >
-        <summary
+      {applyInfo.exclusions.length > 0 && (
+        <details
           style={{
-            padding: "13px 16px",
-            fontSize: 14.5,
-            fontWeight: 700,
-            color: "var(--color-body-strong)",
-            cursor: "pointer",
-            listStyle: "none",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
+            border: "1px solid var(--color-hairline-strong)",
+            borderRadius: 14,
+            overflow: "hidden",
           }}
         >
-          신청제외대상 안내
-          <svg
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="var(--color-muted)"
-            strokeWidth="2.2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
+          <summary
+            style={{
+              padding: "13px 16px",
+              fontSize: 14.5,
+              fontWeight: 700,
+              color: "var(--color-body-strong)",
+              cursor: "pointer",
+              listStyle: "none",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+            }}
           >
-            <path d="m6 9 6 6 6-6" />
-          </svg>
-        </summary>
-        <ul
+            신청제외대상 안내
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="var(--color-muted)"
+              strokeWidth="2.2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="m6 9 6 6 6-6" />
+            </svg>
+          </summary>
+          <ul
+            style={{
+              margin: 0,
+              padding: "4px 16px 14px 30px",
+              display: "flex",
+              flexDirection: "column",
+              gap: 6,
+            }}
+          >
+            {applyInfo.exclusions.map((x, i) => (
+              <li
+                key={i}
+                style={{
+                  fontSize: 13.5,
+                  color: "var(--color-body)",
+                  lineHeight: 1.55,
+                  wordBreak: "keep-all",
+                }}
+              >
+                {x}
+              </li>
+            ))}
+          </ul>
+        </details>
+      )}
+
+      {isOpen ? (
+        <button
+          type="button"
+          onClick={onNext}
+          className="inline-flex items-center justify-center gap-2 rounded-button font-semibold leading-none tracking-[-0.2px] whitespace-nowrap transition active:scale-[0.98] w-full h-14 px-[26px] text-[18px] bg-primary text-white border border-primary hover:bg-primary-hover"
+        >
+          확인했어요, 신청서 작성하기
+        </button>
+      ) : (
+        <div
           style={{
-            margin: 0,
-            padding: "4px 16px 14px 30px",
             display: "flex",
             flexDirection: "column",
-            gap: 6,
+            gap: 8,
+            padding: "16px",
+            borderRadius: 14,
+            background: "var(--color-canvas-soft)",
+            border: "1px solid var(--color-hairline)",
+            textAlign: "center",
           }}
         >
-          {APPLY_INFO.exclude.map((x, i) => (
-            <li
-              key={i}
-              style={{
-                fontSize: 13.5,
-                color: "var(--color-body)",
-                lineHeight: 1.55,
-                wordBreak: "keep-all",
-              }}
-            >
-              {x}
-            </li>
-          ))}
-        </ul>
-      </details>
-
-      <button
-        type="button"
-        onClick={onNext}
-        className="inline-flex items-center justify-center gap-2 rounded-button font-semibold leading-none tracking-[-0.2px] whitespace-nowrap transition active:scale-[0.98] w-full h-14 px-[26px] text-[18px] bg-primary text-white border border-primary hover:bg-primary-hover"
-      >
-        확인했어요, 신청서 작성하기
-      </button>
+          <span style={{ fontSize: 15.5, fontWeight: 700, color: "var(--color-ink)" }}>
+            현재 모집 중이 아닙니다
+          </span>
+          <span style={{ fontSize: 14, color: "var(--color-muted)", lineHeight: 1.6 }}>
+            다음 모집 일정은 전화({PHONE_MAIN})로 안내해 드립니다.
+          </span>
+        </div>
+      )}
 
       <p
         style={{
@@ -488,8 +584,8 @@ function ApplyFormStep({
 }
 
 // ── 3단계: 접수완료 ─────────────────────────────────────────────────
-function ApplyDone({ onClose }: { onClose: () => void }) {
-  const order = APPLY_INFO.order;
+function ApplyDone({ steps, onClose }: { steps: string[]; onClose: () => void }) {
+  const order = steps.length > 0 ? steps : ["신청서 접수", "다음 단계 안내"];
   return (
     <div style={{ textAlign: "center", padding: "8px 0 4px" }}>
       <span
@@ -526,9 +622,9 @@ function ApplyDone({ onClose }: { onClose: () => void }) {
           wordBreak: "keep-all",
         }}
       >
-        다음 단계는 <b style={{ color: "var(--color-ink)" }}>면접</b>입니다.
+        담당자가 확인 후 다음 단계를 개별 안내드립니다.
         <br />
-        면접 일정은 개별 문자로 안내드립니다.
+        궁금한 점은 전화({PHONE_MAIN})로 문의해 주세요.
       </p>
 
       <div
@@ -625,17 +721,24 @@ function ApplyDone({ onClose }: { onClose: () => void }) {
 // ── 메인 ApplyFlow ──────────────────────────────────────────────────
 interface ApplyFlowProps {
   course: string;
+  applyInfo: ApplyInfoView | null;
+  recruitStatus: RecruitStatus;
   onSubmitted?: () => void;
 }
 
-export function ApplyFlow({ course, onSubmitted }: ApplyFlowProps) {
+export function ApplyFlow({ course, applyInfo, recruitStatus, onSubmitted }: ApplyFlowProps) {
   const [step, setStep] = useState(0);
 
   return (
     <div>
       <ApplySteps current={step} />
       {step === 0 && (
-        <ApplyInfoStep course={course} onNext={() => setStep(1)} />
+        <ApplyInfoStep
+          course={course}
+          applyInfo={applyInfo}
+          recruitStatus={recruitStatus}
+          onNext={() => setStep(1)}
+        />
       )}
       {step === 1 && (
         <ApplyFormStep
@@ -648,7 +751,7 @@ export function ApplyFlow({ course, onSubmitted }: ApplyFlowProps) {
         />
       )}
       {step === 2 && (
-        <ApplyDone onClose={() => setStep(0)} />
+        <ApplyDone steps={applyInfo?.steps ?? []} onClose={() => setStep(0)} />
       )}
     </div>
   );

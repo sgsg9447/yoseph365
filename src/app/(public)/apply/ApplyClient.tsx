@@ -1,19 +1,20 @@
 "use client";
 
-// ApplyClient — ?course= 파라미터를 읽어 ApplyFlow를 렌더.
+// ApplyClient — ?course= 파라미터를 읽어 DB 모집안내(ApplyFlow)를 렌더.
 // useSearchParams는 'use client' + Suspense 바운더리 안에서만 사용 가능.
-// 참조: HANDOFF/ui_kits/website/apply.jsx (ApplyPage, ApplyCoursePicker, APPLY_COURSES)
 
 import { useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { Card } from "@/components/ui/Card";
 import { ApplyFlow } from "@/components/apply/ApplyFlow";
-import { APPLY_COURSES } from "@/lib/data/courses";
+import type { ApplyCourse } from "@/lib/queries/types";
 
 function ApplyCoursePicker({
+  courses,
   course,
   onChange,
 }: {
+  courses: ApplyCourse[];
   course: string;
   onChange: (c: string) => void;
 }) {
@@ -39,9 +40,10 @@ function ApplyCoursePicker({
           width: "100%",
         }}
       >
-        {APPLY_COURSES.map((c) => (
-          <option key={c} value={c}>
-            {c}
+        {courses.map((c) => (
+          <option key={c.name} value={c.name}>
+            {c.name}
+            {c.recruitStatus !== "모집중" ? " (모집마감)" : ""}
           </option>
         ))}
       </select>
@@ -49,19 +51,24 @@ function ApplyCoursePicker({
   );
 }
 
-export function ApplyClient() {
+export function ApplyClient({ courses }: { courses: ApplyCourse[] }) {
   const params = useSearchParams();
   const fromUrl = params.get("course") ?? "";
-  const [course, setCourse] = useState(fromUrl || APPLY_COURSES[0]);
+  const [course, setCourse] = useState(fromUrl || courses[0]?.name || "");
+
+  const selected = courses.find((c) => c.name === course) ?? null;
 
   return (
     <Card padding={0} style={{ padding: "clamp(20px, 3.5vw, 32px)" }}>
       {/* 과정 선택기: ?course= 파라미터가 없을 때만 표시 */}
-      {!fromUrl && (
-        <ApplyCoursePicker course={course} onChange={setCourse} />
+      {!fromUrl && courses.length > 0 && (
+        <ApplyCoursePicker courses={courses} course={course} onChange={setCourse} />
       )}
-      {/* 3단계 위저드: ApplyFlow가 완료 후 첫 화면으로 돌아감 */}
-      <ApplyFlow course={course} />
+      <ApplyFlow
+        course={course}
+        applyInfo={selected?.applyInfo ?? null}
+        recruitStatus={selected?.recruitStatus ?? "모집중"}
+      />
     </Card>
   );
 }

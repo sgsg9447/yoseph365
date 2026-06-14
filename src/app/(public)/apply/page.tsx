@@ -4,9 +4,19 @@
 
 import { Suspense } from "react";
 import { PageHero } from "@/components/sections/PageHero";
+import { getApplyCourses } from "@/lib/queries/courses";
+import type { ApplyCourse } from "@/lib/queries/types";
 import { ApplyClient } from "./ApplyClient";
 
-export default function ApplyPage() {
+export const revalidate = 3600;
+
+export default async function ApplyPage() {
+  let courses: ApplyCourse[];
+  try {
+    courses = await getApplyCourses();
+  } catch {
+    courses = [];
+  }
   return (
     <>
       <PageHero
@@ -17,7 +27,7 @@ export default function ApplyPage() {
       <section className="wrap" style={{ paddingTop: 32, paddingBottom: 72 }}>
         <div style={{ maxWidth: 640, margin: "0 auto" }}>
           <Suspense fallback={null}>
-            <ApplyClient />
+            <ApplyClient courses={courses} />
           </Suspense>
         </div>
       </section>
