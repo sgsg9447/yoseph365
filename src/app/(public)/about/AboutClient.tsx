@@ -12,12 +12,19 @@ import type { AboutHistoryView, SiteSectionView } from "@/lib/queries/types";
 
 // ── 학원소개 ──────────────────────────────────────────────────────────────────
 
-// 사진은 다음 작업에 주입(현재 플레이스홀더)
 const INTRO_SLIDES: CarouselSlide[] = [
-  { label: "학원 전경 · 실습장" },
-  { label: "목공 실습장" },
-  { label: "강의실" },
-  { label: "수강생 작품" },
+  { src: "/photos/introduction/classroom-1.jpg", label: "강의실" },
+  { src: "/photos/introduction/classroom-2.jpg", label: "강의실" },
+  { src: "/photos/introduction/woodwork-lab-1.jpg", label: "인테리어 목공 실습실" },
+  { src: "/photos/introduction/woodwork-lab-2.jpg", label: "인테리어 목공 실습실" },
+  { src: "/photos/introduction/woodwork-lab-3.jpg", label: "인테리어 목공 실습실" },
+  { src: "/photos/introduction/woodwork-lab-4.jpg", label: "인테리어 목공 실습실" },
+  { src: "/photos/introduction/woodwork-lab-5.jpg", label: "인테리어 목공 실습실" },
+  { src: "/photos/introduction/film-lab-1.jpg", label: "인테리어 필름 실습실" },
+  { src: "/photos/introduction/film-lab-2.jpg", label: "인테리어 필름 실습실" },
+  { src: "/photos/introduction/film-lab-3.jpg", label: "인테리어 필름 실습실" },
+  { src: "/photos/introduction/film-lab-4.jpg", label: "인테리어 필름 실습실" },
+  { src: "/photos/introduction/film-lab-5.jpg", label: "인테리어 필름 실습실" },
 ];
 
 function AboutIntro() {

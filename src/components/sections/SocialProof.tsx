@@ -86,12 +86,12 @@ const trust: AwardHighlightProps[] = [
 ];
 
 const photos = [
-  "목공 실습",
-  "벽체 단열 실습",
-  "타일 시공 실습",
-  "전동공구 수업",
-  "수강생 작품",
-  "수료식",
+  { src: "/photos/training/training-03.jpg", label: "가벽·아치 목공 실습" },
+  { src: "/photos/training/training-09.jpg", label: "욕실 변기 설치 실습" },
+  { src: "/photos/training/training-07.jpg", label: "벽타일 시공 실습" },
+  { src: "/photos/training/training-08.jpg", label: "바닥재 시공 실습" },
+  { src: "/photos/training/training-06.jpg", label: "집수리 설비 실습" },
+  { src: "/photos/training/training-02.jpg", label: "무늬목 시공 실습" },
 ];
 
 export function SocialProof() {
@@ -105,7 +105,7 @@ export function SocialProof() {
       />
       <div className="grid g-3" style={{ margin: "36px 0 12px" }}>
         {photos.map((p, i) => (
-          <PhotoSlot key={i} ratio="4 / 3" label={p} />
+          <PhotoSlot key={i} ratio="4 / 3" src={p.src} label={p.label} />
         ))}
       </div>
       <div className="flex justify-center" style={{ margin: "4px 0 34px" }}>
