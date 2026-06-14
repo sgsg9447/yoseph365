@@ -310,27 +310,6 @@ export function CourseDetailView({ course }: { course: CatalogCourse }) {
           {course.moreNote}
         </p>
       )}
-
-      {/* 하단 신청 버튼 (정규 과정만) */}
-      {!course.tracks && (
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: "10px 16px",
-            marginTop: 30,
-          }}
-        >
-          <ApplyCtaButton open={isOpen} onClick={() => goApply(course.id)} />
-          <span style={{ fontSize: 14, color: "var(--color-muted)" }}>
-            {isOpen
-              ? "개강일·잔여석은 신청 시 바로 안내드립니다"
-              : "다음 모집 일정은 전화로 안내해 드립니다"}
-          </span>
-        </div>
-      )}
     </section>
   );
 }

@@ -39,7 +39,7 @@ export function Footer() {
       <div
         className="wrap flex flex-col gap-[14px] pt-[22px] border-t border-hairline"
       >
-        <div className="awards-list justify-center">
+        <div className="awards-list">
           {AWARDS.map((a, i) => (
             <span
               key={i}

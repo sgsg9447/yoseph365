@@ -141,7 +141,7 @@
   .board-link:hover .board-title { color: var(--color-primary); text-decoration: underline; text-underline-offset: 3px; }
   .awards-strip { display: flex; align-items: center; gap: 16px; padding-top: 14px; padding-bottom: 14px; }
   .awards-divider { display: block; width: 1px; height: 26px; background: var(--color-hairline-strong); }
-  .awards-list { display: flex; align-items: center; gap: 22px; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; padding: 4px 2px; }
+  .awards-list { display: flex; align-items: center; gap: 22px; min-width: 0; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; padding: 4px 2px; }
   .awards-list::-webkit-scrollbar { display: none; }
   .fund-tabs { display: flex; gap: 8px; overflow-x: auto; padding: 4px 2px; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
   .fund-tabs::-webkit-scrollbar { display: none; }
