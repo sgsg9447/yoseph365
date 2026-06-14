@@ -4,7 +4,6 @@ import { PageHero } from "@/components/sections/PageHero";
 import { getCatalogCourses } from "@/lib/queries/courses";
 import type { CatalogCourse } from "@/lib/queries/types";
 import { CourseGrid } from "./CourseGrid";
-import { EnrollSteps } from "./EnrollSteps";
 
 export const revalidate = 3600;
 
@@ -23,7 +22,6 @@ export default async function CoursesPage() {
         sub="목공·집수리·인테리어 전문 기술을 체계적으로 배웁니다. 초보자부터 자격증 준비생까지 수준별 과정을 운영합니다."
       />
       <CourseGrid courses={courses} />
-      <EnrollSteps />
     </>
   );
 }

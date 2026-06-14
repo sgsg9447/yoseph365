@@ -14,8 +14,8 @@ const benefits = [
   },
   {
     icon: <Wallet size={22} />,
-    title: "수강료 0원",
-    desc: "내일배움카드로 수강료 전액을 국비로 지원받습니다.",
+    title: "국비지원 수강료",
+    desc: "내일배움카드로 수강료를 국비 지원받고, 자비부담금만 납부합니다.",
   },
   {
     icon: <Clipboard size={22} />,
@@ -32,7 +32,7 @@ const benefits = [
 const steps = [
   { n: 1, t: "자격 확인", d: "국비지원 대상 여부를 전화로 확인" },
   { n: 2, t: "과정 선택", d: "목적에 맞는 과정과 개강일 결정" },
-  { n: 3, t: "수강 신청", d: "내일배움카드로 0원 등록" },
+  { n: 3, t: "수강 신청", d: "내일배움카드로 수강 등록" },
   { n: 4, t: "교육 시작", d: "개강일에 맞춰 수업 시작" },
 ];
 
@@ -51,8 +51,8 @@ export function Barriers() {
         <SectionHeading
           align="center"
           eyebrow="시작은 쉽게"
-          title={<>시작은 쉽게, 비용은 0원</>}
-          sub="내일배움카드만 있으면 수강료 전액 국비지원. 복잡한 절차 없이 전화 한 통이면 됩니다."
+          title={<>시작은 쉽게, 부담은 가볍게</>}
+          sub="내일배움카드로 수강료를 국비 지원받습니다. 복잡한 절차 없이 전화 한 통이면 됩니다."
         />
         <div className="grid g-4" style={{ margin: "48px 0 56px", rowGap: 32 }}>
           {benefits.map((b, i) => (

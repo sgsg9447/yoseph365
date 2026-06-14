@@ -46,7 +46,7 @@ export function ClosingCTA() {
         <h2
           className="font-display font-bold text-ink leading-[1.35] tracking-[-0.6px] mx-auto mb-4 break-keep max-w-[640px] text-[clamp(26px,3.6vw,38px)]"
         >
-          내일배움카드가 있다면 수강료 0원
+          내일배움카드로 수강료 부담을 덜어드립니다
         </h2>
         <p className="text-[18px] text-body leading-[1.7] mx-auto mb-[30px] break-keep max-w-[520px]">
           자격 확인부터 과정 안내까지, 전화 한 통이면 됩니다.

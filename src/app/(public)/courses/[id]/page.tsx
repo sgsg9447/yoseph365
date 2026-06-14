@@ -5,7 +5,6 @@ import { notFound } from "next/navigation";
 import { PageHero } from "@/components/sections/PageHero";
 import { getCatalogCourses, getCourseById } from "@/lib/queries/courses";
 import { CourseDetailView } from "../CourseDetailView";
-import { EnrollSteps } from "../EnrollSteps";
 
 export const revalidate = 3600;
 
@@ -49,7 +48,6 @@ export default async function CourseDetailPage({
         sub="목공·집수리·인테리어 전문 기술을 체계적으로 배웁니다. 초보자부터 자격증 준비생까지 수준별 과정을 운영합니다."
       />
       <CourseDetailView course={course} />
-      <EnrollSteps />
     </>
   );
 }
