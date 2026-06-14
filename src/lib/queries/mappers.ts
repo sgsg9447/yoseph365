@@ -12,12 +12,6 @@ export function patternToStartDate(p: string | null): string {
   return "평일반";
 }
 
-export function categoryToBadge(c: string): string {
-  if (c === "집수리") return "집수리";
-  if (c === "기능사") return "자격";
-  return "입문"; // 건축목공입문 / 인테리어필름입문
-}
-
 interface CurriculumRow {
   round: number;
   unit: string | null;

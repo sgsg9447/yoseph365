@@ -6,7 +6,6 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Card } from "@/components/ui/Card";
-import { Badge } from "@/components/ui/Badge";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Phone, Clipboard, Wallet, Award } from "@/components/icons";
 import type { CatalogCourse, CourseDay, TrackView } from "@/lib/queries/types";
@@ -93,7 +92,6 @@ function CourseGrid({
             >
               <span style={{ display: "flex", gap: 6 }}>
                 <DayChip day={c.day} />
-                <Badge tone="neutral">{c.badge}</Badge>
               </span>
               {/* 오른쪽 화살표 */}
               <svg
@@ -327,7 +325,6 @@ function CourseDetail({
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           <span style={{ display: "flex", gap: 6 }}>
             <DayChip day={course.day} />
-            <Badge tone="neutral">{course.badge}</Badge>
           </span>
           <h2
             style={{

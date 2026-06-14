@@ -3,7 +3,6 @@ import type { CatalogCourse, ScheduleCourse } from "./types";
 import {
   patternToDay,
   patternToStartDate,
-  categoryToBadge,
   curriculumToTable,
   trackToView,
 } from "./mappers";
@@ -39,7 +38,6 @@ export async function getCatalogCourses(): Promise<CatalogCourse[]> {
     return {
       id: c.id,
       day: patternToDay(c.schedule_pattern),
-      badge: categoryToBadge(c.category),
       name: c.name,
       tags: c.skills ?? [],
       desc: c.summary ?? "",

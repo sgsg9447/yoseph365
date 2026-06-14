@@ -2,7 +2,6 @@ import { describe, it, expect } from "vitest";
 import {
   patternToDay,
   patternToStartDate,
-  categoryToBadge,
   curriculumToTable,
   trackToView,
   historyToView,
@@ -22,15 +21,6 @@ describe("patternToStartDate", () => {
     expect(patternToStartDate("평일주간")).toBe("평일반");
     expect(patternToStartDate("주말")).toBe("주말반");
     expect(patternToStartDate("단기")).toBe("단기");
-  });
-});
-
-describe("categoryToBadge", () => {
-  it("shortens category", () => {
-    expect(categoryToBadge("집수리")).toBe("집수리");
-    expect(categoryToBadge("건축목공입문")).toBe("입문");
-    expect(categoryToBadge("인테리어필름입문")).toBe("입문");
-    expect(categoryToBadge("기능사")).toBe("자격");
   });
 });
 

@@ -22,7 +22,6 @@ export interface TrackView {
 export interface CatalogCourse {
   id: string;
   day: CourseDay;
-  badge: string;
   name: string;
   tags: string[];
   desc: string;
