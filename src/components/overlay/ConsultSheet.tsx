@@ -20,6 +20,7 @@ const INQUIRY_COURSES = [
   "건축목공기능사과정",
   "건축도장기능사과정",
 ];
+const PHONE_PREFIXES = ["010", "011", "016", "017", "019"];
 
 function InterestCoursePicker({
   courses,
@@ -136,10 +137,113 @@ function InterestCoursePicker({
   );
 }
 
+function PhonePrefixPicker({
+  value,
+  onChange,
+}: {
+  value: string;
+  onChange: (value: string) => void;
+}) {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <div
+      style={{
+        border: "1px solid var(--color-hairline-strong)",
+        borderRadius: 12,
+        overflow: "hidden",
+        background: "var(--color-surface-card)",
+      }}
+    >
+      <button
+        type="button"
+        aria-expanded={open}
+        onClick={() => setOpen((v) => !v)}
+        style={{
+          width: "100%",
+          minHeight: 52,
+          padding: "0 12px 0 14px",
+          border: "none",
+          background: "var(--color-surface-card)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: 8,
+          fontFamily: "var(--font-sans)",
+          fontSize: 16,
+          fontWeight: 600,
+          color: "var(--color-ink)",
+          cursor: "pointer",
+        }}
+      >
+        {value}
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="var(--color-muted)"
+          strokeWidth="2.2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden
+          style={{
+            flex: "0 0 auto",
+            transform: open ? "rotate(180deg)" : "none",
+            transition: "transform .15s ease",
+          }}
+        >
+          <path d="m6 9 6 6 6-6" />
+        </svg>
+      </button>
+
+      {open && (
+        <div
+          style={{
+            borderTop: "1px solid var(--color-hairline)",
+            background: "var(--color-surface-card)",
+          }}
+        >
+          {PHONE_PREFIXES.map((prefix, i) => {
+            const active = prefix === value;
+            return (
+              <button
+                key={prefix}
+                type="button"
+                onClick={() => {
+                  onChange(prefix);
+                  setOpen(false);
+                }}
+                style={{
+                  width: "100%",
+                  padding: "10px 14px",
+                  border: "none",
+                  borderBottom:
+                    i === PHONE_PREFIXES.length - 1 ? "none" : "1px solid var(--color-hairline-soft)",
+                  background: active ? "var(--color-primary-soft)" : "transparent",
+                  color: active ? "var(--color-primary)" : "var(--color-body-strong)",
+                  fontFamily: "var(--font-sans)",
+                  fontSize: 15,
+                  fontWeight: active ? 700 : 600,
+                  textAlign: "left",
+                  cursor: "pointer",
+                }}
+              >
+                {prefix}
+              </button>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ── InquiryForm ───────────────────────────────────────────────────────────────
 
 function InquiryForm({ onSubmit }: { onSubmit: () => void }) {
   const [checked, setChecked] = useState<string[]>([]);
+  const [phonePrefix, setPhonePrefix] = useState(PHONE_PREFIXES[0]);
   const toggle = (c: string) =>
     setChecked((prev) =>
       prev.includes(c) ? prev.filter((x) => x !== c) : [...prev, c]
@@ -164,11 +268,7 @@ function InquiryForm({ onSubmit }: { onSubmit: () => void }) {
           연락처 <span aria-hidden="true" className="text-error ml-1">*</span>
         </span>
         <div className="grid gap-2" style={{ gridTemplateColumns: "96px 1fr 1fr" }}>
-          <select className={inputCls + " px-[10px] cursor-pointer"}>
-            {["010", "011", "016", "017", "019"].map((p) => (
-              <option key={p} value={p}>{p}</option>
-            ))}
-          </select>
+          <PhonePrefixPicker value={phonePrefix} onChange={setPhonePrefix} />
           <input
             type="tel"
             inputMode="numeric"
