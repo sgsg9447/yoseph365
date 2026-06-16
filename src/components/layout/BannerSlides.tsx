@@ -34,9 +34,22 @@ function Frame({ tone, children }: { tone: string; children: React.ReactNode }) 
   );
 }
 
-function Eyebrow({ children }: { children: React.ReactNode }) {
+function Eyebrow({
+  children,
+  compact = false,
+}: {
+  children: React.ReactNode;
+  compact?: boolean;
+}) {
+  // compact: 한 줄에 뱃지 2개가 들어가야 하는 좁은 화면(국비과정 배너)용 — 폰트·패딩을 줄여
+  // 320px에서도 줄바꿈 없이 한 줄 유지. xl에선 일반 크기로 복귀.
+  const size = compact
+    ? "gap-[5px] xl:gap-[6px] px-2 xl:px-3 py-1.5 xl:py-2 text-[clamp(10px,3vw,14px)]"
+    : "gap-[6px] xl:gap-[7px] px-2.5 xl:px-4 py-[8px] xl:py-[9px] text-[clamp(12px,1.6vw,16px)]";
   return (
-    <span className="inline-flex items-center gap-[6px] xl:gap-[7px] px-2.5 xl:px-4 py-[8px] xl:py-[9px] rounded-full bg-white border border-hairline text-[clamp(12px,1.6vw,16px)] font-bold text-primary whitespace-nowrap shrink-0">
+    <span
+      className={`inline-flex items-center ${size} rounded-full bg-white border border-hairline font-bold text-primary whitespace-nowrap shrink-0`}
+    >
       {children}
     </span>
   );
@@ -65,9 +78,9 @@ function FeeBanner() {
         </p>
       </div>
 
-      <div className="w-full xl:flex-none xl:w-[440px] bg-white border border-hairline rounded-[20px] shadow-card px-[clamp(22px,3vw,30px)] py-[clamp(20px,2.5vw,26px)]">
-        <div className="flex items-baseline justify-between gap-[10px] pb-4 border-b-[1.5px] border-hairline">
-          <span className="text-[clamp(18px,2vw,21px)] font-bold text-ink tracking-[-0.3px]">
+      <div className="w-full xl:flex-none xl:w-[440px] bg-white border border-hairline rounded-[20px] shadow-card px-[clamp(16px,3vw,30px)] py-[clamp(18px,2.5vw,26px)]">
+        <div className="flex items-baseline justify-between gap-2 pb-4 border-b-[1.5px] border-hairline">
+          <span className="text-[clamp(15px,2vw,21px)] font-bold text-ink tracking-[-0.3px]">
             자기부담금 훈련비
           </span>
           <span className="text-[14px] font-semibold text-muted whitespace-nowrap">
@@ -83,7 +96,7 @@ function FeeBanner() {
             ].join(" ")}
           >
             <span className="flex items-baseline gap-2">
-              <span className="text-[clamp(17px,1.9vw,20px)] font-bold text-ink tracking-[-0.3px]">
+              <span className="text-[clamp(15px,1.9vw,20px)] font-bold text-ink tracking-[-0.3px]">
                 {name}
               </span>
               <span className="text-[14px] font-semibold text-muted">{day}</span>
@@ -91,7 +104,7 @@ function FeeBanner() {
             <span className="flex items-baseline gap-[2px]">
               <span
                 className={[
-                  "font-display font-bold leading-none tracking-[-0.8px] text-[clamp(24px,2.8vw,30px)]",
+                  "font-display font-bold leading-none tracking-[-0.8px] text-[clamp(20px,2.8vw,30px)]",
                   accent ? "text-primary" : "text-ink",
                 ].join(" ")}
               >
@@ -188,9 +201,9 @@ function CoursesBanner() {
     <Frame tone={TONE_BLUEGRAY}>
       <div className={LEFT}>
         <div className="flex flex-nowrap gap-1 xl:gap-2 mb-3 xl:mb-5">
-          <Eyebrow>국비지원 훈련생 환영</Eyebrow>
-          <Eyebrow>
-            <CreditCard size={15} strokeWidth={2.2} />
+          <Eyebrow compact>국비지원 훈련생 환영</Eyebrow>
+          <Eyebrow compact>
+            <CreditCard size={14} strokeWidth={2.2} />
             내일배움카드 수강
           </Eyebrow>
         </div>
