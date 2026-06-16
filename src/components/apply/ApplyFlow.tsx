@@ -237,7 +237,7 @@ function ApplyInfoStep({
           <ApplyInfoRow label="신청자격">
             {applyInfo.qualifications.map((q, i) => (
               <span key={i} style={{ display: "block" }}>
-                · {q}
+                {q}
               </span>
             ))}
           </ApplyInfoRow>
