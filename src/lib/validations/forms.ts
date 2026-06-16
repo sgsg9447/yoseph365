@@ -4,6 +4,12 @@ import { z } from "zod";
 const phoneRe = /^01[016789]-?\d{3,4}-?\d{4}$/;
 const phone = z.string().trim().regex(phoneRe, "연락처 형식을 확인해 주세요");
 const optText = (max: number) => z.string().trim().max(max).optional().default("");
+const optEmail = z.preprocess(
+  (value) => (typeof value === "string" ? value.trim() : value),
+  z.union([z.string().email("이메일 형식을 확인해 주세요").max(100), z.literal("")])
+    .optional()
+    .default(""),
+);
 
 // 수강신청(application)
 export const applicationSchema = z.object({
@@ -24,5 +30,7 @@ export const consultSchema = z.object({
   name: z.string().trim().min(1, "이름을 입력해 주세요").max(50),
   phone,
   courseId: optText(80),
+  email: optEmail,
+  message: optText(1000),
 });
 export type ConsultInput = z.infer<typeof consultSchema>;

@@ -13,15 +13,6 @@ import { formatPhoneInput } from "@/lib/formatters/input";
 
 const PHONE = PHONE_MAIN;
 
-const INQUIRY_COURSES = [
-  "[평일] 집수리과정",
-  "[주말] 건축목공(인테리어목수)입문과정",
-  "[주말] 인테리어필름과정",
-  "건축목공기능사과정",
-  "건축도장기능사과정",
-];
-const PHONE_PREFIXES = ["010", "011", "016", "017", "019"];
-
 function InterestCoursePicker({
   courses,
   courseId,
@@ -137,220 +128,20 @@ function InterestCoursePicker({
   );
 }
 
-function PhonePrefixPicker({
-  value,
-  onChange,
-}: {
-  value: string;
-  onChange: (value: string) => void;
-}) {
-  const [open, setOpen] = useState(false);
-
-  return (
-    <div
-      style={{
-        position: "relative",
-        zIndex: open ? 20 : 1,
-      }}
-    >
-      <button
-        type="button"
-        aria-expanded={open}
-        onClick={() => setOpen((v) => !v)}
-        style={{
-          width: "100%",
-          minHeight: 52,
-          padding: "0 12px 0 14px",
-          border: "1px solid var(--color-hairline-strong)",
-          borderRadius: 12,
-          background: "var(--color-surface-card)",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          gap: 8,
-          fontFamily: "var(--font-sans)",
-          fontSize: 16,
-          fontWeight: 600,
-          color: "var(--color-ink)",
-          cursor: "pointer",
-        }}
-      >
-        {value}
-        <svg
-          width="16"
-          height="16"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="var(--color-muted)"
-          strokeWidth="2.2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          aria-hidden
-          style={{
-            flex: "0 0 auto",
-            transform: open ? "rotate(180deg)" : "none",
-            transition: "transform .15s ease",
-          }}
-        >
-          <path d="m6 9 6 6 6-6" />
-        </svg>
-      </button>
-
-      {open && (
-        <div
-          style={{
-            position: "absolute",
-            top: "calc(100% + 4px)",
-            left: 0,
-            right: 0,
-            zIndex: 30,
-            border: "1px solid var(--color-hairline-strong)",
-            borderRadius: 12,
-            overflow: "hidden",
-            background: "var(--color-surface-card)",
-            boxShadow: "0 14px 32px rgba(15, 23, 42, 0.14)",
-          }}
-        >
-          {PHONE_PREFIXES.map((prefix, i) => {
-            const active = prefix === value;
-            return (
-              <button
-                key={prefix}
-                type="button"
-                onClick={() => {
-                  onChange(prefix);
-                  setOpen(false);
-                }}
-                style={{
-                  width: "100%",
-                  padding: "10px 14px",
-                  border: "none",
-                  borderBottom:
-                    i === PHONE_PREFIXES.length - 1 ? "none" : "1px solid var(--color-hairline-soft)",
-                  background: active ? "var(--color-primary-soft)" : "transparent",
-                  color: active ? "var(--color-primary)" : "var(--color-body-strong)",
-                  fontFamily: "var(--font-sans)",
-                  fontSize: 15,
-                  fontWeight: active ? 700 : 600,
-                  textAlign: "left",
-                  cursor: "pointer",
-                }}
-              >
-                {prefix}
-              </button>
-            );
-          })}
-        </div>
-      )}
-    </div>
-  );
-}
-
-// ── InquiryForm ───────────────────────────────────────────────────────────────
-
-function InquiryForm({ onSubmit }: { onSubmit: () => void }) {
-  const [checked, setChecked] = useState<string[]>([]);
-  const [phonePrefix, setPhonePrefix] = useState(PHONE_PREFIXES[0]);
-  const toggle = (c: string) =>
-    setChecked((prev) =>
-      prev.includes(c) ? prev.filter((x) => x !== c) : [...prev, c]
-    );
-
-  const inputCls =
-    "h-[52px] px-[14px] font-[inherit] text-[16px] text-ink bg-surface-card rounded-button outline-none border border-hairline-strong min-w-0";
-
-  return (
-    <div className="flex flex-col gap-[18px]">
-      {/* 이름 */}
-      <label className="flex flex-col gap-[7px]">
-        <span className="text-[15px] font-semibold text-body-strong">
-          이름 <span aria-hidden="true" className="text-error ml-1">*</span>
-        </span>
-        <input placeholder="홍길동" className={inputCls} />
-      </label>
-
-      {/* 연락처 3-split */}
-      <div className="flex flex-col gap-[7px]">
-        <span className="text-[15px] font-semibold text-body-strong">
-          연락처 <span aria-hidden="true" className="text-error ml-1">*</span>
-        </span>
-        <div className="grid gap-2" style={{ gridTemplateColumns: "96px 1fr 1fr" }}>
-          <PhonePrefixPicker value={phonePrefix} onChange={setPhonePrefix} />
-          <input
-            type="tel"
-            inputMode="numeric"
-            maxLength={4}
-            aria-label="연락처 가운데 자리"
-            className={inputCls + " text-center"}
-          />
-          <input
-            type="tel"
-            inputMode="numeric"
-            maxLength={4}
-            aria-label="연락처 마지막 자리"
-            className={inputCls + " text-center"}
-          />
-        </div>
-      </div>
-
-      {/* 강좌 체크리스트*/}
-      <div className="flex flex-col gap-[9px]">
-        <span className="text-[15px] font-semibold text-body-strong">
-          수강신청 강좌 <span aria-hidden="true" className="text-error ml-1">*</span>
-        </span>
-        <div className="flex flex-col border border-hairline-strong rounded-button overflow-hidden">
-          {INQUIRY_COURSES.map((c, i) => {
-            const on = checked.includes(c);
-            return (
-              <label
-                key={c}
-                className={[
-                  "flex items-center gap-[11px] px-[14px] py-[13px] cursor-pointer",
-                  on ? "bg-primary-soft" : "bg-surface-card",
-                  i !== 0 ? "border-t border-hairline" : "",
-                ].join(" ")}
-              >
-                <input
-                  type="checkbox"
-                  checked={on}
-                  onChange={() => toggle(c)}
-                  className="w-[18px] h-[18px] flex-[0_0_auto] m-0 accent-primary"
-                />
-                <span
-                  className={[
-                    "text-[15px] text-ink break-keep",
-                    on ? "font-semibold" : "font-medium",
-                  ].join(" ")}
-                >
-                  {c}
-                </span>
-              </label>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* 추가문의사항 */}
-      <label className="flex flex-col gap-[7px]">
-        <span className="text-[15px] font-semibold text-body-strong">추가문의사항</span>
-        <textarea
-          rows={4}
-          placeholder="궁금하신 점을 자유롭게 남겨주세요"
-          className="px-[14px] py-[13px] font-[inherit] text-[16px] text-ink bg-surface-card rounded-button outline-none border border-hairline-strong resize-y leading-[1.6] min-w-0 w-full"
-        />
-      </label>
-
-      <Button variant="primary" size="lg" fullWidth onClick={onSubmit}>제출하기</Button>
-    </div>
-  );
-}
-
 // ── ConsultForm (상담신청) ────────────────────────────────────────────────────
 
-function ConsultForm({ onDone }: { onDone: () => void }) {
+function ConsultForm({
+  onDone,
+  submitLabel,
+}: {
+  onDone: () => void;
+  submitLabel: string;
+}) {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [courseId, setCourseId] = useState("");
+  const [email, setEmail] = useState("");
+  const [message, setMessage] = useState("");
   const [courses, setCourses] = useState<{ id: string; name: string }[]>([]);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -369,7 +160,7 @@ function ConsultForm({ onDone }: { onDone: () => void }) {
     if (pending) return;
     setError(null);
     setPending(true);
-    const res = await submitConsult({ name, phone, courseId });
+    const res = await submitConsult({ name, phone, courseId, email, message });
     setPending(false);
     if (res.ok) onDone();
     else setError(res.error);
@@ -401,11 +192,27 @@ function ConsultForm({ onDone }: { onDone: () => void }) {
           setPhone(formatPhoneInput(e.target.value, (e.nativeEvent as InputEvent).inputType))
         }
       />
+      <Field
+        label="이메일"
+        type="email"
+        inputMode="email"
+        placeholder="선택 입력"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+      />
 
       <div className="flex flex-col gap-[7px]">
         <ReqLabel optional>관심 과정</ReqLabel>
         <InterestCoursePicker courses={courses} courseId={courseId} onChange={setCourseId} />
       </div>
+
+      <Field
+        label="추가문의사항"
+        as="textarea"
+        placeholder="궁금하신 점을 자유롭게 남겨주세요"
+        value={message}
+        onChange={(e) => setMessage(e.target.value)}
+      />
 
       {error && <p className="text-[13.5px] text-error leading-[1.5] m-0">{error}</p>}
 
@@ -417,7 +224,7 @@ function ConsultForm({ onDone }: { onDone: () => void }) {
         onClick={handleSubmit}
         disabled={pending}
       >
-        {pending ? "접수 중…" : "상담 신청하기"}
+        {pending ? "접수 중…" : submitLabel}
       </Button>
       <p className="text-[13px] text-muted-soft text-center m-0 leading-[1.5]">
         입력하신 정보는 상담 목적으로만 사용됩니다.
@@ -438,6 +245,7 @@ export function ConsultSheet({ open, onClose, mode }: ConsultSheetProps) {
   const [done, setDone] = useState(false);
 
   const isInquiry = mode === "inquiry";
+  const submitLabel = isInquiry ? "문의 남기기" : "상담 신청하기";
 
   // Reset done state when sheet closes
   const handleClose = () => {
@@ -467,10 +275,8 @@ export function ConsultSheet({ open, onClose, mode }: ConsultSheetProps) {
           </p>
           <Button variant="primary" size="lg" fullWidth onClick={handleClose}>확인</Button>
         </div>
-      ) : isInquiry ? (
-        <InquiryForm onSubmit={() => setDone(true)} />
       ) : (
-        <ConsultForm onDone={() => setDone(true)} />
+        <ConsultForm onDone={() => setDone(true)} submitLabel={submitLabel} />
       )}
     </BottomSheet>
   );

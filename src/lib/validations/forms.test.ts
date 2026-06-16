@@ -37,6 +37,18 @@ describe("consultSchema", () => {
     const r = consultSchema.safeParse(base);
     expect(r.success && r.data.courseId).toBe("");
   });
+  it("이메일과 추가문의사항은 선택값으로 받는다", () => {
+    const r = consultSchema.safeParse({
+      ...base,
+      email: "test@example.com",
+      message: "주말 과정 상담 부탁드립니다.",
+    });
+    expect(r.success && r.data.email).toBe("test@example.com");
+    expect(r.success && r.data.message).toBe("주말 과정 상담 부탁드립니다.");
+  });
+  it("이메일이 있으면 형식이 맞아야 한다", () => {
+    expect(consultSchema.safeParse({ ...base, email: "not-email" }).success).toBe(false);
+  });
   it("연락처 형식이 틀리면 실패", () => {
     expect(consultSchema.safeParse({ ...base, phone: "abc" }).success).toBe(false);
   });

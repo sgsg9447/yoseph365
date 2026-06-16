@@ -41,13 +41,18 @@ export async function submitConsult(input: unknown): Promise<SubmitResult> {
     return { ok: false, error: parsed.error.issues[0]?.message ?? "입력값을 확인해 주세요." };
   }
   const v = parsed.data;
+  const contentParts = [
+    v.message ? `추가문의: ${v.message}` : "상담 신청",
+    v.email && `이메일: ${v.email}`,
+  ].filter(Boolean) as string[];
+
   const sb = createPublicClient();
   const { error } = await sb.from("inquiry").insert({
     name: v.name,
     phone: v.phone,
     category: v.courseId ? "과정문의" : "기타",
     course_id: v.courseId || null,
-    content: "상담 신청",
+    content: contentParts.join("\n"),
     privacy_agreed: true,
   });
   if (error) return { ok: false, error: GENERIC_ERROR };
