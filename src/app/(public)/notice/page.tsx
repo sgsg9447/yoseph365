@@ -31,7 +31,7 @@ export default async function NoticePage() {
       <PageHero
         eyebrow="공지사항"
         title="공지사항"
-        sub="수강신청 안내, 학원 소식과 인증·표창 소식을 전해드립니다."
+        sub={"수강신청 안내부터 학원 소식까지, 한눈에 확인하세요."}
       />
       <section className="wrap band" style={{ paddingTop: 32 }}>
         <div style={{ maxWidth: 760, margin: "0 auto" }}>
