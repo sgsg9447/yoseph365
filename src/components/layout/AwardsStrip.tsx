@@ -7,7 +7,7 @@ import { AWARDS } from "@/lib/data/awards";
 const SNS_WITH_NODES = [
   {
     name: "유튜브",
-    href: "https://www.youtube.com",
+    href: "https://www.youtube.com/channel/UCxSKDGo92Nxeff1M2Hh6sKg",
     bg: "#FF0000",
     node: (
       <span
@@ -24,7 +24,7 @@ const SNS_WITH_NODES = [
   },
   {
     name: "네이버 블로그",
-    href: "https://blog.naver.com",
+    href: "https://blog.naver.com/yoseph2018",
     bg: "#03C75A",
     node: (
       <span
@@ -42,7 +42,7 @@ const SNS_WITH_NODES = [
   },
   {
     name: "인스타그램",
-    href: "https://www.instagram.com",
+    href: "https://www.instagram.com/yoseph0326783650",
     bg: "radial-gradient(circle at 30% 110%, #fdf497 0%, #fd5949 45%, #d6249f 60%, #285AEB 90%)",
     node: (
       <svg

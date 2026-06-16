@@ -27,20 +27,3 @@ export const NAV_FUNDING = [
   { label: "훈련참여절차", href: "/funding#process" },
   { label: "산재노동자 직업훈련", href: "/funding#sanjae" },
 ];
-
-// ── SNS 링크 (플레이스홀더 — 실제 주소로 교체 필요) ───────────────────
-export interface SnsLink {
-  name: string;
-  href: string;
-  bg: string;
-}
-
-export const SNS_LINKS: SnsLink[] = [
-  { name: "유튜브", href: "https://www.youtube.com", bg: "#FF0000" },
-  { name: "네이버 블로그", href: "https://blog.naver.com", bg: "#03C75A" },
-  {
-    name: "인스타그램",
-    href: "https://www.instagram.com",
-    bg: "radial-gradient(circle at 30% 110%, #fdf497 0%, #fd5949 45%, #d6249f 60%, #285AEB 90%)",
-  },
-];
