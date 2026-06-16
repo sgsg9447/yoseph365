@@ -1,31 +1,22 @@
 // Hero section with intent cards.
 // onPick is passed down from the client wrapper (HomeIntentSchedule) on the home page.
 
-import { Users, TrendingUp, Home, Award } from "@/components/icons";
 import { IntentCard } from "@/components/ui/IntentCard";
 
 const intents = [
   {
-    icon: <Users size={26} />,
-    tint: "sky" as const,
     title: "재취업 준비",
     desc: "목공 기술로 새 일자리를 찾고 싶어요",
   },
   {
-    icon: <TrendingUp size={26} />,
-    tint: "rose" as const,
     title: "창업·부업",
     desc: "내 공방·가게를 차리고 싶어요",
   },
   {
-    icon: <Home size={26} />,
-    tint: "peach" as const,
     title: "내 집 직접 수리",
     desc: "우리 집을 직접 고치고 꾸미고 싶어요",
   },
   {
-    icon: <Award size={26} />,
-    tint: "lavender" as const,
     title: "자격증 취득",
     desc: "목공·건축 자격증을 따고 싶어요",
   },
