@@ -33,9 +33,14 @@ export function Header({ active }: HeaderProps) {
       }}
     >
       <div className="wrap flex items-center justify-between h-[66px]">
-        {/* Logo */}
+        {/* Logo — 모바일은 폭 절약 위해 조금 더 작게(h-7), 데스크탑은 h-9 */}
         <Link href="/" className="inline-flex items-center">
-          <Logo className="h-9 w-auto block" />
+          <span className="only-desktop">
+            <Logo className="h-9 w-auto block" />
+          </span>
+          <span className="only-mobile">
+            <Logo className="logo-mobile w-auto block" />
+          </span>
         </Link>
 
         {/* Desktop nav */}
