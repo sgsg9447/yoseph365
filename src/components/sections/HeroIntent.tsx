@@ -32,7 +32,7 @@ interface HeroIntentProps {
 
 export function HeroIntent({ onPick }: HeroIntentProps) {
   return (
-    <section className="relative overflow-hidden" style={{ background: "#FAF8F4" }}>
+    <section className="relative overflow-hidden">
       <div
         className="wrap relative z-[1] text-center"
         style={{
