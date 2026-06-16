@@ -102,13 +102,13 @@ export function SocialProof() {
         eyebrow="훈련 현장"
         title={<>현장과 같은 실습 환경</>}
         sub={
-          <>
+          <span className="text-[16px] sm:text-[17px]">
             보여주기식 실습이 아닙니다.{" "}
             <br className="only-mobile" />
             실제와 같은 장비·공정으로,
             <br />
             수료 후 바로 현장에서 일할 수 있게 가르칩니다.
-          </>
+          </span>
         }
       />
       <div className="grid g-3" style={{ margin: "36px 0 12px" }}>
