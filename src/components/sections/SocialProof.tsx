@@ -100,8 +100,14 @@ export function SocialProof() {
       <SectionHeading
         align="center"
         eyebrow="훈련 현장"
-        title={<>배우는 현장을 그대로 보여드립니다</>}
-        sub="실습 중심 수업입니다. 훈련 사진에서 더 많은 현장을 볼 수 있습니다."
+        title={<>현장과 같은 실습 환경</>}
+        sub={
+          <>
+            현장과 같은 장비·공정으로 실습합니다.{" "}
+            <br className="only-mobile" />
+            훈련 사진에서 더 많은 현장을 볼 수 있습니다.
+          </>
+        }
       />
       <div className="grid g-3" style={{ margin: "36px 0 12px" }}>
         {photos.map((p, i) => (

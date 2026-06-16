@@ -43,7 +43,6 @@ export function Barriers() {
           align="center"
           eyebrow="시작은 쉽게"
           title={<>시작은 쉽게, 부담은 가볍게</>}
-          sub={"내일배움카드로 수강료를 국비 지원받습니다.\n복잡한 절차 없이 전화 한 통이면 됩니다."}
         />
         <div className="grid g-4" style={{ margin: "48px 0 56px", rowGap: 32, columnGap: 8 }}>
           {benefits.map((b, i) => (

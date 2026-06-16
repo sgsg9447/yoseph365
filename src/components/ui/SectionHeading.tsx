@@ -5,7 +5,7 @@ type Align = "left" | "center";
 interface SectionHeadingProps {
   eyebrow?: string;
   title: ReactNode;
-  sub?: string;
+  sub?: ReactNode;
   align?: Align;
 }
 

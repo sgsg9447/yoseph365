@@ -8,7 +8,7 @@ import { PhotoSlot } from "@/components/ui/PhotoSlot";
 export const metadata: Metadata = {
   title: "훈련 사진 — 성요셉목수학교",
   description:
-    "실습 중심 수업의 훈련 현장과 수강생 작품을 사진으로 만나보세요.",
+    "실제 시공 현장과 같은 장비·공정으로 실습하는 훈련 현장을 사진으로 만나보세요.",
 };
 
 const GROUPS = [
@@ -68,8 +68,8 @@ export default function PhotosPage() {
     <>
       <PageHero
         eyebrow="훈련 사진"
-        title="배우는 현장을 그대로"
-        sub="실습 중심 수업의 훈련 현장과 수강생 작품을 사진으로 만나보세요."
+        title="현장과 같은 실습 환경"
+        sub="실제 시공 현장과 같은 장비·공정으로 실습하는 훈련 현장을 사진으로 만나보세요."
       />
       <PhotoGallery />
     </>
