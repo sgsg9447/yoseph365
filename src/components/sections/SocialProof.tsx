@@ -1,6 +1,6 @@
-// Server component — training photos grid + award highlights ink panel.
-// Note: handoff uses --color-gradient-amber (not in our tokens) → replaced with
-// arbitrary value #e8956a (the handoff's gradient fallback / peach-amber).
+// Server component — training photos grid + award highlights panel.
+// Award panel: refined dark — warm charcoal (#1c1714) surface, flat badges,
+// single amber (#e8956a) accent (no brown / glossy badges / gradient text).
 
 import Link from "next/link";
 import Image from "next/image";
@@ -19,17 +19,14 @@ function AwardHighlight({ lines, sub, img }: AwardHighlightProps) {
       className="relative flex flex-col items-center text-center gap-3 rounded-lg"
       style={{
         padding: "30px 22px 26px",
-        background: "#faf8f4",
+        background: "rgba(255,255,255,0.05)",
         borderRadius: 16,
-        border: "1px solid var(--color-hairline)",
+        border: "1px solid rgba(255,255,255,0.1)",
       }}
     >
       <span
         className="w-[60px] h-[60px] grid place-items-center rounded-full p-3 box-border"
-        style={{
-          background: "#fff",
-          border: "1px solid var(--color-hairline)",
-        }}
+        style={{ background: "#fff" }}
       >
         <Image
           src={img}
@@ -41,7 +38,7 @@ function AwardHighlight({ lines, sub, img }: AwardHighlightProps) {
       </span>
       <span
         className="font-display text-[18.5px] font-bold leading-[1.4] tracking-[-0.3px] break-keep flex flex-col"
-        style={{ color: "var(--color-ink)" }}
+        style={{ color: "#fff" }}
       >
         {lines.map((ln, i) => (
           <span key={i}>{ln}</span>
@@ -49,7 +46,7 @@ function AwardHighlight({ lines, sub, img }: AwardHighlightProps) {
       </span>
       <span
         className="inline-flex items-center text-[13.5px] font-bold tabular-nums tracking-[0.2px] whitespace-nowrap"
-        style={{ color: "#c2622f" }}
+        style={{ color: "#e8956a" }}
       >
         {sub}
       </span>
@@ -119,8 +116,7 @@ export function SocialProof() {
         className="relative overflow-hidden"
         style={{
           borderRadius: 22,
-          background: "var(--color-surface-card)",
-          border: "1px solid var(--color-hairline-strong)",
+          background: "#1c1714",
           padding: "clamp(28px, 4.5vw, 48px) clamp(20px, 4vw, 48px)",
         }}
       >
@@ -128,13 +124,13 @@ export function SocialProof() {
           <div className="text-center flex flex-col gap-2">
             <span
               className="text-[14px] font-bold tracking-[1.5px]"
-              style={{ color: "#c2622f" }}
+              style={{ color: "#e8956a" }}
             >
               공식 인증
             </span>
             <span
               className="font-display font-bold leading-[1.35] tracking-[-0.5px] break-keep text-[clamp(22px,3vw,30px)]"
-              style={{ color: "var(--color-ink)" }}
+              style={{ color: "#fff" }}
             >
               4년 연속, 기관이 인정한 훈련기관입니다
             </span>
