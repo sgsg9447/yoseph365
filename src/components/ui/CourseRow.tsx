@@ -25,26 +25,39 @@ export function CourseRow({
   highlighted,
   onClick,
 }: CourseRowProps) {
+  const metaText = meta ? `· ${meta}` : null;
+
   const inner = (
     <>
-      <span className="flex flex-col gap-[6px] flex-1 min-w-0">
-        <span className="text-[18px] font-semibold text-ink tracking-[-0.3px]">{name}</span>
-        <span className="flex items-center gap-2 flex-wrap">
-          {startDate && (
-            <span className="text-[15px] font-semibold text-primary whitespace-nowrap">{startDate} 개강</span>
-          )}
-          {meta && <span className="text-[14px] text-muted whitespace-nowrap">· {meta}</span>}
+      <span className="flex items-center gap-3">
+        <span className="flex flex-col gap-[7px] flex-1 min-w-0">
+          <span className="text-[15px] sm:text-[18px] font-semibold text-ink tracking-[-0.3px]">{name}</span>
+          <span className="flex items-center gap-2 flex-wrap">
+            {startDate && (
+              <span className="text-[15px] font-semibold text-primary whitespace-nowrap">
+                {startDate} 개강
+              </span>
+            )}
+            {/* 데스크톱: 설명을 개강 옆에 인라인으로 */}
+            {metaText && (
+              <span className="hidden sm:inline text-[14px] text-body leading-[1.5] min-w-0">{metaText}</span>
+            )}
+          </span>
         </span>
+        <Badge tone={open ? "success" : "neutral"} dot={open}>
+          {status}
+        </Badge>
+        <ChevronRight size={20} className="text-muted-soft flex-shrink-0" />
       </span>
-      <Badge tone={open ? "success" : "neutral"} dot={open}>
-        {status}
-      </Badge>
-      <ChevronRight size={20} className="text-muted-soft flex-shrink-0" />
+      {/* 모바일: 설명을 전체 폭으로 아래에 (좁은 컬럼에서 3줄로 감기는 것 방지) */}
+      {metaText && (
+        <span className="sm:hidden block text-[14px] text-body leading-[1.5] mt-[7px]">{metaText}</span>
+      )}
     </>
   );
 
   const commonClass = [
-    "flex items-center gap-3 w-full py-[18px] px-[12px] text-left transition-colors",
+    "block w-full py-[18px] px-[12px] text-left transition-colors",
     last ? "" : "border-b border-hairline",
     highlighted ? "course-row-highlight" : "",
   ]
