@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useRef } from "react";
 import type { PointerEvent as ReactPointerEvent } from "react";
 import { BANNER_SLIDES } from "./BannerSlides";
 
@@ -16,19 +16,11 @@ export function Banner() {
   const draggingRef = useRef(false);
   const movedRef = useRef(false); // 실제 드래그가 일어났는지(클릭과 구분)
 
-  // 5s autoplay — prefers-reduced-motion이면 생략, 드래그 중엔 멈춤
-  useEffect(() => {
-    const reducedMotion =
-      typeof window !== "undefined" &&
-      window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
-    if (reducedMotion) return;
-
-    const t = setInterval(() => {
-      if (draggingRef.current) return;
-      setI((p) => (p + 1) % n);
-    }, 5000);
-    return () => clearInterval(t);
-  }, []);
+  // 활성 dot의 진행바 애니메이션(5s)이 끝나면 다음 슬라이드로 — 진행바가 곧 타이머.
+  // prefers-reduced-motion이면 CSS가 애니메이션을 끄므로 이 핸들러도 호출되지 않는다.
+  function onProgressEnd() {
+    setI((p) => (p + 1) % n);
+  }
 
   function onPointerDown(e: ReactPointerEvent<HTMLDivElement>) {
     startX.current = e.clientX;
@@ -110,24 +102,42 @@ export function Banner() {
         </span>
       </div>
 
-      {/* Dot navigation */}
+      {/* Dot navigation — 활성 dot은 다음 슬라이드까지 남은 시간을 진행바로 표시 */}
       <div className="flex justify-center gap-[10px] pt-[18px]">
-        {BANNER_SLIDES.map((s, k) => (
-          <button
-            key={s.key}
-            aria-label={`슬라이드 ${k + 1}`}
-            onClick={() => setI(k)}
-            className="w-11 h-[14px] p-0 border-none bg-none cursor-pointer flex items-center"
-          >
-            <span
-              className="block w-full rounded-full transition-all duration-300"
-              style={{
-                height: k === i ? 4 : 3,
-                background: k === i ? "var(--color-ink)" : "rgba(26,26,24,0.16)",
-              }}
-            />
-          </button>
-        ))}
+        {BANNER_SLIDES.map((s, k) => {
+          const active = k === i;
+          return (
+            <button
+              key={s.key}
+              aria-label={`슬라이드 ${k + 1}`}
+              onClick={() => setI(k)}
+              className="w-11 h-[14px] p-0 border-none bg-none cursor-pointer flex items-center"
+            >
+              <span
+                className="relative block w-full rounded-full overflow-hidden transition-all duration-300"
+                style={{
+                  height: active ? 4 : 3,
+                  background: "rgba(26,26,24,0.16)",
+                }}
+              >
+                {active && (
+                  <span
+                    key={i}
+                    data-testid="banner-progress"
+                    onAnimationEnd={onProgressEnd}
+                    className="dot-progress block h-full rounded-full"
+                    style={{
+                      // 기본 100%(reduced-motion이면 꽉 찬 dot). 애니메이션이 0→100%로 덮어씀
+                      width: "100%",
+                      background: "var(--color-ink)",
+                      animationPlayState: dragging ? "paused" : "running",
+                    }}
+                  />
+                )}
+              </span>
+            </button>
+          );
+        })}
       </div>
     </section>
   );

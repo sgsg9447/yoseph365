@@ -64,4 +64,15 @@ describe("Banner", () => {
     swipe(screen.getByTestId("banner-track"), 200, 180);
     expect(screen.getByText("1 / 6")).toBeInTheDocument();
   });
+
+  it("활성 dot에는 진행률 표시(progress fill)가 있고 자동전환 애니메이션이 적용된다", () => {
+    render(<Banner />);
+    const progress = screen.getByTestId("banner-progress");
+    expect(progress).toBeInTheDocument();
+    expect(progress.className).toContain("dot-progress");
+  });
+
+  // 참고: 아래 두 동작은 jsdom으로 단위 테스트 불가 — 브라우저 프리뷰에서 검증한다.
+  // 1) 진행바 애니메이션 종료(animationend) → 다음 슬라이드 자동전환 (jsdom에 AnimationEvent 없음)
+  // 2) prefers-reduced-motion 시 자동전환 중단 (CSS @media로 처리 — jsdom은 미디어쿼리 미적용)
 });

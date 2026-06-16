@@ -213,3 +213,11 @@
     }
   }
 }
+
+/* 배너 활성 dot 진행바 — 다음 슬라이드까지 5초간 채워짐(자동전환 타이머 겸용).
+   @layer 밖(unlayered)에 둬서 Tailwind v4 콘텐츠 스캔과 무관하게 항상 출력되게 함.
+   prefers-reduced-motion이면 애니메이션을 끄고, fill 기본 width:100%(꽉 찬 dot)만 남는다. */
+@media (prefers-reduced-motion: no-preference) {
+  .dot-progress { animation: dotProgress 5s linear forwards; }
+  @keyframes dotProgress { from { width: 0%; } to { width: 100%; } }
+}
