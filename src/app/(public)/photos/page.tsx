@@ -69,7 +69,7 @@ export default function PhotosPage() {
       <PageHero
         eyebrow="훈련 사진"
         title="현장과 같은 실습 환경"
-        sub="실제 시공 현장과 같은 장비·공정으로 실습하는 훈련 현장을 사진으로 만나보세요."
+        sub="보여주기식이 아닌, 실제와 같은 장비·공정으로 실습하는 훈련 현장을 사진으로 만나보세요."
       />
       <PhotoGallery />
     </>
