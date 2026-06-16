@@ -205,6 +205,11 @@
   @keyframes splashIn { to { opacity: 1; } }
   @media (prefers-reduced-motion: reduce) { .splash-fade { opacity: 1; animation: none; } }
 
+  /* 첫 진입 스플래시 오버레이(InitialSplash) — 하이드레이션 완료 시 JS 가 제거.
+     아래 안전 페이드아웃은 JS 미동작 시 콘텐츠가 영구 가려지지 않게 하는 대비책. */
+  .initial-splash { position: fixed; inset: 0; z-index: 60; animation: initialSplashSafety .4s ease 5s forwards; }
+  @keyframes initialSplashSafety { to { opacity: 0; visibility: hidden; } }
+
   @keyframes menuDown { from { transform: translateY(-14px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
   @keyframes sheetUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
   /* 목적 선택 시 매칭 과정: 잠깐 하이라이트되고 원래대로 돌아옴(잔상 없음) */

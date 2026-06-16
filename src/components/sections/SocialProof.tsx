@@ -19,18 +19,16 @@ function AwardHighlight({ lines, sub, img }: AwardHighlightProps) {
       className="relative flex flex-col items-center text-center gap-3 rounded-lg"
       style={{
         padding: "30px 22px 26px",
-        background: "rgba(255,255,255,0.045)",
+        background: "#faf8f4",
         borderRadius: 16,
-        border: "1px solid rgba(255,255,255,0.12)",
+        border: "1px solid var(--color-hairline)",
       }}
     >
       <span
         className="w-[60px] h-[60px] grid place-items-center rounded-full p-3 box-border"
         style={{
-          background:
-            "linear-gradient(150deg, #ffffff 0%, #f3f5f8 55%, #e3e8ef 100%)",
-          boxShadow:
-            "0 6px 18px rgba(0,0,0,0.3), inset 0 1px 1px rgba(255,255,255,0.9)",
+          background: "#fff",
+          border: "1px solid var(--color-hairline)",
         }}
       >
         <Image
@@ -43,23 +41,15 @@ function AwardHighlight({ lines, sub, img }: AwardHighlightProps) {
       </span>
       <span
         className="font-display text-[18.5px] font-bold leading-[1.4] tracking-[-0.3px] break-keep flex flex-col"
-        style={{ color: "#fff" }}
+        style={{ color: "var(--color-ink)" }}
       >
         {lines.map((ln, i) => (
           <span key={i}>{ln}</span>
         ))}
       </span>
-      {/* --color-gradient-amber not in tokens → arbitrary gradient using handoff fallback values */}
       <span
         className="inline-flex items-center text-[13.5px] font-bold tabular-nums tracking-[0.2px] whitespace-nowrap"
-        style={{
-          background:
-            "linear-gradient(90deg, #f0a875 0%, #e8956a 45%, #d97a47 100%)",
-          WebkitBackgroundClip: "text",
-          backgroundClip: "text",
-          WebkitTextFillColor: "transparent",
-          color: "transparent",
-        }}
+        style={{ color: "#c2622f" }}
       >
         {sub}
       </span>
@@ -129,33 +119,22 @@ export function SocialProof() {
         className="relative overflow-hidden"
         style={{
           borderRadius: 22,
-          background: "var(--color-ink)",
+          background: "var(--color-surface-card)",
+          border: "1px solid var(--color-hairline-strong)",
           padding: "clamp(28px, 4.5vw, 48px) clamp(20px, 4vw, 48px)",
         }}
       >
-        {/* orb: --color-gradient-amber not in tokens → #e8956a arbitrary */}
-        <div
-          className="orb"
-          style={{
-            width: 420,
-            height: 420,
-            top: -210,
-            right: "-8%",
-            background: "#e8956a",
-            opacity: 0.16,
-          }}
-        />
         <div className="relative z-[1] flex flex-col gap-[26px]">
           <div className="text-center flex flex-col gap-2">
             <span
               className="text-[14px] font-bold tracking-[1.5px]"
-              style={{ color: "#e8956a" }}
+              style={{ color: "#c2622f" }}
             >
               공식 인증
             </span>
             <span
               className="font-display font-bold leading-[1.35] tracking-[-0.5px] break-keep text-[clamp(22px,3vw,30px)]"
-              style={{ color: "#fff" }}
+              style={{ color: "var(--color-ink)" }}
             >
               4년 연속, 기관이 인정한 훈련기관입니다
             </span>

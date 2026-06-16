@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash '/Users/seulgi/workspace/yoseph365/.codex/hooks/tdd-reminder.sh' 2>/dev/null || true",
+            "statusMessage": "TDD 규율 리마인더 주입"
+          }
+        ]
+      }
+    ]
+  }
+}

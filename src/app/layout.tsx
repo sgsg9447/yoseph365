@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { InitialSplash } from "@/components/layout/InitialSplash";
 
 export const metadata: Metadata = {
   title: "성요셉목수학교 — 국비지원 목공·집수리·인테리어 직업훈련",
@@ -27,7 +28,10 @@ export default function RootLayout({
           href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@500;700&display=swap"
         />
       </head>
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        <InitialSplash />
+        {children}
+      </body>
     </html>
   );
 }
