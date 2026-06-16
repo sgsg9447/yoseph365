@@ -4,7 +4,7 @@
 // 참조: HANDOFF/ui_kits/website/about.jsx
 
 import { useState } from "react";
-import { Award, CheckCircle } from "@/components/icons";
+import { Award, CheckCircle, Hammer } from "@/components/icons";
 import { PhotoCarousel, type CarouselSlide } from "@/components/ui/PhotoCarousel";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { LocationInfo } from "@/components/sections/LocationInfo";
@@ -27,11 +27,23 @@ const INTRO_SLIDES: CarouselSlide[] = [
   { src: "/photos/introduction/film-lab-5.jpg", label: "인테리어 필름 실습실" },
 ];
 
+const HISTORY_INTRO_MOBILE_LINES = [
+  "다양한 공식인증을 받은 체계적인 교육기관에서",
+  "전문적인 훈련을 통해 실무 역량을 키우고",
+  "성공적인 미래를 준비하세요.",
+  "변화하는 시대에 맞춘 최신 커리큘럼으로,",
+  "자신만의 경쟁력을 높일 수 있습니다.",
+];
+
 function AboutIntro() {
   const points = [
     {
       icon: <CheckCircle size={20} />,
-      text: "국가직무 능력교육 NCS기반의 훈련과정과 현장실습 위주의 훈련진행.",
+      text: "국가직무 능력교육 NCS기반의 훈련과정",
+    },
+    {
+      icon: <Hammer size={20} />,
+      text: "현장실습 위주 훈련진행",
     },
     {
       icon: <Award size={20} />,
@@ -41,19 +53,28 @@ function AboutIntro() {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 64 }}>
-      <div className="grid g-2" style={{ alignItems: "center", gap: 40 }}>
+      <div className="grid g-2" style={{ alignItems: "center", gap: 40, minWidth: 0 }}>
         <PhotoCarousel slides={INTRO_SLIDES} ratio="4 / 3" radius={18} />
-        <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: 18,
+            minWidth: 0,
+            maxWidth: "100%",
+          }}
+        >
           <h2
             style={{
               fontFamily: "var(--font-display)",
-              fontSize: "clamp(24px, 2.8vw, 32px)",
+              fontSize: "clamp(18px, 5.1vw, 32px)",
               fontWeight: 700,
               color: "var(--color-ink)",
               lineHeight: 1.35,
               letterSpacing: "-0.6px",
               margin: 0,
-              wordBreak: "keep-all",
+              wordBreak: "normal",
+              overflowWrap: "anywhere",
             }}
           >
             손으로 배우고, 기술로 다시 서는 곳
@@ -64,12 +85,20 @@ function AboutIntro() {
               color: "var(--color-body)",
               lineHeight: 1.8,
               margin: 0,
-              wordBreak: "keep-all",
+              wordBreak: "normal",
+              overflowWrap: "anywhere",
             }}
           >
-            NCS교육방식을 도입함으로써, 체계적인 교육과 더불어 현장전문가의 심도 깊은
-            직업훈련교육으로 현장과의 격차를 줄여, 현장투입이 가능한 목공기능, 필름기능인
-            양성을 목표로 합니다.
+            <span style={{ display: "block", wordBreak: "break-all", overflowWrap: "anywhere" }}>
+              NCS교육방식을 도입함으로써,
+            </span>
+            <span style={{ display: "block", wordBreak: "break-all", overflowWrap: "anywhere" }}>
+              체계적인 교육과 더불어 현장전문가의 심도 깊은 직업훈련교육으로
+            </span>
+            <span style={{ display: "block", wordBreak: "break-all", overflowWrap: "anywhere" }}>
+              현장과의 격차를 줄여, 현장투입이 가능한 목공기능, 필름기능인 양성을
+              목표로 합니다.
+            </span>
           </p>
           <div
             style={{ display: "flex", flexDirection: "column", gap: 14, marginTop: 6 }}
@@ -191,11 +220,20 @@ function AboutHistory({
                 wordBreak: "keep-all",
               }}
             >
-              {intro.body.map((line, i) => (
-                <span key={i} style={{ display: "block" }}>
-                  {line}
-                </span>
-              ))}
+              <span className="hidden sm:block">
+                {intro.body.map((line, i) => (
+                  <span key={i} style={{ display: "block" }}>
+                    {line}
+                  </span>
+                ))}
+              </span>
+              <span className="block sm:hidden">
+                {HISTORY_INTRO_MOBILE_LINES.map((line, i) => (
+                  <span key={i} style={{ display: "block" }}>
+                    {line}
+                  </span>
+                ))}
+              </span>
             </p>
           )}
         </div>

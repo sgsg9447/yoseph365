@@ -249,9 +249,6 @@ export function InquiryBoard() {
         <Button variant="primary" size="lg" onClick={() => openConsult("inquiry")}>
           문의 남기기
         </Button>
-        <span style={{ fontSize: 14, color: "var(--color-muted)" }}>
-          남겨주시면 1영업일 안에 전화로 답변드립니다
-        </span>
       </div>
     </section>
   );

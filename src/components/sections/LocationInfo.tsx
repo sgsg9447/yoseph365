@@ -4,20 +4,28 @@
 import { MapPin, Phone, Calendar } from "@/components/icons";
 import { PHONE_MAIN, ADDRESS, CONSULT_HOURS } from "@/lib/data/site";
 
+function ContactValue({ value }: { value: string }) {
+  if (value !== CONSULT_HOURS) return value;
+
+  return (
+    <>
+      <span className="block sm:inline">평일 9:30~18:00,</span>{" "}
+      <span className="block sm:inline">점심시간 12:00~13:00</span>
+    </>
+  );
+}
+
 const rows = [
   {
     icon: <MapPin size={20} />,
-    label: "주소",
     value: ADDRESS,
   },
   {
     icon: <Phone size={20} />,
-    label: "대표전화",
     value: PHONE_MAIN,
   },
   {
     icon: <Calendar size={20} />,
-    label: "상담 시간",
     value: CONSULT_HOURS,
   },
 ];
@@ -46,7 +54,7 @@ export function LocationInfo() {
             key={i}
             style={{
               display: "flex",
-              alignItems: "flex-start",
+              alignItems: "center",
               gap: 14,
               padding: "18px 20px",
               background: "var(--color-surface-card)",
@@ -68,16 +76,7 @@ export function LocationInfo() {
             >
               {r.icon}
             </span>
-            <span style={{ display: "flex", flexDirection: "column", gap: 3 }}>
-              <span
-                style={{
-                  fontSize: 13,
-                  fontWeight: 600,
-                  color: "var(--color-muted)",
-                }}
-              >
-                {r.label}
-              </span>
+            <span style={{ display: "flex", flexDirection: "column", justifyContent: "center" }}>
               <span
                 style={{
                   fontSize: 16,
@@ -87,7 +86,7 @@ export function LocationInfo() {
                   wordBreak: "keep-all",
                 }}
               >
-                {r.value}
+                <ContactValue value={r.value} />
               </span>
             </span>
           </div>

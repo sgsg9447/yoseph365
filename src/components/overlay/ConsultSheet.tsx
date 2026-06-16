@@ -9,6 +9,7 @@ import { Phone, Check } from "@/components/icons";
 import { PHONE_MAIN } from "@/lib/data/site";
 import { createClient } from "@/lib/supabase/client";
 import { submitConsult } from "@/lib/actions/submit";
+import { formatPhoneInput } from "@/lib/formatters/input";
 
 const PHONE = PHONE_MAIN;
 
@@ -19,6 +20,121 @@ const INQUIRY_COURSES = [
   "건축목공기능사과정",
   "건축도장기능사과정",
 ];
+
+function InterestCoursePicker({
+  courses,
+  courseId,
+  onChange,
+}: {
+  courses: { id: string; name: string }[];
+  courseId: string;
+  onChange: (id: string) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const selected = courses.find((c) => c.id === courseId);
+  const options = [{ id: "", name: "선택 안 함" }, ...courses];
+
+  return (
+    <div
+      style={{
+        border: "1px solid var(--color-hairline-strong)",
+        borderRadius: 14,
+        overflow: "hidden",
+      }}
+    >
+      <button
+        type="button"
+        aria-expanded={open}
+        onClick={() => setOpen((v) => !v)}
+        style={{
+          width: "100%",
+          padding: "13px 16px",
+          border: "none",
+          background: "var(--color-surface-card)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: 12,
+          fontFamily: "var(--font-sans)",
+          cursor: "pointer",
+          textAlign: "left",
+        }}
+      >
+        <span
+          style={{
+            minWidth: 0,
+            fontSize: 16,
+            fontWeight: 700,
+            color: "var(--color-ink)",
+            lineHeight: 1.45,
+            wordBreak: "keep-all",
+          }}
+        >
+          {selected?.name ?? "선택 안 함"}
+        </span>
+        <svg
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="var(--color-muted)"
+          strokeWidth="2.2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden
+          style={{
+            flex: "0 0 auto",
+            transform: open ? "rotate(180deg)" : "none",
+            transition: "transform .15s ease",
+          }}
+        >
+          <path d="m6 9 6 6 6-6" />
+        </svg>
+      </button>
+
+      {open && (
+        <div
+          style={{
+            borderTop: "1px solid var(--color-hairline)",
+            background: "var(--color-surface-card)",
+          }}
+        >
+          {options.map((c, i) => {
+            const active = c.id === courseId;
+            return (
+              <button
+                key={c.id || "none"}
+                type="button"
+                onClick={() => {
+                  onChange(c.id);
+                  setOpen(false);
+                }}
+                style={{
+                  width: "100%",
+                  padding: "12px 16px",
+                  border: "none",
+                  borderBottom:
+                    i === options.length - 1 ? "none" : "1px solid var(--color-hairline-soft)",
+                  background: active ? "var(--color-primary-soft)" : "transparent",
+                  color: active ? "var(--color-primary)" : "var(--color-body-strong)",
+                  fontFamily: "var(--font-sans)",
+                  fontSize: 15,
+                  fontWeight: active ? 700 : 600,
+                  lineHeight: 1.45,
+                  textAlign: "left",
+                  wordBreak: "keep-all",
+                  cursor: "pointer",
+                }}
+              >
+                {c.name}
+              </button>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
 
 // ── InquiryForm ───────────────────────────────────────────────────────────────
 
@@ -118,9 +234,6 @@ function InquiryForm({ onSubmit }: { onSubmit: () => void }) {
       </label>
 
       <Button variant="primary" size="lg" fullWidth onClick={onSubmit}>제출하기</Button>
-      <p className="text-[13px] text-muted-soft text-center m-0 leading-[1.5]">
-        남겨주시면 1영업일 안에 전화로 답변드립니다.
-      </p>
     </div>
   );
 }
@@ -169,21 +282,23 @@ function ConsultForm({ onDone }: { onDone: () => void }) {
       </div>
 
       <Field label="이름" placeholder="홍길동" required value={name} onChange={(e) => setName(e.target.value)} />
-      <Field label="연락처" type="tel" placeholder="010-0000-0000" required value={phone} onChange={(e) => setPhone(e.target.value)} />
+      <Field
+        label="연락처"
+        type="tel"
+        inputMode="numeric"
+        placeholder="010-0000-0000"
+        required
+        value={phone}
+        maxLength={13}
+        onChange={(e) =>
+          setPhone(formatPhoneInput(e.target.value, (e.nativeEvent as InputEvent).inputType))
+        }
+      />
 
-      <label className="flex flex-col gap-[7px]">
+      <div className="flex flex-col gap-[7px]">
         <ReqLabel optional>관심 과정</ReqLabel>
-        <select
-          value={courseId}
-          onChange={(e) => setCourseId(e.target.value)}
-          className="h-[52px] w-full bg-surface-card text-ink text-[17px] font-[inherit] rounded-button outline-none border border-hairline-strong px-4 cursor-pointer"
-        >
-          <option value="">선택 안 함</option>
-          {courses.map((c) => (
-            <option key={c.id} value={c.id}>{c.name}</option>
-          ))}
-        </select>
-      </label>
+        <InterestCoursePicker courses={courses} courseId={courseId} onChange={setCourseId} />
+      </div>
 
       {error && <p className="text-[13.5px] text-error leading-[1.5] m-0">{error}</p>}
 

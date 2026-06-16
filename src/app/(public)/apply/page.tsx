@@ -23,6 +23,10 @@ export default async function ApplyPage() {
         eyebrow="수강신청"
         title="온라인 수강신청"
         sub="모집안내 확인 후 신청서를 작성하시면 접수가 완료됩니다."
+        subMobileLines={[
+          "모집안내 확인 후 신청서를 작성하시면",
+          "접수가 완료됩니다.",
+        ]}
       />
       <section className="wrap" style={{ paddingTop: 32, paddingBottom: 72 }}>
         <div style={{ maxWidth: 640, margin: "0 auto" }}>

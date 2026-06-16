@@ -5,9 +5,17 @@ interface PageHeroProps {
   eyebrow?: string;
   title: string;
   sub?: string;
+  subMobileOneLine?: boolean;
+  subMobileLines?: string[];
 }
 
-export function PageHero({ eyebrow, title, sub }: PageHeroProps) {
+export function PageHero({
+  eyebrow,
+  title,
+  sub,
+  subMobileOneLine = false,
+  subMobileLines,
+}: PageHeroProps) {
   return (
     <section
       style={{
@@ -62,7 +70,8 @@ export function PageHero({ eyebrow, title, sub }: PageHeroProps) {
             letterSpacing: "-0.8px",
             margin: "0 auto",
             maxWidth: 720,
-            wordBreak: "keep-all",
+            wordBreak: "normal",
+            overflowWrap: "anywhere",
           }}
         >
           {title}
@@ -70,15 +79,30 @@ export function PageHero({ eyebrow, title, sub }: PageHeroProps) {
         {sub && (
           <p
             style={{
-              fontSize: 17,
               color: "var(--color-body)",
-              lineHeight: 1.7,
+              fontSize: subMobileOneLine ? "clamp(9.5px, 3vw, 17px)" : 17,
+              lineHeight: subMobileOneLine ? 1.5 : 1.7,
               margin: "14px auto 0",
               maxWidth: 800,
-              wordBreak: "keep-all",
+              wordBreak: "normal",
+              overflowWrap: "anywhere",
+              whiteSpace: subMobileOneLine ? "nowrap" : undefined,
             }}
           >
-            {sub}
+            {subMobileLines ? (
+              <>
+                <span className="hidden sm:inline">{sub}</span>
+                <span className="block sm:hidden">
+                  {subMobileLines.map((line, i) => (
+                    <span key={i} style={{ display: "block" }}>
+                      {line}
+                    </span>
+                  ))}
+                </span>
+              </>
+            ) : (
+              sub
+            )}
           </p>
         )}
       </div>

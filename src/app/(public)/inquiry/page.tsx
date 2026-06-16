@@ -17,7 +17,11 @@ export default function InquiryPage() {
       <PageHero
         eyebrow="상담문의"
         title="무엇이든 물어보세요"
-        sub="국비지원부터 과정 선택까지 — 남겨주신 문의는 1영업일 안에 전화로 답변드립니다."
+        sub="국비지원부터 과정 선택까지, 남겨주신 문의는 확인 후 안내드립니다."
+        subMobileLines={[
+          "국비지원부터 과정 선택까지,",
+          "남겨주신 문의는 확인 후 안내드립니다.",
+        ]}
       />
       <InquiryBoard />
     </>
