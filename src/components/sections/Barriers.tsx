@@ -8,26 +8,10 @@ import { Button } from "@/components/ui/Button";
 import { useConsult } from "@/components/layout/SiteShell";
 
 const benefits = [
-  {
-    icon: <CheckCircle size={22} />,
-    title: "국비지원 자격 확인",
-    desc: "내일배움카드 대상인지 전화로 바로 확인해 드립니다.",
-  },
-  {
-    icon: <Wallet size={22} />,
-    title: "국비지원 수강료",
-    desc: "내일배움카드로 수강료를 국비 지원받고, 자비부담금만 납부합니다.",
-  },
-  {
-    icon: <Clipboard size={22} />,
-    title: "신청 절차 4단계",
-    desc: "복잡한 서류 없이 4단계로 간단하게 신청합니다.",
-  },
-  {
-    icon: <Phone size={22} />,
-    title: "전화로 1:1 무료 상담",
-    desc: "궁금한 점은 전화 한 통으로 바로 해결합니다.",
-  },
+  { icon: <CheckCircle size={22} />, title: "국비지원 자격 확인" },
+  { icon: <Wallet size={22} />, title: "국비지원 수강료" },
+  { icon: <Clipboard size={22} />, title: "신청 절차 4단계" },
+  { icon: <Phone size={22} />, title: "전화로 1:1 무료 상담" },
 ];
 
 const steps = [
@@ -59,13 +43,13 @@ export function Barriers() {
           align="center"
           eyebrow="시작은 쉽게"
           title={<>시작은 쉽게, 부담은 가볍게</>}
-          sub="내일배움카드로 수강료를 국비 지원받습니다. 복잡한 절차 없이 전화 한 통이면 됩니다."
+          sub={"내일배움카드로 수강료를 국비 지원받습니다.\n복잡한 절차 없이 전화 한 통이면 됩니다."}
         />
-        <div className="grid g-4" style={{ margin: "48px 0 56px", rowGap: 32 }}>
+        <div className="grid g-4" style={{ margin: "48px 0 56px", rowGap: 32, columnGap: 8 }}>
           {benefits.map((b, i) => (
             <div
               key={i}
-              className="flex flex-col items-center text-center gap-3 px-[10px]"
+              className="flex flex-col items-center text-center gap-3 px-[2px]"
             >
               <span
                 className="w-[54px] h-[54px] grid place-items-center rounded-full text-body-strong"
@@ -79,12 +63,6 @@ export function Barriers() {
               </span>
               <span className="text-[17px] font-bold text-ink tracking-[-0.3px] leading-[1.3] break-keep">
                 {b.title}
-              </span>
-              <span
-                className="text-[14.5px] text-muted leading-[1.6] break-keep max-w-[220px]"
-                style={{ textWrap: "balance" } as React.CSSProperties}
-              >
-                {b.desc}
               </span>
             </div>
           ))}

@@ -24,7 +24,7 @@ export function SectionHeading({ eyebrow, title, sub, align = "left" }: SectionH
         {title}
       </h2>
       {sub && (
-        <p className="text-[17px] text-body leading-[1.7] break-keep m-0">{sub}</p>
+        <p className="text-[17px] text-body leading-[1.7] break-keep whitespace-pre-line m-0">{sub}</p>
       )}
     </div>
   );
