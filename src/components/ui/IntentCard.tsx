@@ -1,10 +1,11 @@
+import { type ReactNode } from "react";
 import { Card } from "./Card";
 import { ChevronRight } from "@/components/icons";
 
 interface IntentCardProps {
   index: string;
   title: string;
-  desc: string;
+  desc: ReactNode;
   onClick?: () => void;
 }
 
@@ -15,7 +16,7 @@ export function IntentCard({ index, title, desc, onClick }: IntentCardProps) {
       padding={22}
       onClick={onClick}
       className="flex flex-col items-stretch h-full box-border"
-      style={{ background: "linear-gradient(155deg, #FFFFFF 0%, #FCFAF6 100%)" }}
+      style={{ background: "linear-gradient(155deg, #FFFFFF 0%, #FFFEFD 100%)" }}
     >
       <span className="flex items-center justify-between">
         <span className="text-[14px] font-bold text-muted-soft tracking-[0.5px] tabular-nums">

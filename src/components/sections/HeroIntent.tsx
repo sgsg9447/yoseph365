@@ -3,26 +3,49 @@
 
 import { IntentCard } from "@/components/ui/IntentCard";
 
+// 카드 설명: 데스크톱 4열(≥1000px)에서는 두 줄, 그 미만(반응형)에서는 한 줄.
+const descBreak = <br className="hidden min-[1000px]:block" />;
+
 const intents = [
   {
     index: "01",
     title: "재취업 준비",
-    desc: "목공 기술을 배워 새로운 일을 준비하고 싶어요",
+    desc: (
+      <>
+        목공 기술로 새 일을 {descBreak}
+        시작하고 싶어요
+      </>
+    ),
   },
   {
     index: "02",
     title: "창업·부업",
-    desc: "작은 공방이나 부업을 시작해보고 싶어요",
+    desc: (
+      <>
+        작은 공방이나 {descBreak}
+        부업을 시작해보고 싶어요
+      </>
+    ),
   },
   {
     index: "03",
     title: "내 집 직접 수리",
-    desc: "집수리와 인테리어를 직접 해보고 싶어요",
+    desc: (
+      <>
+        집수리와 인테리어를 {descBreak}
+        직접 해보고 싶어요
+      </>
+    ),
   },
   {
     index: "04",
     title: "자격증 취득",
-    desc: "목공·건축 자격증을 준비하고 싶어요",
+    desc: (
+      <>
+        목공·건축 자격증을 {descBreak}
+        준비하고 싶어요
+      </>
+    ),
   },
 ];
 
@@ -50,8 +73,10 @@ export function HeroIntent({ onPick }: HeroIntentProps) {
           <br />
           배우시려고 하나요?
         </h1>
-        <p className="text-[18px] text-body leading-[1.7] mx-auto mb-8 break-keep max-w-[560px]">
-          목적에 맞는 과정을 골라보세요. 내일배움카드로 수강료 부담을 덜 수 있습니다.
+        <p className="text-[16px] sm:text-[18px] text-body leading-[1.7] mx-auto mb-8 break-keep max-w-[560px]">
+          목적에 맞는 과정을 골라보세요.{" "}
+          <br className="sm:hidden" />
+          내일배움카드로 수강료 부담을 덜 수 있습니다.
         </p>
         <div className="grid g-intent text-left">
           {intents.map((it, i) => (
