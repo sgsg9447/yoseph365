@@ -2,12 +2,13 @@ import { Card } from "./Card";
 import { ChevronRight } from "@/components/icons";
 
 interface IntentCardProps {
+  index: string;
   title: string;
   desc: string;
   onClick?: () => void;
 }
 
-export function IntentCard({ title, desc, onClick }: IntentCardProps) {
+export function IntentCard({ index, title, desc, onClick }: IntentCardProps) {
   return (
     <Card
       interactive
@@ -15,13 +16,16 @@ export function IntentCard({ title, desc, onClick }: IntentCardProps) {
       onClick={onClick}
       className="flex flex-col items-stretch h-full box-border"
     >
-      <span className="flex items-start justify-between gap-2">
-        <span className="text-[21px] font-bold text-ink tracking-[-0.5px] leading-[1.3] break-keep">
-          {title}
+      <span className="flex items-center justify-between">
+        <span className="text-[14px] font-bold text-muted-soft tracking-[0.5px] tabular-nums">
+          {index}
         </span>
-        <ChevronRight size={20} className="text-muted-soft mt-1 flex-shrink-0" />
+        <ChevronRight size={20} className="text-muted-soft flex-shrink-0" />
       </span>
-      <span className="text-[15px] text-muted leading-[1.6] break-keep mt-[10px]">
+      <span className="text-[18px] font-bold text-ink tracking-[-0.3px] leading-[1.35] break-keep mt-[14px]">
+        {title}
+      </span>
+      <span className="text-[15px] text-muted leading-[1.6] break-keep mt-[8px]">
         {desc}
       </span>
     </Card>

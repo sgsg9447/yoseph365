@@ -5,20 +5,24 @@ import { IntentCard } from "@/components/ui/IntentCard";
 
 const intents = [
   {
+    index: "01",
     title: "재취업 준비",
-    desc: "목공 기술로 새 일자리를 찾고 싶어요",
+    desc: "목공 기술을 배워 새로운 일을 준비하고 싶어요",
   },
   {
+    index: "02",
     title: "창업·부업",
-    desc: "내 공방·가게를 차리고 싶어요",
+    desc: "작은 공방이나 부업을 시작해보고 싶어요",
   },
   {
+    index: "03",
     title: "내 집 직접 수리",
-    desc: "우리 집을 직접 고치고 꾸미고 싶어요",
+    desc: "집수리와 인테리어를 직접 해보고 싶어요",
   },
   {
+    index: "04",
     title: "자격증 취득",
-    desc: "목공·건축 자격증을 따고 싶어요",
+    desc: "목공·건축 자격증을 준비하고 싶어요",
   },
 ];
 
@@ -28,7 +32,7 @@ interface HeroIntentProps {
 
 export function HeroIntent({ onPick }: HeroIntentProps) {
   return (
-    <section className="relative overflow-hidden">
+    <section className="relative overflow-hidden" style={{ background: "#FAF8F4" }}>
       <div
         className="wrap relative z-[1] text-center"
         style={{
