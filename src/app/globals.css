@@ -200,6 +200,17 @@
   @media (min-width: 1000px) { .g-intent { grid-template-columns: 1fr 1fr 1fr 1fr; } }
   @media (min-width: 1100px) { .awards-list { justify-content: space-between; flex: 1; } }
 
+  /* 콘텐츠 스켈레톤 (loading.tsx) — 핸드오프 loading.html 의 .sk 토큰 그대로 이식 */
+  .sk { border-radius: var(--radius-sm); background: var(--color-hairline-soft); position: relative; overflow: hidden; }
+  .sk::after { content: ""; position: absolute; inset: 0;
+    background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.75) 50%, rgba(255,255,255,0) 100%);
+    transform: translateX(-100%); animation: shimmer 1.5s infinite; }
+  @keyframes shimmer { 100% { transform: translateX(100%); } }
+  .sk-card { border: 1px solid var(--color-hairline); border-radius: var(--radius-lg);
+    background: var(--color-surface-card); box-shadow: var(--shadow-card); padding: 18px; }
+  .sk-thumb { width: 100%; aspect-ratio: 4 / 3; border-radius: var(--radius-md); }
+  @media (prefers-reduced-motion: reduce) { .sk::after { animation-duration: 2.4s; } }
+
   @keyframes menuDown { from { transform: translateY(-14px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
   @keyframes sheetUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
   /* 목적 선택 시 매칭 과정: 잠깐 하이라이트되고 원래대로 돌아옴(잔상 없음) */

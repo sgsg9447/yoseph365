@@ -1,4 +1,4 @@
-// 22 Lucide-style inline SVG icons.
+// 23 Lucide-style inline SVG icons.
 // Each icon: ({ size, strokeWidth, className }) — stroke="currentColor", aria-hidden.
 
 export interface IconProps {
@@ -231,6 +231,15 @@ export function Menu({ size = 24, strokeWidth = 1.9, className }: IconProps) {
       <line x1="4" x2="20" y1="12" y2="12" />
       <line x1="4" x2="20" y1="6" y2="6" />
       <line x1="4" x2="20" y1="18" y2="18" />
+    </svg>
+  );
+}
+
+export function Reload({ size = 24, strokeWidth = 1.9, className }: IconProps) {
+  return (
+    <svg {...svgProps(size, strokeWidth, className)}>
+      <path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8" />
+      <path d="M21 3v5h-5" />
     </svg>
   );
 }
