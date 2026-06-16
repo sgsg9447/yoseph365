@@ -203,16 +203,38 @@
   @keyframes menuDown { from { transform: translateY(-14px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
   @keyframes sheetUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
   /* 목적 선택 시 매칭 과정: 잠깐 하이라이트되고 원래대로 돌아옴(잔상 없음) */
-  .course-row-highlight { border-radius: 12px; }
+  .course-row-highlight { border-radius: 8px; position: relative; isolation: isolate; }
   @media (prefers-reduced-motion: no-preference) {
     .rise { animation: rise .5s cubic-bezier(0.2,0,0,1) both; }
     @keyframes rise { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
-    /* 진입 시 톤+링이 번쩍 들어왔다가 투명으로 사라짐 */
-    .course-row-highlight { animation: courseHighlight 1.5s ease-out; }
-    @keyframes courseHighlight {
-      0%   { background-color: var(--color-primary-softer); box-shadow: inset 0 0 0 2px var(--color-primary-border); }
-      55%  { background-color: var(--color-primary-softer); box-shadow: inset 0 0 0 2px var(--color-primary-border); }
-      100% { background-color: transparent; box-shadow: inset 0 0 0 2px transparent; }
+    /* 진입 시 텍스트 높이에 맞춘 옅은 배경 + 왼쪽 액센트 바가 들어왔다가 사라짐 */
+    .course-row-highlight::before,
+    .course-row-highlight::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 18px;
+      bottom: 18px;
+      z-index: -1;
+      pointer-events: none;
+      opacity: 0;
+      animation: courseBar 1.5s ease-out forwards;
+    }
+    /* 배경 pill (텍스트 뒤) */
+    .course-row-highlight::before {
+      right: 0;
+      border-radius: 8px;
+      background: var(--color-primary-softer);
+    }
+    /* 왼쪽 액센트 바 */
+    .course-row-highlight::after {
+      width: 3px;
+      border-radius: 3px;
+      background: var(--color-primary);
+    }
+    @keyframes courseBar {
+      0%, 55% { opacity: 1; }
+      100%    { opacity: 0; }
     }
   }
 }
