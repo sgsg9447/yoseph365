@@ -1086,7 +1086,28 @@ export function FundingClient({ initialTab }: { initialTab: TabId }) {
     };
     fromHash();
     window.addEventListener("hashchange", fromHash);
-    return () => window.removeEventListener("hashchange", fromHash);
+
+    // Next.js App Router는 같은 페이지 해시 <Link> 이동을 history.pushState로 처리하는데,
+    // pushState는 브라우저 사양상 hashchange를 발생시키지 않는다. 그래서 이미 /funding에 있는
+    // 상태에서 헤더 드롭다운으로 /funding#sanjae를 눌러도 탭이 바뀌지 않는다.
+    // pushState/replaceState를 감싸 hashchange를 직접 발생시켜 위 리스너가 동작하도록 한다.
+    const origPush = window.history.pushState;
+    const origReplace = window.history.replaceState;
+    const patch =
+      (orig: History["pushState"]) =>
+      function (this: History, ...args: Parameters<History["pushState"]>) {
+        orig.apply(this, args);
+        // React 커밋/insertion 단계 안에서 동기적으로 setState가 예약되지 않도록 마이크로태스크로 미룬다.
+        queueMicrotask(() => window.dispatchEvent(new Event("hashchange")));
+      };
+    window.history.pushState = patch(origPush);
+    window.history.replaceState = patch(origReplace);
+
+    return () => {
+      window.removeEventListener("hashchange", fromHash);
+      window.history.pushState = origPush;
+      window.history.replaceState = origReplace;
+    };
   }, []);
 
   const onTab = (id: TabId) => {
