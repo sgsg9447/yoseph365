@@ -11,7 +11,7 @@ export function CourseGrid({ courses }: { courses: CatalogCourse[] }) {
   if (courses.length === 0) {
     return (
       <section className="wrap band" style={{ paddingBottom: 24, textAlign: "center" }}>
-        <SectionHeading align="center" eyebrow="2026년" title="운영중인 훈련과정" />
+        <SectionHeading align="center" title="운영중인 훈련과정" />
         <p
           style={{
             fontSize: 15.5,
@@ -32,7 +32,6 @@ export function CourseGrid({ courses }: { courses: CatalogCourse[] }) {
     <section className="wrap band" style={{ paddingBottom: 24 }}>
       <SectionHeading
         align="center"
-        eyebrow="2026년"
         title="운영중인 훈련과정"
         sub="과정을 누르면 회차별 교육 내용을 볼 수 있습니다."
       />

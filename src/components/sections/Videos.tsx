@@ -19,7 +19,7 @@ const VIDEOS: VideoData[] = [
     id: "XtVzSxRDYmk",
     start: 3,
     tag: "인터뷰",
-    title: "목수학교는 어떤 곳일까? — 유튜브 목수김동혁 인터뷰",
+    title: "목수학교는 어떤 곳일까? — 유튜브 목수김동혁",
     who: "유튜브 · 목수김동혁",
   },
 ];
@@ -66,7 +66,6 @@ export function Videos() {
           align="center"
           eyebrow="영상으로 보기"
           title={<>영상으로 먼저 만나보세요</>}
-          sub="뉴스와 인터뷰에 소개된 훈련 현장을 영상으로 확인하세요."
         />
         <div className="grid g-2" style={{ marginTop: 36, gap: 22 }}>
           {VIDEOS.map((v) => (

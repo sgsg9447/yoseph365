@@ -406,7 +406,7 @@ export default async function InquiryDetailPage({ params }: Props) {
                     wordBreak: "keep-all",
                   }}
                 >
-                  남겨주신 문의는 1영업일 안에 전화 또는 게시판으로
+                  남겨주신 문의는 확인 후 전화 또는 게시판으로
                   답변드립니다. 급하시면{" "}
                   <a
                     href={"tel:" + PHONE_MAIN}

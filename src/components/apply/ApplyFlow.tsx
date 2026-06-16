@@ -3,11 +3,12 @@
 // ApplyFlow — 수강신청 3단계 위저드 (모집안내 → 신청서 작성 → 접수완료)
 // 참조: HANDOFF/ui_kits/website/apply-flow.jsx 전체
 
-import { useState } from "react";
+import { useEffect, useRef, useState, type RefObject } from "react";
 import { Check } from "@/components/icons";
 import type { ApplyInfoView, RecruitStatus } from "@/lib/queries/types";
 import { PHONE_MAIN } from "@/lib/data/site";
 import { submitApplication } from "@/lib/actions/submit";
+import { formatBirthDateInput, formatPhoneInput } from "@/lib/formatters/input";
 
 // ── 진행 단계 표시 ──────────────────────────────────────────────────
 const STEP_LABELS = ["모집안내", "신청서 작성", "접수완료"];
@@ -16,23 +17,23 @@ function ApplySteps({ current }: { current: number }) {
   return (
     <nav
       aria-label="신청 진행 단계"
-      className="flex items-center justify-center gap-[6px] mb-5"
+      className="flex items-center justify-center gap-[3px] sm:gap-[6px] mb-5"
     >
       {STEP_LABELS.map((s, i) => (
-        <span key={s} className="inline-flex items-center gap-[6px]">
+        <span key={s} className="inline-flex items-center gap-[3px] sm:gap-[6px]">
           <span
             aria-current={i === current ? "step" : undefined}
-            className="inline-flex items-center gap-[6px]"
+            className="inline-flex items-center gap-[3px] sm:gap-[6px]"
           >
             {/* Number bubble */}
             <span
               style={{
-                width: 22,
-                height: 22,
+                width: "clamp(18px, 5.6vw, 22px)",
+                height: "clamp(18px, 5.6vw, 22px)",
                 display: "grid",
                 placeItems: "center",
                 borderRadius: 9999,
-                fontSize: 12,
+                fontSize: "clamp(10px, 3vw, 12px)",
                 fontWeight: 800,
                 background:
                   i <= current ? "var(--color-primary)" : "var(--color-canvas-soft)",
@@ -48,10 +49,11 @@ function ApplySteps({ current }: { current: number }) {
             {/* Step label — real text node for accessibility */}
             <span
               style={{
-                fontSize: 13,
+                fontSize: "clamp(11px, 3.25vw, 13px)",
                 fontWeight: i === current ? 700 : 500,
                 color:
                   i === current ? "var(--color-ink)" : "var(--color-muted-soft)",
+                whiteSpace: "nowrap",
               }}
             >
               {s}
@@ -60,7 +62,7 @@ function ApplySteps({ current }: { current: number }) {
           {i < STEP_LABELS.length - 1 && (
             <span
               style={{
-                width: 18,
+                width: "clamp(8px, 2.8vw, 18px)",
                 height: 1,
                 background: "var(--color-hairline-strong)",
               }}
@@ -77,17 +79,19 @@ function ApplyInfoRow({
   label,
   children,
   last,
+  compact = false,
 }: {
   label: string;
   children: React.ReactNode;
   last?: boolean;
+  compact?: boolean;
 }) {
   return (
     <div
       style={{
         display: "grid",
-        gridTemplateColumns: "88px 1fr",
-        gap: 12,
+        gridTemplateColumns: compact ? "64px 1fr" : "clamp(72px, 23vw, 88px) 1fr",
+        gap: compact ? 8 : 10,
         padding: "13px 16px",
         borderBottom: last ? "none" : "1px solid var(--color-hairline)",
         alignItems: "start",
@@ -107,6 +111,34 @@ function ApplyInfoRow({
         {children}
       </span>
     </div>
+  );
+}
+
+function TrainingTimeText({ value }: { value: string }) {
+  const match = value.match(/^(.*?)(\s*\([^)]*\))$/);
+  if (!match) return value;
+
+  return (
+    <>
+      <span>{match[1]}</span>
+      <span className="hidden sm:inline">{match[2]}</span>
+      <span className="block sm:hidden">{match[2].trimStart()}</span>
+    </>
+  );
+}
+
+function ExclusionText({ value }: { value: string }) {
+  const keepTogether = "수강중인 자";
+  const index = value.indexOf(keepTogether);
+
+  if (index < 0) return value;
+
+  return (
+    <>
+      {value.slice(0, index)}
+      <span style={{ whiteSpace: "nowrap" }}>{keepTogether}</span>
+      {value.slice(index + keepTogether.length)}
+    </>
   );
 }
 
@@ -164,10 +196,21 @@ function ApplyInfoStep({
           wordBreak: "keep-all",
         }}
       >
-        <b style={{ color: "var(--color-ink)" }}>{course || "훈련과정"}</b>에 참여할 교육생을
-        모집합니다.
-        <br />
-        아래 일정과 세부내용을 확인하시고 신청해 주세요.
+        <span className="hidden sm:inline">
+          <b style={{ color: "var(--color-ink)" }}>{course || "훈련과정"}</b>에 참여할 교육생을
+          모집합니다.
+          <br />
+          아래 일정과 세부내용을 확인하시고 신청해 주세요.
+        </span>
+        <span className="block sm:hidden">
+          <b style={{ color: "var(--color-ink)" }}>{course || "훈련과정"}</b>에 참여할
+          <br />
+          교육생을 모집합니다.
+          <br />
+          아래 일정과 세부내용을
+          <br />
+          확인하시고 신청해 주세요.
+        </span>
       </p>
 
       <div
@@ -200,10 +243,19 @@ function ApplyInfoStep({
           </ApplyInfoRow>
         )}
         {applyInfo.applyMethod.length > 0 && (
-          <ApplyInfoRow label="지원방법">
+          <ApplyInfoRow label="지원방법" compact>
             {applyInfo.applyMethod.map((m, i) => (
-              <span key={i} style={{ display: "block" }}>
-                · {m}
+              <span
+                key={i}
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "auto 1fr",
+                  columnGap: 4,
+                  alignItems: "start",
+                }}
+              >
+                <span aria-hidden="true">*</span>
+                <span>{m}</span>
               </span>
             ))}
           </ApplyInfoRow>
@@ -218,7 +270,7 @@ function ApplyInfoStep({
           <ApplyInfoRow label="훈련시간">
             {applyInfo.trainingTime.map((t, i) => (
               <span key={i} style={{ display: "block" }}>
-                {t}
+                <TrainingTimeText value={t} />
               </span>
             ))}
           </ApplyInfoRow>
@@ -300,13 +352,13 @@ function ApplyInfoStep({
               <li
                 key={i}
                 style={{
-                  fontSize: 13.5,
+                  fontSize: "clamp(12.5px, 3.45vw, 13.5px)",
                   color: "var(--color-body)",
                   lineHeight: 1.55,
                   wordBreak: "keep-all",
                 }}
               >
-                {x}
+                <ExclusionText value={x} />
               </li>
             ))}
           </ul>
@@ -343,17 +395,6 @@ function ApplyInfoStep({
         </div>
       )}
 
-      <p
-        style={{
-          fontSize: 13,
-          color: "var(--color-muted-soft)",
-          textAlign: "center",
-          margin: 0,
-          lineHeight: 1.5,
-        }}
-      >
-        궁금한 점은 전화({PHONE_MAIN})로 문의해 주세요.
-      </p>
     </div>
   );
 }
@@ -407,10 +448,12 @@ function ApplyFormStep({
   course,
   onSubmit,
   onBack,
+  nameInputRef,
 }: {
   course: string;
   onSubmit: () => void;
   onBack: () => void;
+  nameInputRef?: RefObject<HTMLInputElement | null>;
 }) {
   const [name, setName] = useState("");
   const [birth, setBirth] = useState("");
@@ -464,6 +507,7 @@ function ApplyFormStep({
       <label style={{ display: "flex", flexDirection: "column", gap: 7 }}>
         <ReqLabel>성명</ReqLabel>
         <input
+          ref={nameInputRef}
           placeholder="홍길동"
           style={inputBase}
           value={name}
@@ -480,7 +524,10 @@ function ApplyFormStep({
             inputMode="numeric"
             style={inputBase}
             value={birth}
-            onChange={(e) => setBirth(e.target.value)}
+            maxLength={10}
+            onChange={(e) =>
+              setBirth(formatBirthDateInput(e.target.value, (e.nativeEvent as InputEvent).inputType))
+            }
           />
         </label>
         <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
@@ -527,7 +574,10 @@ function ApplyFormStep({
           placeholder="010-0000-0000"
           style={inputBase}
           value={phone}
-          onChange={(e) => setPhone(e.target.value)}
+          maxLength={13}
+          onChange={(e) =>
+            setPhone(formatPhoneInput(e.target.value, (e.nativeEvent as InputEvent).inputType))
+          }
         />
       </label>
 
@@ -606,8 +656,15 @@ function ApplyFormStep({
             wordBreak: "keep-all",
           }}
         >
-          <b style={{ color: "var(--color-ink)" }}>(필수)</b> 개인정보 수집·이용에 동의합니다.
-          수집된 정보는 훈련생 선발 목적으로만 사용됩니다.
+          <span className="hidden sm:inline">
+            <b style={{ color: "var(--color-ink)" }}>(필수)</b> 개인정보 수집·이용에 동의합니다.
+            수집된 정보는 훈련생 선발 목적으로만 사용됩니다.
+          </span>
+          <span className="block sm:hidden">
+            <b style={{ color: "var(--color-ink)" }}>(필수)</b> 개인정보 수집·이용에 동의합니다.
+            <br />
+            수집된 정보는 훈련생 선발 목적으로만 사용됩니다.
+          </span>
         </span>
       </label>
 
@@ -694,8 +751,6 @@ function ApplyDone({ steps, onClose }: { steps: string[]; onClose: () => void })
         }}
       >
         담당자가 확인 후 다음 단계를 개별 안내드립니다.
-        <br />
-        궁금한 점은 전화({PHONE_MAIN})로 문의해 주세요.
       </p>
 
       <div
@@ -795,10 +850,32 @@ interface ApplyFlowProps {
   applyInfo: ApplyInfoView | null;
   recruitStatus: RecruitStatus;
   onSubmitted?: () => void;
+  onFormStepEnter?: () => void;
 }
 
-export function ApplyFlow({ course, applyInfo, recruitStatus, onSubmitted }: ApplyFlowProps) {
+export function ApplyFlow({
+  course,
+  applyInfo,
+  recruitStatus,
+  onSubmitted,
+  onFormStepEnter,
+}: ApplyFlowProps) {
   const [step, setStep] = useState(0);
+  const nameInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (step !== 1) return;
+
+    const scrollFrame = window.requestAnimationFrame(() => {
+      onFormStepEnter?.();
+
+      window.requestAnimationFrame(() => {
+        nameInputRef.current?.focus({ preventScroll: true });
+      });
+    });
+
+    return () => window.cancelAnimationFrame(scrollFrame);
+  }, [step, onFormStepEnter]);
 
   return (
     <div>
@@ -819,6 +896,7 @@ export function ApplyFlow({ course, applyInfo, recruitStatus, onSubmitted }: App
             onSubmitted?.();
           }}
           onBack={() => setStep(0)}
+          nameInputRef={nameInputRef}
         />
       )}
       {step === 2 && (

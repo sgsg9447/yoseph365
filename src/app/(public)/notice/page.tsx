@@ -31,7 +31,11 @@ export default async function NoticePage() {
       <PageHero
         eyebrow="공지사항"
         title="공지사항"
-        sub={"수강신청 안내부터 학원 소식까지, 한눈에 확인하세요."}
+        sub="수강신청 안내부터 학원 소식까지, 한눈에 확인하세요."
+        subMobileLines={[
+          "수강신청 안내부터 학원 소식까지,",
+          "한눈에 확인하세요.",
+        ]}
       />
       <section className="wrap band" style={{ paddingTop: 32 }}>
         <div style={{ maxWidth: 760, margin: "0 auto" }}>
@@ -72,22 +76,6 @@ export default async function NoticePage() {
                     textDecoration: "none",
                   }}
                 >
-                  {n.isPinned && (
-                    <span
-                      style={{
-                        flex: "0 0 auto",
-                        fontSize: 12,
-                        fontWeight: 700,
-                        color: "var(--color-primary)",
-                        background: "var(--color-primary-soft)",
-                        border: "1px solid var(--color-primary-border)",
-                        borderRadius: 9999,
-                        padding: "3px 9px",
-                      }}
-                    >
-                      공지
-                    </span>
-                  )}
                   <span
                     style={{
                       flex: 1,

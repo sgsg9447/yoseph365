@@ -26,6 +26,38 @@ interface FundCardProps {
   children: React.ReactNode;
   foot?: React.ReactNode;
 }
+
+function NoteText({ text, mobileLines }: { text: string; mobileLines?: string[] }) {
+  return (
+    <span
+      style={{
+        display: "grid",
+        gridTemplateColumns: "auto 1fr",
+        columnGap: 4,
+        alignItems: "start",
+      }}
+    >
+      <span aria-hidden="true">※</span>
+      <span>
+        {mobileLines ? (
+          <>
+            <span className="hidden sm:inline">{text}</span>
+            <span className="block sm:hidden">
+              {mobileLines.map((line, i) => (
+                <span key={i} style={{ display: "block" }}>
+                  {line}
+                </span>
+              ))}
+            </span>
+          </>
+        ) : (
+          text
+        )}
+      </span>
+    </span>
+  );
+}
+
 function FundCard({ title, children, foot }: FundCardProps) {
   return (
     <Card padding={0} style={{ overflow: "hidden" }}>
@@ -329,7 +361,9 @@ function NbCardTab({ onConsult }: { onConsult: () => void }) {
         </FundCard>
         <FundCard
           title="추가 지원 대상"
-          foot="※ 300만원 계좌를 모두 소진한 경우, 위 대상자에게 100~200만원의 금액을 추가 지원합니다."
+          foot={
+            <NoteText text="300만원 계좌를 모두 소진한 경우, 위 대상자에게 100~200만원의 금액을 추가 지원합니다." />
+          }
         >
           <NumRow n={1}>
             기간제 · 파견 · 단시간 · 일용근로자로 재직 중인 피보험자
@@ -513,15 +547,26 @@ function ProcessTab() {
 
       <FundCard
         title="신청정보"
-        foot="※ 학력정보는 통계 목적으로만 활용되며, 훈련기관을 포함한 외부에 제공되지 않습니다."
+        foot={
+          <NoteText text="학력정보는 통계 목적으로만 활용되며, 훈련기관을 포함한 외부에 제공되지 않습니다." />
+        }
       >
         <DotList
           items={[
             <>
-              성명, 연락처, 이메일, 고용형태, 지원유형, 지원대상, 자격코드는
-              훈련수강을 위한{" "}
-              <b style={{ color: "var(--color-ink)" }}>필수 입력 정보</b>
-              입니다.
+              <span className="hidden sm:inline">
+                성명, 연락처, 이메일, 고용형태, 지원유형, 지원대상, 자격코드는
+                훈련수강을 위한{" "}
+                <b style={{ color: "var(--color-ink)" }}>필수 입력 정보</b>
+                입니다.
+              </span>
+              <span className="block sm:hidden">
+                <span style={{ display: "block" }}>성명, 연락처, 이메일, 고용형태, 지원유형,</span>
+                <span style={{ display: "block" }}>지원대상, 자격코드는 훈련수강을 위한</span>
+                <span style={{ display: "block" }}>
+                  <b style={{ color: "var(--color-ink)" }}>필수 입력 정보</b>입니다.
+                </span>
+              </span>
             </>,
             <>
               온라인 수강신청 결과(선발 · 미선발)를 카카오톡 또는
@@ -629,7 +674,13 @@ function ProcessTab() {
             wordBreak: "keep-all",
           }}
         >
-          ※ 구체적인 지원절차는 각 지원사업 안내를 참조해 주시기 바랍니다.
+          <NoteText
+            text="구체적인 지원절차는 각 지원사업 안내를 참조해 주시기 바랍니다."
+            mobileLines={[
+              "구체적인 지원절차는 각 지원사업 안내를",
+              "참조해 주시기 바랍니다.",
+            ]}
+          />
         </p>
       </Card>
     </div>
@@ -745,17 +796,23 @@ function SanjaeTab({ onConsult }: { onConsult: () => void }) {
       <div className="grid g-2" style={{ alignItems: "stretch", gap: 18 }}>
         <FundCard
           title="지원대상"
-          foot="※ 통원환자의 경우 제1급~제12급에 해당할 것이라는 의학적 소견이 있는 자를 포함합니다."
+          foot={
+            <NoteText text="통원환자의 경우 제1급~제12급에 해당할 것이라는 의학적 소견이 있는 자를 포함합니다." />
+          }
         >
           <DotList
             items={[
               <>
-                장해판정일로부터{" "}
-                <b style={{ color: "var(--color-ink)" }}>1년 이내</b>의 실업
-                중인, 산재{" "}
-                <b style={{ color: "var(--color-ink)" }}>
-                  제1급~제12급 장해급여자
-                </b>
+                <span style={{ display: "block" }}>
+                  장해판정일로부터{" "}
+                  <b style={{ color: "var(--color-ink)" }}>1년 이내</b>의 실업 중인,
+                </span>
+                <span style={{ display: "block" }}>
+                  산재{" "}
+                  <b style={{ color: "var(--color-ink)" }}>
+                    제1급~제12급 장해급여자
+                  </b>
+                </span>
               </>,
             ]}
           />
@@ -848,7 +905,7 @@ function SanjaeTab({ onConsult }: { onConsult: () => void }) {
             wordBreak: "keep-all",
           }}
         >
-          ※ 훈련수당은 일 80% 이상 출석한 경우, 산재노동자에게 지급됩니다.
+          <NoteText text="훈련수당은 일 80% 이상 출석한 경우, 산재노동자에게 지급됩니다." />
         </p>
       </Card>
 
@@ -1004,10 +1061,10 @@ function SanjaeTab({ onConsult }: { onConsult: () => void }) {
           </span>
           <span
             style={{
-              fontSize: 14.5,
+              fontSize: "clamp(12px, 3.35vw, 14.5px)",
               color: "var(--color-muted)",
               lineHeight: 1.6,
-              wordBreak: "keep-all",
+              whiteSpace: "nowrap",
             }}
           >
             신청 가능 여부와 절차를 전화로 확인해 드립니다.

@@ -50,7 +50,8 @@ export function ClosingCTA() {
           내일배움카드로 수강료 부담을 덜어드립니다
         </h2>
         <p className="text-[18px] text-body leading-[1.7] mx-auto mb-[30px] break-keep max-w-[520px]">
-          자격 확인부터 과정 안내까지, 전화 한 통이면 됩니다.
+          <span className="block sm:inline">자격 확인부터 과정 안내까지,</span>{" "}
+          <span className="block sm:inline">전화 한 통이면 됩니다.</span>
         </p>
         <div className="flex justify-center mb-[18px]">
           <Button
@@ -68,9 +69,6 @@ export function ClosingCTA() {
         >
           {PHONE}
         </a>
-        <p className="text-[13px] text-muted mt-2">
-          평일 09:00 – 18:00 · 점심 12:00 – 13:00
-        </p>
       </div>
     </section>
   );
