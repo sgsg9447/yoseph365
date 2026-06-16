@@ -149,10 +149,8 @@ function PhonePrefixPicker({
   return (
     <div
       style={{
-        border: "1px solid var(--color-hairline-strong)",
-        borderRadius: 12,
-        overflow: "hidden",
-        background: "var(--color-surface-card)",
+        position: "relative",
+        zIndex: open ? 20 : 1,
       }}
     >
       <button
@@ -163,7 +161,8 @@ function PhonePrefixPicker({
           width: "100%",
           minHeight: 52,
           padding: "0 12px 0 14px",
-          border: "none",
+          border: "1px solid var(--color-hairline-strong)",
+          borderRadius: 12,
           background: "var(--color-surface-card)",
           display: "flex",
           alignItems: "center",
@@ -200,8 +199,16 @@ function PhonePrefixPicker({
       {open && (
         <div
           style={{
-            borderTop: "1px solid var(--color-hairline)",
+            position: "absolute",
+            top: "calc(100% + 4px)",
+            left: 0,
+            right: 0,
+            zIndex: 30,
+            border: "1px solid var(--color-hairline-strong)",
+            borderRadius: 12,
+            overflow: "hidden",
             background: "var(--color-surface-card)",
+            boxShadow: "0 14px 32px rgba(15, 23, 42, 0.14)",
           }}
         >
           {PHONE_PREFIXES.map((prefix, i) => {
