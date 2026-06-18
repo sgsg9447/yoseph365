@@ -14,7 +14,9 @@ import { updateApplicationMemo, updateApplicationStatus } from "./actions";
 
 const STATUS_FILTERS = ["전체", "신규", "상담중", "등록확인", "보류"];
 const STATUSES: EnrollStatus[] = ["신규", "상담중", "등록확인", "보류"];
-const GRID = "1fr 1.3fr 1.1fr 0.9fr 0.5fr 0.7fr 0.8fr 0.8fr";
+// minmax(0,...)로 컬럼을 내용과 무관하게 비율 고정 → 헤더와 모든 행의 열이 정렬됨
+const GRID =
+  "minmax(0,1fr) minmax(0,1.3fr) minmax(0,1.1fr) minmax(0,0.9fr) minmax(0,0.5fr) minmax(0,0.7fr) minmax(0,0.8fr) minmax(0,0.8fr)";
 const PER_PAGE = 10;
 const ROW_H = 44; // 한 행(컴팩트) 대략 높이 — 빈 행 채움·빈 상태 최소 높이 기준
 
@@ -170,7 +172,7 @@ function EnrollRow({ row }: { row: EnrollmentView }) {
   return (
     <div className="border-t border-hairline-soft">
       <div className="grid items-center px-5 py-2.5 text-[14px]" style={{ gridTemplateColumns: GRID }}>
-        <span className="font-semibold text-ink inline-flex items-center gap-1.5">
+        <span className="min-w-0 font-semibold text-ink inline-flex items-center gap-1.5">
           {row.status === "신규" && (
             <span
               role="img"
@@ -179,14 +181,12 @@ function EnrollRow({ row }: { row: EnrollmentView }) {
               className="w-2 h-2 rounded-full bg-primary flex-shrink-0"
             />
           )}
-          {row.name}
+          <span className="truncate">{row.name}</span>
         </span>
-        <span className="text-body">{row.courses.join(", ")}</span>
-        <span className="text-body">
-          <a href={`tel:${row.phone.replace(/[^0-9]/g, "")}`} className="text-primary">
-            {row.phone}
-          </a>
+        <span className="min-w-0 truncate text-body" title={row.courses.join(", ")}>
+          {row.courses.join(", ")}
         </span>
+        <span className="min-w-0 truncate text-body">{row.phone}</span>
         <span className="text-body">{row.birth || <span className="text-muted-soft">-</span>}</span>
         <span className="text-body">{row.gender || <span className="text-muted-soft">-</span>}</span>
         <span className="text-muted">{row.date}</span>
