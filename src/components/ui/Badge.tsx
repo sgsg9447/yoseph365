@@ -1,4 +1,4 @@
-type Tone = "neutral" | "ink" | "success" | "solid";
+type Tone = "neutral" | "ink" | "success" | "solid" | "soft";
 
 interface BadgeProps {
   children: React.ReactNode;
@@ -12,6 +12,7 @@ const toneClasses: Record<Tone, string> = {
   ink: "bg-surface-strong text-ink",
   success: "bg-success-soft text-success",
   solid: "bg-primary text-white",
+  soft: "bg-primary-soft text-primary",
 };
 
 export function Badge({ children, tone = "neutral", dot, className }: BadgeProps) {
