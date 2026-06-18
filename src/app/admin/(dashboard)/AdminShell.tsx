@@ -37,7 +37,7 @@ const TAB_ICONS: Record<string, ReactNode> = {
   notice: <FileText size={18} />,
 };
 
-function useActiveTab(tabs: AdminTab[]) {
+function useActiveTab() {
   const pathname = usePathname();
   return (tab: AdminTab) => {
     if (tab.href === "/admin") {
@@ -58,7 +58,7 @@ function formatKoreanDate(date: Date): string {
 
 export function AdminShell({ tabs, counts, children }: AdminShellProps) {
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const isActive = useActiveTab(tabs);
+  const isActive = useActiveTab();
 
   const currentTab = tabs.find(isActive) ?? tabs[0];
   const today = formatKoreanDate(new Date());
