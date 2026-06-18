@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { PageHero } from "@/components/sections/PageHero";
 import { getCatalogCourses, getCourseById } from "@/lib/queries/courses";
 import { CourseDetailView } from "../CourseDetailView";
+import { TrackView } from "@/components/analytics/TrackView";
 
 export const revalidate = 3600;
 
@@ -49,6 +50,7 @@ export default async function CourseDetailPage({
         subMobileOneLine
       />
       <CourseDetailView course={course} />
+      <TrackView name="course_view" courseId={id} />
     </>
   );
 }

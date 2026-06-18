@@ -48,3 +48,10 @@ export const applicationStatusSchema = z.object({
   status: z.enum(["신규", "상담중", "등록확인", "보류"]),
 });
 export type ApplicationStatusInput = z.infer<typeof applicationStatusSchema>;
+
+// 이벤트 트래킹(/api/track) — 범용 기획 지표 로깅
+export const trackEventSchema = z.object({
+  name: z.string().trim().min(1).max(50),
+  courseId: z.string().trim().max(80).optional(),
+});
+export type TrackEventInput = z.infer<typeof trackEventSchema>;
