@@ -1,5 +1,24 @@
 import { describe, it, expect } from "vitest";
-import { applicationSchema, consultSchema, applicationMemoSchema } from "./forms";
+import {
+  applicationSchema,
+  consultSchema,
+  applicationMemoSchema,
+  applicationStatusSchema,
+} from "./forms";
+
+describe("applicationStatusSchema", () => {
+  it("유효한 상태값을 통과시킨다", () => {
+    for (const status of ["신규", "상담중", "등록확인", "보류"]) {
+      expect(applicationStatusSchema.safeParse({ id: 1, status }).success).toBe(true);
+    }
+  });
+  it("정의되지 않은 상태값은 실패", () => {
+    expect(applicationStatusSchema.safeParse({ id: 1, status: "취소" }).success).toBe(false);
+  });
+  it("id가 양의 정수가 아니면 실패", () => {
+    expect(applicationStatusSchema.safeParse({ id: 0, status: "신규" }).success).toBe(false);
+  });
+});
 
 describe("applicationMemoSchema", () => {
   it("유효한 id·메모를 통과시킨다", () => {

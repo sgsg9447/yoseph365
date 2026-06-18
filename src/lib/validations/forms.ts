@@ -41,3 +41,10 @@ export const applicationMemoSchema = z.object({
   memo: z.string().trim().max(2000, "메모는 2000자 이내로 입력해 주세요"),
 });
 export type ApplicationMemoInput = z.infer<typeof applicationMemoSchema>;
+
+// 관리자 — 수강신청 상태(status) 변경
+export const applicationStatusSchema = z.object({
+  id: z.number().int().positive(),
+  status: z.enum(["신규", "상담중", "등록확인", "보류"]),
+});
+export type ApplicationStatusInput = z.infer<typeof applicationStatusSchema>;

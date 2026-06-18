@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useTransition } from "react";
-import type { EnrollmentView } from "@/lib/queries/admin";
+import { useEffect, useRef, useState, useTransition } from "react";
+import type { EnrollmentView, EnrollStatus } from "@/lib/queries/admin";
 import { filterEnrollments, paginate } from "@/lib/admin/enroll";
 import { FilterPills } from "@/components/admin/FilterPills";
 import { Select } from "@/components/ui/Select";
@@ -9,9 +9,10 @@ import { SectionCard } from "@/components/admin/SectionCard";
 import { StatusChip } from "@/components/admin/StatusChip";
 import { EmptyState } from "@/components/admin/EmptyState";
 import { Button } from "@/components/ui/Button";
-import { updateApplicationMemo, confirmApplication } from "./actions";
+import { updateApplicationMemo, updateApplicationStatus } from "./actions";
 
 const STATUS_FILTERS = ["전체", "신규", "상담중", "등록확인", "보류"];
+const STATUSES: EnrollStatus[] = ["신규", "상담중", "등록확인", "보류"];
 const GRID = "1fr 1.3fr 1.1fr 0.9fr 0.5fr 0.7fr 0.8fr 0.8fr";
 const PER_PAGE = 10;
 
@@ -75,7 +76,7 @@ export function EnrollTable({ rows, courseOptions }: EnrollTableProps) {
         ) : (
           <div>
             <div
-              className="hidden md:grid px-5 py-3 bg-canvas-soft text-[13px] font-semibold text-muted"
+              className="hidden md:grid items-center px-5 py-3 bg-canvas-soft text-[13px] font-semibold text-muted"
               style={{ gridTemplateColumns: GRID }}
             >
               <span>신청자</span>
@@ -129,7 +130,7 @@ function EnrollRow({ row }: { row: EnrollmentView }) {
   const [memo, setMemo] = useState(row.memo);
   const [saved, setSaved] = useState(row.memo);
   const [pending, startTransition] = useTransition();
-  const [confirming, startConfirm] = useTransition();
+  const [changing, startChange] = useTransition();
   const [error, setError] = useState<string | null>(null);
 
   function save() {
@@ -145,11 +146,9 @@ function EnrollRow({ row }: { row: EnrollmentView }) {
     });
   }
 
-  function confirm() {
-    setError(null);
-    startConfirm(async () => {
-      const res = await confirmApplication(row.id);
-      if (!res.ok) setError(res.error);
+  function changeStatus(next: EnrollStatus) {
+    startChange(async () => {
+      await updateApplicationStatus({ id: row.id, status: next });
     });
   }
 
@@ -179,7 +178,7 @@ function EnrollRow({ row }: { row: EnrollmentView }) {
         <span className="text-body">{row.gender || <span className="text-muted-soft">-</span>}</span>
         <span className="text-muted">{row.date}</span>
         <span>
-          <StatusChip status={row.status} />
+          <StatusMenu value={row.status} onChange={changeStatus} pending={changing} />
         </span>
         <span className="flex justify-end">
           <button
@@ -233,14 +232,6 @@ function EnrollRow({ row }: { row: EnrollmentView }) {
               <p className="text-[14px] text-muted-soft">추가로 입력한 정보가 없습니다.</p>
             )}
           </div>
-          {row.status === "신규" && (
-            <div className="flex items-center justify-between gap-3">
-              <span className="text-[14px] text-muted">아직 확인하지 않은 새 신청입니다.</span>
-              <Button size="sm" onClick={confirm} disabled={confirming}>
-                {confirming ? "처리 중…" : "확인 처리"}
-              </Button>
-            </div>
-          )}
           <div>
             <label className="block text-[13px] font-semibold text-body-strong mb-1">메모</label>
             <textarea
@@ -267,6 +258,76 @@ function EnrollRow({ row }: { row: EnrollmentView }) {
               </Button>
             </div>
           </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function StatusMenu({
+  value,
+  onChange,
+  pending,
+}: {
+  value: EnrollStatus;
+  onChange: (s: EnrollStatus) => void;
+  pending: boolean;
+}) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    function onDown(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    }
+    document.addEventListener("mousedown", onDown);
+    return () => document.removeEventListener("mousedown", onDown);
+  }, [open]);
+
+  return (
+    <div ref={ref} className="relative inline-block">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        disabled={pending}
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        aria-label="상태 변경"
+        className="inline-flex items-center gap-1 disabled:opacity-60"
+      >
+        <StatusChip status={value} />
+        <svg
+          width="13" height="13" viewBox="0 0 24 24" fill="none"
+          stroke="var(--color-muted)" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"
+          aria-hidden className="transition-transform" style={{ transform: open ? "rotate(180deg)" : "none" }}
+        >
+          <path d="m6 9 6 6 6-6" />
+        </svg>
+      </button>
+      {open && (
+        <div
+          role="listbox"
+          className="absolute left-0 top-[calc(100%+4px)] z-30 min-w-[128px] overflow-hidden rounded-xl border border-hairline bg-surface-card shadow-pop"
+        >
+          {STATUSES.map((s) => (
+            <button
+              key={s}
+              type="button"
+              role="option"
+              aria-selected={s === value}
+              onClick={() => {
+                setOpen(false);
+                if (s !== value) onChange(s);
+              }}
+              className={[
+                "flex w-full items-center px-3 py-2 text-left",
+                s === value ? "bg-primary-soft" : "hover:bg-hairline-soft",
+              ].join(" ")}
+            >
+              <StatusChip status={s} />
+            </button>
+          ))}
         </div>
       )}
     </div>
