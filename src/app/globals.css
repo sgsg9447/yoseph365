@@ -256,3 +256,16 @@
   .dot-progress { animation: dotProgress 5s linear forwards; }
   @keyframes dotProgress { from { width: 0%; } to { width: 100%; } }
 }
+
+/* 얇고 트랙·보더 없는 스크롤바(드롭다운 등). @layer 밖에 둬 항상 출력. */
+.scrollbar-clean {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-hairline-strong) transparent;
+}
+.scrollbar-clean::-webkit-scrollbar { width: 6px; height: 6px; }
+.scrollbar-clean::-webkit-scrollbar-track { background: transparent; border: 0; }
+.scrollbar-clean::-webkit-scrollbar-thumb {
+  background: var(--color-hairline-strong);
+  border-radius: 9999px;
+}
+.scrollbar-clean::-webkit-scrollbar-thumb:hover { background: var(--color-muted-soft); }

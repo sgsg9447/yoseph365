@@ -66,7 +66,7 @@ export function Select({ value, options, onChange, ariaLabel }: SelectProps) {
 
       {open && (
         <div className="absolute left-0 right-0 top-[calc(100%+4px)] z-30 overflow-hidden rounded-[14px] border border-hairline bg-surface-card shadow-pop">
-          <div className="max-h-72 overflow-y-auto">
+          <div className="scrollbar-clean max-h-72 overflow-y-auto">
             {options.map((o, i) => {
               const active = o.value === value;
               return (
