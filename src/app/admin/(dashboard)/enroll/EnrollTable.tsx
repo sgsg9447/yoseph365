@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/Button";
 import { updateApplicationMemo, confirmApplication } from "./actions";
 
 const STATUS_FILTERS = ["전체", "신규", "상담중", "등록확인", "보류"];
-const GRID = "1.2fr 1.5fr 1.2fr 0.8fr 0.8fr 0.9fr";
+const GRID = "1.1fr 1.4fr 1.1fr 1.1fr 0.7fr 0.8fr 0.8fr";
 const PER_PAGE = 10;
 
 interface EnrollTableProps {
@@ -81,6 +81,7 @@ export function EnrollTable({ rows, courseOptions }: EnrollTableProps) {
               <span>신청자</span>
               <span>과정</span>
               <span>연락처</span>
+              <span>생년월일·성별</span>
               <span>신청일</span>
               <span>상태</span>
               <span className="text-right">관리</span>
@@ -158,14 +159,16 @@ function EnrollRow({ row }: { row: EnrollmentView }) {
       <div className="grid items-center px-5 py-4 text-[15px] gap-y-1" style={{ gridTemplateColumns: GRID }}>
         <span className="font-semibold text-ink">{row.name}</span>
         <span className="text-body">{row.courses.join(", ")}</span>
-        <span className="flex flex-col">
+        <span className="text-body">
           <a href={`tel:${row.phone.replace(/[^0-9]/g, "")}`} className="text-primary">
             {row.phone}
           </a>
-          {(row.birth || row.gender) && (
-            <span className="text-[12px] text-muted">
-              {[row.birth, row.gender].filter(Boolean).join(" · ")}
-            </span>
+        </span>
+        <span className="text-body">
+          {row.birth || row.gender ? (
+            [row.birth, row.gender].filter(Boolean).join(" · ")
+          ) : (
+            <span className="text-muted-soft">-</span>
           )}
         </span>
         <span className="text-muted">{row.date}</span>
