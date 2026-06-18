@@ -34,3 +34,24 @@ export const consultSchema = z.object({
   message: optText(1000),
 });
 export type ConsultInput = z.infer<typeof consultSchema>;
+
+// 관리자 — 수강신청 메모(admin_memo) 갱신
+export const applicationMemoSchema = z.object({
+  id: z.number().int().positive(),
+  memo: z.string().trim().max(2000, "메모는 2000자 이내로 입력해 주세요"),
+});
+export type ApplicationMemoInput = z.infer<typeof applicationMemoSchema>;
+
+// 관리자 — 수강신청 상태(status) 변경
+export const applicationStatusSchema = z.object({
+  id: z.number().int().positive(),
+  status: z.enum(["신규", "상담중", "등록확인", "보류"]),
+});
+export type ApplicationStatusInput = z.infer<typeof applicationStatusSchema>;
+
+// 이벤트 트래킹(/api/track) — 범용 기획 지표 로깅
+export const trackEventSchema = z.object({
+  name: z.string().trim().min(1).max(50),
+  courseId: z.string().trim().max(80).optional(),
+});
+export type TrackEventInput = z.infer<typeof trackEventSchema>;

@@ -1,5 +1,40 @@
 import { describe, it, expect } from "vitest";
-import { applicationSchema, consultSchema } from "./forms";
+import {
+  applicationSchema,
+  consultSchema,
+  applicationMemoSchema,
+  applicationStatusSchema,
+} from "./forms";
+
+describe("applicationStatusSchema", () => {
+  it("유효한 상태값을 통과시킨다", () => {
+    for (const status of ["신규", "상담중", "등록확인", "보류"]) {
+      expect(applicationStatusSchema.safeParse({ id: 1, status }).success).toBe(true);
+    }
+  });
+  it("정의되지 않은 상태값은 실패", () => {
+    expect(applicationStatusSchema.safeParse({ id: 1, status: "취소" }).success).toBe(false);
+  });
+  it("id가 양의 정수가 아니면 실패", () => {
+    expect(applicationStatusSchema.safeParse({ id: 0, status: "신규" }).success).toBe(false);
+  });
+});
+
+describe("applicationMemoSchema", () => {
+  it("유효한 id·메모를 통과시킨다", () => {
+    expect(applicationMemoSchema.safeParse({ id: 1, memo: "전화 연결 예정" }).success).toBe(true);
+  });
+  it("빈 메모도 허용(메모 삭제)", () => {
+    expect(applicationMemoSchema.safeParse({ id: 1, memo: "" }).success).toBe(true);
+  });
+  it("id가 양의 정수가 아니면 실패", () => {
+    expect(applicationMemoSchema.safeParse({ id: 0, memo: "x" }).success).toBe(false);
+    expect(applicationMemoSchema.safeParse({ id: 1.5, memo: "x" }).success).toBe(false);
+  });
+  it("메모가 2000자를 넘으면 실패", () => {
+    expect(applicationMemoSchema.safeParse({ id: 1, memo: "가".repeat(2001) }).success).toBe(false);
+  });
+});
 
 describe("applicationSchema", () => {
   const base = { name: "홍길동", phone: "010-1234-5678", course: "평일 집수리과정", privacyAgreed: true };

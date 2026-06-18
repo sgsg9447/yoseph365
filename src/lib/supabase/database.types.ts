@@ -34,6 +34,30 @@ export type Database = {
   }
   public: {
     Tables: {
+      event_log: {
+        Row: {
+          id: number
+          name: string
+          course_id: string | null
+          props: Json
+          created_at: string
+        }
+        Insert: {
+          id?: never
+          name: string
+          course_id?: string | null
+          props?: Json
+          created_at?: string
+        }
+        Update: {
+          id?: never
+          name?: string
+          course_id?: string | null
+          props?: Json
+          created_at?: string
+        }
+        Relationships: []
+      }
       about_history: {
         Row: {
           created_at: string
