@@ -15,8 +15,9 @@ import { updateApplicationMemo, updateApplicationStatus } from "./actions";
 const STATUS_FILTERS = ["전체", "신규", "상담중", "등록확인", "보류"];
 const STATUSES: EnrollStatus[] = ["신규", "상담중", "등록확인", "보류"];
 // minmax(0,...)로 컬럼을 내용과 무관하게 비율 고정 → 헤더와 모든 행의 열이 정렬됨
+// (각 셀에 min-w-0/truncate를 함께 줘야 내용이 트랙을 넘지 않아 정렬이 유지됨)
 const GRID =
-  "minmax(0,1fr) minmax(0,1.3fr) minmax(0,1.1fr) minmax(0,0.9fr) minmax(0,0.5fr) minmax(0,0.7fr) minmax(0,0.8fr) minmax(0,0.8fr)";
+  "minmax(0,1fr) minmax(0,1.4fr) minmax(0,1.1fr) minmax(0,0.9fr) minmax(0,0.5fr) minmax(0,0.9fr) minmax(0,0.9fr) minmax(0,0.8fr)";
 const PER_PAGE = 10;
 const ROW_H = 44; // 한 행(컴팩트) 대략 높이 — 빈 행 채움·빈 상태 최소 높이 기준
 
@@ -79,14 +80,14 @@ export function EnrollTable({ rows, courseOptions }: EnrollTableProps) {
           className="hidden md:grid items-center px-5 py-2.5 bg-canvas-soft text-[12px] font-semibold text-muted"
           style={{ gridTemplateColumns: GRID }}
         >
-          <span>신청자</span>
-          <span>과정</span>
-          <span>연락처</span>
-          <span>생년월일</span>
-          <span>성별</span>
-          <span>신청일</span>
-          <span>상태</span>
-          <span className="text-right">관리</span>
+          <span className="min-w-0 truncate">신청자</span>
+          <span className="min-w-0 truncate">과정</span>
+          <span className="min-w-0 truncate">연락처</span>
+          <span className="min-w-0 truncate">생년월일</span>
+          <span className="min-w-0 truncate">성별</span>
+          <span className="min-w-0 truncate">신청일</span>
+          <span className="min-w-0 truncate">상태</span>
+          <span className="min-w-0 truncate text-right">관리</span>
         </div>
         {total === 0 ? (
           <div className="flex items-center justify-center" style={{ minHeight: PER_PAGE * ROW_H }}>
@@ -187,23 +188,19 @@ function EnrollRow({ row }: { row: EnrollmentView }) {
           {row.courses.join(", ")}
         </span>
         <span className="min-w-0 truncate text-body">{row.phone}</span>
-        <span className="text-body">{row.birth || <span className="text-muted-soft">-</span>}</span>
-        <span className="text-body">{row.gender || <span className="text-muted-soft">-</span>}</span>
-        <span className="text-muted">{row.date}</span>
-        <span>
+        <span className="min-w-0 truncate text-body">{row.birth || <span className="text-muted-soft">-</span>}</span>
+        <span className="min-w-0 truncate text-body">{row.gender || <span className="text-muted-soft">-</span>}</span>
+        <span className="min-w-0 truncate text-muted">{row.date}</span>
+        <span className="min-w-0">
           <StatusMenu value={row.status} onChange={changeStatus} pending={changing} />
         </span>
-        <span className="flex justify-end">
+        <span className="flex min-w-0 justify-end">
           <button
             type="button"
             onClick={() => setOpen(true)}
-            className={[
-              "text-[13px] font-semibold rounded-full px-3 py-1",
-              hasMemo
-                ? "bg-primary-soft text-primary"
-                : "border border-hairline-strong text-body-strong bg-transparent hover:bg-hairline-soft",
-            ].join(" ")}
+            className="inline-flex items-center gap-1.5 text-[13px] font-semibold rounded-full px-3 py-1 border border-hairline-strong text-body-strong bg-transparent hover:bg-hairline-soft"
           >
+            {hasMemo && <span className="w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" aria-hidden />}
             {hasMemo ? "메모 있음" : "관리"}
           </button>
         </span>
