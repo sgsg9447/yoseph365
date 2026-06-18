@@ -9,13 +9,14 @@ import { SectionCard } from "@/components/admin/SectionCard";
 import { StatusChip } from "@/components/admin/StatusChip";
 import { EmptyState } from "@/components/admin/EmptyState";
 import { Button } from "@/components/ui/Button";
+import { Modal } from "@/components/ui/Modal";
 import { updateApplicationMemo, updateApplicationStatus } from "./actions";
 
 const STATUS_FILTERS = ["전체", "신규", "상담중", "등록확인", "보류"];
 const STATUSES: EnrollStatus[] = ["신규", "상담중", "등록확인", "보류"];
 const GRID = "1fr 1.3fr 1.1fr 0.9fr 0.5fr 0.7fr 0.8fr 0.8fr";
 const PER_PAGE = 10;
-const ROW_H = 57; // 한 행(접힌 상태) 대략 높이 — 빈 행 채움·빈 상태 최소 높이 기준
+const ROW_H = 44; // 한 행(컴팩트) 대략 높이 — 빈 행 채움·빈 상태 최소 높이 기준
 
 interface EnrollTableProps {
   rows: EnrollmentView[];
@@ -47,10 +48,10 @@ export function EnrollTable({ rows, courseOptions }: EnrollTableProps) {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-wrap items-center gap-3">
         <FilterPills items={STATUS_FILTERS} active="전체" onChange={changeStatus} />
-        <div className="flex flex-wrap items-center gap-2">
-          <div className="w-full sm:w-56">
+        <div className="ml-auto flex flex-wrap items-center gap-2">
+          <div className="w-44">
             <Select
               value={course}
               onChange={changeCourse}
@@ -66,14 +67,14 @@ export function EnrollTable({ rows, courseOptions }: EnrollTableProps) {
             value={query}
             onChange={(e) => changeQuery(e.target.value)}
             placeholder="신청자 이름 검색"
-            className="flex-1 min-w-[180px] sm:max-w-xs h-[46px] bg-surface-card text-ink text-[15px] rounded-[14px] border border-hairline-strong px-4 outline-none focus:border-2 focus:border-primary"
+            className="w-44 sm:w-52 h-[42px] bg-surface-card text-ink text-[15px] rounded-[14px] border border-hairline-strong px-4 outline-none focus:border-2 focus:border-primary"
           />
         </div>
       </div>
 
       <SectionCard padding={0}>
         <div
-          className="hidden md:grid items-center px-5 py-3 bg-canvas-soft text-[13px] font-semibold text-muted"
+          className="hidden md:grid items-center px-5 py-2.5 bg-canvas-soft text-[12px] font-semibold text-muted"
           style={{ gridTemplateColumns: GRID }}
         >
           <span>신청자</span>
@@ -168,7 +169,7 @@ function EnrollRow({ row }: { row: EnrollmentView }) {
 
   return (
     <div className="border-t border-hairline-soft">
-      <div className="grid items-center px-5 py-4 text-[15px] gap-y-1" style={{ gridTemplateColumns: GRID }}>
+      <div className="grid items-center px-5 py-2.5 text-[14px]" style={{ gridTemplateColumns: GRID }}>
         <span className="font-semibold text-ink inline-flex items-center gap-1.5">
           {row.status === "신규" && (
             <span
@@ -195,31 +196,30 @@ function EnrollRow({ row }: { row: EnrollmentView }) {
         <span className="flex justify-end">
           <button
             type="button"
-            onClick={() => setOpen((v) => !v)}
-            aria-expanded={open}
+            onClick={() => setOpen(true)}
             className={[
-              "inline-flex items-center gap-1 text-[13px] font-semibold rounded-full px-3 py-1",
+              "text-[13px] font-semibold rounded-full px-3 py-1",
               hasMemo
                 ? "bg-primary-soft text-primary"
                 : "border border-hairline-strong text-body-strong bg-transparent hover:bg-hairline-soft",
             ].join(" ")}
           >
             {hasMemo ? "메모 있음" : "관리"}
-            <svg
-              width="14" height="14" viewBox="0 0 24 24" fill="none"
-              stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"
-              aria-hidden className="transition-transform"
-              style={{ transform: open ? "rotate(180deg)" : "none" }}
-            >
-              <path d="m6 9 6 6 6-6" />
-            </svg>
           </button>
         </span>
       </div>
 
-      {open && (
-        <div className="px-5 pb-4 flex flex-col gap-3 bg-canvas-soft">
-          <div className="pt-3">
+      <Modal
+        open={open}
+        onClose={() => {
+          setMemo(saved);
+          setError(null);
+          setOpen(false);
+        }}
+        title={`${row.name} · 신청 상세`}
+      >
+        <div className="flex flex-col gap-4">
+          <div>
             <span className="block text-[13px] font-semibold text-body-strong mb-1">추가 정보</span>
             {row.address || row.career || row.motivation ? (
               <dl className="flex flex-col gap-1 text-[14px] leading-[1.6]">
@@ -251,20 +251,13 @@ function EnrollRow({ row }: { row: EnrollmentView }) {
             <textarea
               value={memo}
               onChange={(e) => setMemo(e.target.value)}
-              rows={3}
+              rows={4}
               placeholder="상담 내용·처리 메모를 입력하세요"
               className="w-full bg-surface-card text-ink text-[15px] rounded-button border border-hairline-strong px-3 py-2 outline-none focus:border-2 focus:border-primary resize-y"
             />
             {error && <p className="text-[13px] text-error mt-1">{error}</p>}
-            <div className="flex justify-end gap-2 mt-2">
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => {
-                  setMemo(saved);
-                  setError(null);
-                }}
-              >
+            <div className="flex justify-end gap-2 mt-3">
+              <Button size="sm" variant="outline" onClick={() => setMemo(saved)}>
                 되돌리기
               </Button>
               <Button size="sm" onClick={save} disabled={pending}>
@@ -273,7 +266,7 @@ function EnrollRow({ row }: { row: EnrollmentView }) {
             </div>
           </div>
         </div>
-      )}
+      </Modal>
     </div>
   );
 }
