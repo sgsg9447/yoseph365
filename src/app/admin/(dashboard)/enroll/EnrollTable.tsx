@@ -156,7 +156,14 @@ function EnrollRow({ row }: { row: EnrollmentView }) {
   return (
     <div className="border-t border-hairline-soft">
       <div className="grid items-center px-5 py-4 text-[15px] gap-y-1" style={{ gridTemplateColumns: GRID }}>
-        <span className="font-semibold text-ink">{row.name}</span>
+        <span className="flex flex-col">
+          <span className="font-semibold text-ink">{row.name}</span>
+          {(row.birth || row.gender) && (
+            <span className="text-[12px] text-muted">
+              {[row.birth, row.gender].filter(Boolean).join(" · ")}
+            </span>
+          )}
+        </span>
         <span className="text-body">{row.courses.join(", ")}</span>
         <span className="text-body">
           <a href={`tel:${row.phone.replace(/[^0-9]/g, "")}`} className="text-primary">

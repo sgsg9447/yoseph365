@@ -17,10 +17,23 @@ export interface EnrollmentView {
   phone: string;
   date: string;
   status: EnrollStatus;
+  /** 신청 시 추가 입력에서 파싱한 생년월일·성별(테이블 표시용) */
+  birth: string;
+  gender: string;
   /** 운영자 메모(admin_memo) */
   memo: string;
   /** 신청 시 추가 입력(생년월일·성별·주소·관련경력·지원동기 등) — additional_note 원문 */
   note: string;
+}
+
+/** additional_note("라벨: 값" 줄글)에서 라벨에 해당하는 값을 추출. 없으면 "". */
+export function extractNoteField(note: string, label: string): string {
+  for (const line of note.split("\n")) {
+    const idx = line.indexOf(":");
+    if (idx === -1) continue;
+    if (line.slice(0, idx).trim() === label) return line.slice(idx + 1).trim();
+  }
+  return "";
 }
 
 export interface InquiryView {
@@ -59,6 +72,7 @@ export function toEnrollmentView(
   >,
 ): EnrollmentView {
   // 관리자(authenticated) 화면 — 신청 처리를 위해 이름·연락처를 마스킹하지 않고 그대로 노출한다.
+  const note = r.additional_note ?? "";
   return {
     id: r.id,
     name: r.name,
@@ -67,8 +81,10 @@ export function toEnrollmentView(
     phone: r.phone,
     date: fmtDate(r.created_at),
     status: r.status,
+    birth: extractNoteField(note, "생년월일"),
+    gender: extractNoteField(note, "성별"),
     memo: r.admin_memo ?? "",
-    note: r.additional_note ?? "",
+    note,
   };
 }
 
