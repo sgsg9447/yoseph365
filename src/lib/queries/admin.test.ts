@@ -8,7 +8,7 @@ import {
   toCourseClickViews,
   type EnrollmentView,
 } from "./admin";
-import { filterEnrollments } from "@/lib/admin/enroll";
+import { filterEnrollments, paginate } from "@/lib/admin/enroll";
 
 const appRow = {
   id: 1, name: "김지희", phone: "01012345678",
@@ -63,6 +63,48 @@ describe("filterEnrollments", () => {
   it("상태+과정 동시 필터링", () => {
     const r = filterEnrollments(rows, { status: "신규", course: "목공" });
     expect(r.map((x) => x.id)).toEqual([1]);
+  });
+
+  it("이름 검색(query)으로 필터링 — 대소문자 무시", () => {
+    const named: EnrollmentView[] = [
+      { id: 1, name: "김철수", course: "x", courses: ["x"], phone: "p", date: "d", status: "신규", memo: "" },
+      { id: 2, name: "이영희", course: "x", courses: ["x"], phone: "p", date: "d", status: "신규", memo: "" },
+    ];
+    const r = filterEnrollments(named, { status: "전체", course: "전체", query: "영희" });
+    expect(r.map((x) => x.id)).toEqual([2]);
+  });
+
+  it("query가 공백이면 무시", () => {
+    expect(filterEnrollments(rows, { status: "전체", course: "전체", query: "   " })).toHaveLength(3);
+  });
+});
+
+describe("paginate", () => {
+  const items = Array.from({ length: 25 }, (_, i) => i + 1);
+
+  it("페이지당 10개, 1페이지", () => {
+    const r = paginate(items, 1, 10);
+    expect(r.items).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+    expect(r.total).toBe(25);
+    expect(r.totalPages).toBe(3);
+    expect(r.page).toBe(1);
+  });
+
+  it("2페이지는 다음 10개", () => {
+    expect(paginate(items, 2, 10).items).toEqual([11, 12, 13, 14, 15, 16, 17, 18, 19, 20]);
+  });
+
+  it("범위를 넘는 페이지는 마지막 페이지로 클램프", () => {
+    const r = paginate(items, 99, 10);
+    expect(r.page).toBe(3);
+    expect(r.items).toEqual([21, 22, 23, 24, 25]);
+  });
+
+  it("빈 목록은 totalPages 1, items 빈 배열", () => {
+    const r = paginate([], 1, 10);
+    expect(r.totalPages).toBe(1);
+    expect(r.items).toEqual([]);
+    expect(r.page).toBe(1);
   });
 });
 
