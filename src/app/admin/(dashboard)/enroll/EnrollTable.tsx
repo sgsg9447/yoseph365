@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/Button";
 import { updateApplicationMemo, confirmApplication } from "./actions";
 
 const STATUS_FILTERS = ["전체", "신규", "상담중", "등록확인", "보류"];
-const GRID = "1.1fr 1.4fr 1.1fr 1.1fr 0.7fr 0.8fr 0.8fr";
+const GRID = "1fr 1.3fr 1.1fr 0.9fr 0.5fr 0.7fr 0.8fr 0.8fr";
 const PER_PAGE = 10;
 
 interface EnrollTableProps {
@@ -81,7 +81,8 @@ export function EnrollTable({ rows, courseOptions }: EnrollTableProps) {
               <span>신청자</span>
               <span>과정</span>
               <span>연락처</span>
-              <span>생년월일·성별</span>
+              <span>생년월일</span>
+              <span>성별</span>
               <span>신청일</span>
               <span>상태</span>
               <span className="text-right">관리</span>
@@ -164,13 +165,8 @@ function EnrollRow({ row }: { row: EnrollmentView }) {
             {row.phone}
           </a>
         </span>
-        <span className="text-body">
-          {row.birth || row.gender ? (
-            [row.birth, row.gender].filter(Boolean).join(" · ")
-          ) : (
-            <span className="text-muted-soft">-</span>
-          )}
-        </span>
+        <span className="text-body">{row.birth || <span className="text-muted-soft">-</span>}</span>
+        <span className="text-body">{row.gender || <span className="text-muted-soft">-</span>}</span>
         <span className="text-muted">{row.date}</span>
         <span>
           <StatusChip status={row.status} />
