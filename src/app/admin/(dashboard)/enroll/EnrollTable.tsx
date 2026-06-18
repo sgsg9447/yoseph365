@@ -44,16 +44,30 @@ export function EnrollTable({ rows, courseOptions }: EnrollTableProps) {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-3">
         <FilterPills items={STATUS_FILTERS} active="전체" onChange={changeStatus} />
-        <FilterPills items={["전체", ...courseOptions]} active="전체" onChange={changeCourse} />
-        <input
-          type="search"
-          value={query}
-          onChange={(e) => changeQuery(e.target.value)}
-          placeholder="신청자 이름 검색"
-          className="w-full sm:max-w-xs h-10 bg-surface-card text-ink text-[15px] rounded-button border border-hairline-strong px-3 outline-none focus:border-2 focus:border-primary"
-        />
+        <div className="flex flex-wrap items-center gap-2">
+          <select
+            value={course}
+            onChange={(e) => changeCourse(e.target.value)}
+            aria-label="과정 필터"
+            className="h-10 bg-surface-card text-ink text-[15px] rounded-button border border-hairline-strong pl-3 pr-8 outline-none focus:border-2 focus:border-primary"
+          >
+            <option value="전체">전체 과정</option>
+            {courseOptions.map((c) => (
+              <option key={c} value={c}>
+                {c}
+              </option>
+            ))}
+          </select>
+          <input
+            type="search"
+            value={query}
+            onChange={(e) => changeQuery(e.target.value)}
+            placeholder="신청자 이름 검색"
+            className="flex-1 min-w-[180px] sm:max-w-xs h-10 bg-surface-card text-ink text-[15px] rounded-button border border-hairline-strong px-3 outline-none focus:border-2 focus:border-primary"
+          />
+        </div>
       </div>
 
       <SectionCard padding={0}>
