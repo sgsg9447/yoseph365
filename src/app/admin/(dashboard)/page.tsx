@@ -1,11 +1,10 @@
 import Link from "next/link";
 import { KpiCard } from "@/components/admin/KpiCard";
 import { SectionCard } from "@/components/admin/SectionCard";
-import { ProgressBar } from "@/components/admin/ProgressBar";
 import { StatusChip } from "@/components/admin/StatusChip";
 import { EmptyState } from "@/components/admin/EmptyState";
 import { Users, Clipboard, Message, Hammer } from "@/components/icons";
-import { DEMO_KPI, DEMO_COURSE_CLICKS } from "@/app/admin/demo";
+import { DEMO_KPI } from "@/app/admin/demo";
 import { getOpenCourseCount, getAdminCourses, getEnrollments } from "@/lib/queries/admin";
 
 export default async function DashboardPage() {
@@ -48,24 +47,27 @@ export default async function DashboardPage() {
 
       <div className="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
         <SectionCard
-          title="과정별 클릭률 TOP 5"
+          title="과정별 클릭률"
           action={
             <Link href="/admin/clicks" className="text-primary text-[14px] font-semibold">
               자세히 →
             </Link>
           }
         >
-          <div className="flex flex-col gap-3">
-            {DEMO_COURSE_CLICKS.map((item) => (
-              <div key={item.name}>
-                <div className="flex justify-between mb-1">
-                  <span className="text-[14px] text-body-strong">{item.name}</span>
-                  <span className="text-[13px] text-muted">{item.clicks.toLocaleString()} 클릭</span>
+          {courses.length === 0 ? (
+            <EmptyState message="등록된 과정이 없습니다." />
+          ) : (
+            <div className="flex flex-col gap-3">
+              {courses.slice(0, 5).map((course) => (
+                <div key={course.id} className="flex items-center justify-between">
+                  <span className="text-[14px] text-body-strong">{course.name}</span>
+                  <span className="text-[13px] font-semibold text-muted bg-surface-strong rounded-full px-2.5 py-0.5">
+                    집계 전
+                  </span>
                 </div>
-                <ProgressBar pct={item.pct} />
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </SectionCard>
 
         <SectionCard
