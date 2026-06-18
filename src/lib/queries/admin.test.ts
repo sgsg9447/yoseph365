@@ -32,18 +32,25 @@ describe("inquiryStatusLabel", () => {
 });
 
 describe("toInquiryView", () => {
-  it("마스킹 + 라벨 매핑 + interest=category", () => {
-    const v = toInquiryView({
-      id: 9, name: "박민수", phone: "01055556666",
-      category: "국비지원" as const, course_id: null,
-      content: "문의합니다", status: "답변대기" as const,
-      created_at: "2026-06-17T05:00:00Z",
-    });
+  const baseRow = {
+    id: 9, name: "박민수", phone: "01055556666",
+    category: "국비지원" as const,
+    content: "문의합니다", status: "답변대기" as const,
+    created_at: "2026-06-17T05:00:00Z",
+  };
+
+  it("마스킹 + 라벨 매핑 + interest=category (과정명 없음)", () => {
+    const v = toInquiryView(baseRow);
     expect(v.name).toBe("박O수");
     expect(v.phone).toBe("010-5555-••••");
     expect(v.interest).toBe("국비지원");
     expect(v.status).toBe("신규");
     expect(v.message).toBe("문의합니다");
+  });
+
+  it("과정명 전달 시 interest=과정명", () => {
+    const v = toInquiryView(baseRow, "목공 기초 종합반");
+    expect(v.interest).toBe("목공 기초 종합반");
   });
 });
 

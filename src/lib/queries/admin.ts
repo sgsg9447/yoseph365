@@ -26,13 +26,16 @@ export interface InquiryView {
   status: "신규" | "완료";
 }
 
-/** ISO → "YYYY.MM.DD" (KST 기준 단순 포맷) */
+/** ISO → "YYYY.MM.DD" (Asia/Seoul 기준) */
 function fmtDate(iso: string): string {
-  const d = new Date(iso);
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, "0");
-  const day = String(d.getDate()).padStart(2, "0");
-  return `${y}.${m}.${day}`;
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Seoul",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(new Date(iso));
+  const get = (t: string) => parts.find((p) => p.type === t)?.value ?? "";
+  return `${get("year")}.${get("month")}.${get("day")}`;
 }
 
 export function toEnrollmentView(
@@ -53,13 +56,14 @@ export function inquiryStatusLabel(s: InquiryRow["status"]): "신규" | "완료"
 }
 
 export function toInquiryView(
-  r: Pick<InquiryRow, "id" | "name" | "phone" | "category" | "course_id" | "content" | "status" | "created_at">,
+  r: Pick<InquiryRow, "id" | "name" | "phone" | "category" | "content" | "status" | "created_at">,
+  courseName?: string | null,
 ): InquiryView {
   return {
     id: r.id,
     name: maskName(r.name),
     phone: maskPhone(r.phone),
-    interest: r.course_id ?? r.category,
+    interest: courseName ?? r.category,
     message: r.content,
     date: fmtDate(r.created_at),
     status: inquiryStatusLabel(r.status),
@@ -86,12 +90,18 @@ export async function getEnrollments(): Promise<EnrollmentView[]> {
 
 export async function getInquiries(): Promise<InquiryView[]> {
   const supabase = await createClient();
-  const { data, error } = await supabase
-    .from("inquiry")
-    .select("id,name,phone,category,course_id,content,status,created_at")
-    .order("created_at", { ascending: false });
-  if (error) throw error;
-  return (data ?? []).map(toInquiryView);
+  const [inquiryRes, courses] = await Promise.all([
+    supabase
+      .from("inquiry")
+      .select("id,name,phone,category,course_id,content,status,created_at")
+      .order("created_at", { ascending: false }),
+    getAdminCourses(),
+  ]);
+  if (inquiryRes.error) throw inquiryRes.error;
+  const nameById = new Map(courses.map((c) => [c.id, c.name]));
+  return (inquiryRes.data ?? []).map((r) =>
+    toInquiryView(r, r.course_id ? nameById.get(r.course_id) ?? null : null),
+  );
 }
 
 export interface AdminCourseView {
