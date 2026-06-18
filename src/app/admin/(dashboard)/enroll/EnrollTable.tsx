@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import type { EnrollmentView } from "@/lib/queries/admin";
 import { filterEnrollments, paginate } from "@/lib/admin/enroll";
 import { FilterPills } from "@/components/admin/FilterPills";
+import { Select } from "@/components/ui/Select";
 import { SectionCard } from "@/components/admin/SectionCard";
 import { StatusChip } from "@/components/admin/StatusChip";
 import { EmptyState } from "@/components/admin/EmptyState";
@@ -47,25 +48,23 @@ export function EnrollTable({ rows, courseOptions }: EnrollTableProps) {
       <div className="flex flex-col gap-3">
         <FilterPills items={STATUS_FILTERS} active="전체" onChange={changeStatus} />
         <div className="flex flex-wrap items-center gap-2">
-          <select
-            value={course}
-            onChange={(e) => changeCourse(e.target.value)}
-            aria-label="과정 필터"
-            className="h-10 bg-surface-card text-ink text-[15px] rounded-button border border-hairline-strong pl-3 pr-8 outline-none focus:border-2 focus:border-primary"
-          >
-            <option value="전체">전체 과정</option>
-            {courseOptions.map((c) => (
-              <option key={c} value={c}>
-                {c}
-              </option>
-            ))}
-          </select>
+          <div className="w-full sm:w-56">
+            <Select
+              value={course}
+              onChange={changeCourse}
+              ariaLabel="과정 필터"
+              options={[
+                { value: "전체", label: "전체 과정" },
+                ...courseOptions.map((c) => ({ value: c, label: c })),
+              ]}
+            />
+          </div>
           <input
             type="search"
             value={query}
             onChange={(e) => changeQuery(e.target.value)}
             placeholder="신청자 이름 검색"
-            className="flex-1 min-w-[180px] sm:max-w-xs h-10 bg-surface-card text-ink text-[15px] rounded-button border border-hairline-strong px-3 outline-none focus:border-2 focus:border-primary"
+            className="flex-1 min-w-[180px] sm:max-w-xs h-[46px] bg-surface-card text-ink text-[15px] rounded-[14px] border border-hairline-strong px-4 outline-none focus:border-2 focus:border-primary"
           />
         </div>
       </div>
@@ -168,59 +167,67 @@ function EnrollRow({ row }: { row: EnrollmentView }) {
         <span>
           <StatusChip status={row.status} />
         </span>
-        <span className="flex items-center justify-end gap-1.5">
-          {row.status === "신규" && (
-            <button
-              type="button"
-              onClick={confirm}
-              disabled={confirming}
-              className="text-[13px] font-semibold rounded-full px-3 py-1 bg-primary text-white disabled:opacity-60"
-            >
-              {confirming ? "처리 중…" : "확인"}
-            </button>
-          )}
+        <span className="flex justify-end">
           <button
             type="button"
             onClick={() => setOpen((v) => !v)}
+            aria-expanded={open}
             className={[
-              "text-[13px] font-semibold rounded-full px-3 py-1",
-              hasMemo ? "bg-primary-soft text-primary" : "text-muted bg-surface-strong",
+              "inline-flex items-center gap-1 text-[13px] font-semibold rounded-full px-3 py-1",
+              hasMemo ? "bg-primary-soft text-primary" : "text-body-strong bg-surface-strong",
             ].join(" ")}
           >
-            메모{hasMemo ? " ✓" : ""}
+            {hasMemo ? "메모 있음" : "관리"}
+            <svg
+              width="14" height="14" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"
+              aria-hidden className="transition-transform"
+              style={{ transform: open ? "rotate(180deg)" : "none" }}
+            >
+              <path d="m6 9 6 6 6-6" />
+            </svg>
           </button>
         </span>
       </div>
 
       {open && (
-        <div className="px-5 pb-4 -mt-1">
-          <textarea
-            value={memo}
-            onChange={(e) => setMemo(e.target.value)}
-            rows={3}
-            placeholder="상담 내용·처리 메모를 입력하세요"
-            className="w-full bg-surface-card text-ink text-[15px] rounded-button border border-hairline-strong px-3 py-2 outline-none focus:border-2 focus:border-primary resize-y"
-          />
-          {error && <p className="text-[13px] text-error mt-1">{error}</p>}
-          <div className="flex justify-end gap-2 mt-2">
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => {
-                setMemo(saved);
-                setOpen(false);
-                setError(null);
-              }}
-            >
-              취소
-            </Button>
-            <Button size="sm" onClick={save} disabled={pending}>
-              {pending ? "저장 중…" : "저장"}
-            </Button>
+        <div className="px-5 pb-4 flex flex-col gap-3 bg-canvas-soft">
+          {row.status === "신규" && (
+            <div className="flex items-center justify-between gap-3 pt-3">
+              <span className="text-[14px] text-muted">아직 확인하지 않은 새 신청입니다.</span>
+              <Button size="sm" onClick={confirm} disabled={confirming}>
+                {confirming ? "처리 중…" : "확인 처리"}
+              </Button>
+            </div>
+          )}
+          <div>
+            <label className="block text-[13px] font-semibold text-body-strong mb-1">메모</label>
+            <textarea
+              value={memo}
+              onChange={(e) => setMemo(e.target.value)}
+              rows={3}
+              placeholder="상담 내용·처리 메모를 입력하세요"
+              className="w-full bg-surface-card text-ink text-[15px] rounded-button border border-hairline-strong px-3 py-2 outline-none focus:border-2 focus:border-primary resize-y"
+            />
+            {error && <p className="text-[13px] text-error mt-1">{error}</p>}
+            <div className="flex justify-end gap-2 mt-2">
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => {
+                  setMemo(saved);
+                  setError(null);
+                }}
+              >
+                되돌리기
+              </Button>
+              <Button size="sm" onClick={save} disabled={pending}>
+                {pending ? "저장 중…" : "메모 저장"}
+              </Button>
+            </div>
           </div>
         </div>
       )}
-      {error && !open && <p className="px-5 pb-3 -mt-1 text-[13px] text-error">{error}</p>}
     </div>
   );
 }
