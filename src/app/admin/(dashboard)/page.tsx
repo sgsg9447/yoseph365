@@ -1,11 +1,17 @@
 import Link from "next/link";
 import { KpiCard } from "@/components/admin/KpiCard";
 import { SectionCard } from "@/components/admin/SectionCard";
+import { ProgressBar } from "@/components/admin/ProgressBar";
 import { StatusChip } from "@/components/admin/StatusChip";
 import { EmptyState } from "@/components/admin/EmptyState";
 import { Users, Clipboard, Message, Hammer } from "@/components/icons";
 import { DEMO_KPI } from "@/app/admin/demo";
-import { getOpenCourseCount, getAdminCourses, getEnrollments } from "@/lib/queries/admin";
+import {
+  getOpenCourseCount,
+  getAdminCourses,
+  getEnrollments,
+  toCourseClickViews,
+} from "@/lib/queries/admin";
 
 export default async function DashboardPage() {
   const [openCount, courses, enrollments] = await Promise.all([
@@ -15,6 +21,7 @@ export default async function DashboardPage() {
   ]);
   const recent = enrollments.slice(0, 4);
   const totalCourses = courses.length;
+  const clickViews = toCourseClickViews(courses).slice(0, 5);
 
   return (
     <div>
@@ -54,18 +61,30 @@ export default async function DashboardPage() {
             </Link>
           }
         >
-          {courses.length === 0 ? (
+          {clickViews.length === 0 ? (
             <EmptyState message="등록된 과정이 없습니다." />
           ) : (
             <div className="flex flex-col gap-3">
-              {courses.slice(0, 5).map((course) => (
-                <div key={course.id} className="flex items-center justify-between">
-                  <span className="text-[14px] text-body-strong">{course.name}</span>
-                  <span className="text-[13px] font-semibold text-muted bg-surface-strong rounded-full px-2.5 py-0.5">
-                    집계 전
-                  </span>
-                </div>
-              ))}
+              {clickViews.map((course) =>
+                course.clicks > 0 ? (
+                  <div key={course.id}>
+                    <div className="flex justify-between mb-1">
+                      <span className="text-[14px] text-body-strong">{course.name}</span>
+                      <span className="text-[13px] text-muted">
+                        {course.clicks.toLocaleString()} 클릭
+                      </span>
+                    </div>
+                    <ProgressBar pct={course.pct} />
+                  </div>
+                ) : (
+                  <div key={course.id} className="flex items-center justify-between">
+                    <span className="text-[14px] text-body-strong">{course.name}</span>
+                    <span className="text-[13px] font-semibold text-muted bg-surface-strong rounded-full px-2.5 py-0.5">
+                      집계 전
+                    </span>
+                  </div>
+                ),
+              )}
             </div>
           )}
         </SectionCard>

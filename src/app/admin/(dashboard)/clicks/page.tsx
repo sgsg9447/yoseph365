@@ -1,10 +1,11 @@
 import { FilterPills } from "@/components/admin/FilterPills";
 import { SectionCard } from "@/components/admin/SectionCard";
+import { ProgressBar } from "@/components/admin/ProgressBar";
 import { EmptyState } from "@/components/admin/EmptyState";
-import { getAdminCourses } from "@/lib/queries/admin";
+import { getCourseClicks } from "@/lib/queries/admin";
 
 export default async function ClicksPage() {
-  const courses = await getAdminCourses();
+  const courses = await getCourseClicks();
 
   return (
     <div>
@@ -14,12 +15,17 @@ export default async function ClicksPage() {
         {courses.length === 0 ? (
           <EmptyState message="등록된 과정이 없습니다." />
         ) : (
-          <>
-            <p className="text-[14px] text-muted mb-4">
-              방문·클릭 집계는 준비 중입니다. 현재는 과정 목록만 표시됩니다.
-            </p>
-            <div className="flex flex-col gap-4">
-              {courses.map((course) => (
+          <div className="flex flex-col gap-5">
+            {courses.map((course) =>
+              course.clicks > 0 ? (
+                <div key={course.id}>
+                  <p className="text-[15px] font-semibold text-ink mb-1">{course.name}</p>
+                  <p className="text-[14px] text-muted mb-2">
+                    <strong>{course.clicks.toLocaleString()}</strong> 클릭
+                  </p>
+                  <ProgressBar pct={course.pct} thick />
+                </div>
+              ) : (
                 <div
                   key={course.id}
                   className="flex items-center justify-between border-b border-hairline-soft pb-4 last:border-b-0 last:pb-0"
@@ -29,9 +35,9 @@ export default async function ClicksPage() {
                     집계 전
                   </span>
                 </div>
-              ))}
-            </div>
-          </>
+              ),
+            )}
+          </div>
         )}
       </SectionCard>
     </div>

@@ -5,6 +5,7 @@ import {
   inquiryStatusLabel,
   countPending,
   countNewInquiries,
+  toCourseClickViews,
 } from "./admin";
 
 const appRow = {
@@ -60,5 +61,33 @@ describe("카운트 도출", () => {
   });
   it("countNewInquiries = '답변대기' 개수", () => {
     expect(countNewInquiries([{ status: "답변대기" }, { status: "답변완료" }])).toBe(1);
+  });
+});
+
+describe("toCourseClickViews", () => {
+  const courses = [
+    { id: "a", name: "목공 기초" },
+    { id: "b", name: "집수리" },
+    { id: "c", name: "인테리어" },
+  ];
+
+  it("클릭 데이터 없으면 모두 clicks=0, pct=0 (집계 전)", () => {
+    const views = toCourseClickViews(courses);
+    expect(views.map((v) => v.clicks)).toEqual([0, 0, 0]);
+    expect(views.map((v) => v.pct)).toEqual([0, 0, 0]);
+    expect(views[0]).toMatchObject({ id: "a", name: "목공 기초" });
+  });
+
+  it("최다 클릭 과정이 pct 100, 나머지는 비율로 반올림", () => {
+    const views = toCourseClickViews(courses, { a: 100, b: 50, c: 0 });
+    expect(views.find((v) => v.id === "a")).toMatchObject({ clicks: 100, pct: 100 });
+    expect(views.find((v) => v.id === "b")).toMatchObject({ clicks: 50, pct: 50 });
+    expect(views.find((v) => v.id === "c")).toMatchObject({ clicks: 0, pct: 0 });
+  });
+
+  it("맵에 없는 과정은 clicks 0으로 처리", () => {
+    const views = toCourseClickViews(courses, { a: 30 });
+    expect(views.find((v) => v.id === "b")?.clicks).toBe(0);
+    expect(views.find((v) => v.id === "a")?.pct).toBe(100);
   });
 });
