@@ -14,7 +14,7 @@ export function SectionCard({ title, action, children, padding = 20, className }
 
   if (padding === 0 || padding === "0" || padding === "0px") {
     return (
-      <Card padding={0} className={className}>
+      <Card padding={0} className={["overflow-hidden", className ?? ""].join(" ").trim()}>
         {hasHeader && (
           <div className="flex items-center justify-between px-5 py-4">
             {title && <h2 className="text-[17px] font-bold text-ink">{title}</h2>}
