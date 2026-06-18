@@ -10,10 +10,15 @@ export type EnrollStatus = Database["public"]["Enums"]["application_status"]; //
 export interface EnrollmentView {
   id: number;
   name: string;
+  /** 첫 선택 과정(대시보드 등 단일 표시용) */
   course: string;
+  /** 선택한 전체 과정(과정 필터용) */
+  courses: string[];
   phone: string;
   date: string;
   status: EnrollStatus;
+  /** 운영자 메모(admin_memo) */
+  memo: string;
 }
 
 export interface InquiryView {
@@ -39,15 +44,21 @@ function fmtDate(iso: string): string {
 }
 
 export function toEnrollmentView(
-  r: Pick<ApplicationRow, "id" | "name" | "phone" | "selected_courses" | "status" | "created_at">,
+  r: Pick<
+    ApplicationRow,
+    "id" | "name" | "phone" | "selected_courses" | "status" | "created_at" | "admin_memo"
+  >,
 ): EnrollmentView {
+  // 관리자(authenticated) 화면 — 신청 처리를 위해 이름·연락처를 마스킹하지 않고 그대로 노출한다.
   return {
     id: r.id,
-    name: maskName(r.name),
+    name: r.name,
     course: r.selected_courses[0] ?? "-",
-    phone: maskPhone(r.phone),
+    courses: r.selected_courses,
+    phone: r.phone,
     date: fmtDate(r.created_at),
     status: r.status,
+    memo: r.admin_memo ?? "",
   };
 }
 
@@ -82,7 +93,7 @@ export async function getEnrollments(): Promise<EnrollmentView[]> {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("application")
-    .select("id,name,phone,selected_courses,status,created_at")
+    .select("id,name,phone,selected_courses,status,created_at,admin_memo")
     .order("created_at", { ascending: false });
   if (error) throw error;
   return (data ?? []).map(toEnrollmentView);

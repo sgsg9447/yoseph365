@@ -34,3 +34,10 @@ export const consultSchema = z.object({
   message: optText(1000),
 });
 export type ConsultInput = z.infer<typeof consultSchema>;
+
+// 관리자 — 수강신청 메모(admin_memo) 갱신
+export const applicationMemoSchema = z.object({
+  id: z.number().int().positive(),
+  memo: z.string().trim().max(2000, "메모는 2000자 이내로 입력해 주세요"),
+});
+export type ApplicationMemoInput = z.infer<typeof applicationMemoSchema>;

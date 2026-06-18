@@ -6,22 +6,63 @@ import {
   countPending,
   countNewInquiries,
   toCourseClickViews,
+  type EnrollmentView,
 } from "./admin";
+import { filterEnrollments } from "@/lib/admin/enroll";
 
 const appRow = {
   id: 1, name: "김지희", phone: "01012345678",
   selected_courses: ["목공 기초 종합반", "집수리 실무반"],
   status: "신규" as const, created_at: "2026-06-15T02:00:00Z",
+  admin_memo: "전화 연결 안 됨",
 };
 
 describe("toEnrollmentView", () => {
-  it("이름·전화 마스킹 + 첫 과정 + 날짜 포맷", () => {
+  it("관리자용 — 이름·연락처를 마스킹하지 않고 그대로 노출한다", () => {
     const v = toEnrollmentView(appRow);
-    expect(v.name).toBe("김O희");
-    expect(v.phone).toBe("010-1234-••••");
-    expect(v.course).toBe("목공 기초 종합반");
+    expect(v.name).toBe("김지희");
+    expect(v.phone).toBe("01012345678");
     expect(v.date).toBe("2026.06.15");
     expect(v.status).toBe("신규");
+  });
+
+  it("선택 과정 전체(courses)와 메모를 노출한다", () => {
+    const v = toEnrollmentView(appRow);
+    expect(v.courses).toEqual(["목공 기초 종합반", "집수리 실무반"]);
+    expect(v.course).toBe("목공 기초 종합반");
+    expect(v.memo).toBe("전화 연결 안 됨");
+  });
+
+  it("메모(admin_memo)가 null이면 빈 문자열", () => {
+    const v = toEnrollmentView({ ...appRow, admin_memo: null });
+    expect(v.memo).toBe("");
+  });
+});
+
+describe("filterEnrollments", () => {
+  const rows: EnrollmentView[] = [
+    { id: 1, name: "A", course: "목공", courses: ["목공"], phone: "p", date: "d", status: "신규", memo: "" },
+    { id: 2, name: "B", course: "집수리", courses: ["집수리", "목공"], phone: "p", date: "d", status: "등록확인", memo: "" },
+    { id: 3, name: "C", course: "인테리어", courses: ["인테리어"], phone: "p", date: "d", status: "신규", memo: "" },
+  ];
+
+  it("전체/전체면 모두 통과", () => {
+    expect(filterEnrollments(rows, { status: "전체", course: "전체" })).toHaveLength(3);
+  });
+
+  it("상태로 필터링", () => {
+    const r = filterEnrollments(rows, { status: "신규", course: "전체" });
+    expect(r.map((x) => x.id)).toEqual([1, 3]);
+  });
+
+  it("과정으로 필터링 — 선택 과정에 포함되면 통과", () => {
+    const r = filterEnrollments(rows, { status: "전체", course: "목공" });
+    expect(r.map((x) => x.id)).toEqual([1, 2]);
+  });
+
+  it("상태+과정 동시 필터링", () => {
+    const r = filterEnrollments(rows, { status: "신규", course: "목공" });
+    expect(r.map((x) => x.id)).toEqual([1]);
   });
 });
 
