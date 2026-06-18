@@ -3,10 +3,10 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 import type { AdminTab } from "../nav";
+import { Logo } from "@/components/layout/Logo";
 import {
   Home,
   TrendingUp,
@@ -67,14 +67,7 @@ export function AdminShell({ tabs, counts, children }: AdminShellProps) {
     <>
       {/* Logo */}
       <div style={{ margin: "6px 6px 28px" }}>
-        <Image
-          src="/logo/logo-primary.png"
-          alt="성요셉목수학교"
-          height={36}
-          width={144}
-          style={{ height: 36, width: "auto" }}
-          priority
-        />
+        <Logo className="h-9 w-auto" />
       </div>
 
       {/* Nav */}
