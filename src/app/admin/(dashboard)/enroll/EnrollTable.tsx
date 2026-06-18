@@ -158,7 +158,17 @@ function EnrollRow({ row }: { row: EnrollmentView }) {
   return (
     <div className="border-t border-hairline-soft">
       <div className="grid items-center px-5 py-4 text-[15px] gap-y-1" style={{ gridTemplateColumns: GRID }}>
-        <span className="font-semibold text-ink">{row.name}</span>
+        <span className="font-semibold text-ink inline-flex items-center gap-1.5">
+          {row.status === "신규" && (
+            <span
+              role="img"
+              aria-label="확인 전 새 신청"
+              title="확인 전 새 신청"
+              className="w-2 h-2 rounded-full bg-primary flex-shrink-0"
+            />
+          )}
+          {row.name}
+        </span>
         <span className="text-body">{row.courses.join(", ")}</span>
         <span className="text-body">
           <a href={`tel:${row.phone.replace(/[^0-9]/g, "")}`} className="text-primary">
