@@ -65,27 +65,31 @@ export function Select({ value, options, onChange, ariaLabel }: SelectProps) {
       </button>
 
       {open && (
-        <div className="absolute left-0 right-0 top-[calc(100%+4px)] z-30 max-h-72 overflow-auto rounded-[14px] border border-hairline bg-surface-card shadow-pop">
-          {options.map((o, i) => {
-            const active = o.value === value;
-            return (
-              <button
-                key={o.value}
-                type="button"
-                onClick={() => {
-                  onChange(o.value);
-                  setOpen(false);
-                }}
-                className={[
-                  "block w-full px-4 py-3 text-left text-[15px]",
-                  i === options.length - 1 ? "" : "border-b border-hairline-soft",
-                  active ? "bg-primary-soft text-primary font-bold" : "text-body-strong font-semibold",
-                ].join(" ")}
-              >
-                {o.label}
-              </button>
-            );
-          })}
+        <div className="absolute left-0 right-0 top-[calc(100%+4px)] z-30 overflow-hidden rounded-[14px] border border-hairline bg-surface-card shadow-pop">
+          <div className="max-h-72 overflow-y-auto">
+            {options.map((o, i) => {
+              const active = o.value === value;
+              return (
+                <button
+                  key={o.value}
+                  type="button"
+                  onClick={() => {
+                    onChange(o.value);
+                    setOpen(false);
+                  }}
+                  className={[
+                    "block w-full px-4 py-3 text-left text-[15px]",
+                    i === options.length - 1 ? "" : "border-b border-hairline-soft",
+                    active
+                      ? "bg-primary-soft text-primary font-bold"
+                      : "text-body-strong font-semibold",
+                  ].join(" ")}
+                >
+                  {o.label}
+                </button>
+              );
+            })}
+          </div>
         </div>
       )}
     </div>
