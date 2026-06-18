@@ -168,43 +168,6 @@ export async function getAdminCourses(): Promise<AdminCourseView[]> {
   }));
 }
 
-export interface CourseClickView {
-  id: string;
-  name: string;
-  clicks: number;
-  /** 최다 클릭 과정 대비 비율(0~100). 클릭 데이터 없으면 0(=집계 전). */
-  pct: number;
-}
-
-/**
- * 과정 클릭수 맵으로 클릭률 뷰 생성. pct는 최다 클릭 과정 대비 비율.
- * clicksById가 비면 모든 과정 clicks=0, pct=0 → 화면은 "집계 전"으로 표시.
- */
-export function toCourseClickViews(
-  courses: { id: string; name: string }[],
-  clicksById: Record<string, number> = {},
-): CourseClickView[] {
-  const withClicks = courses.map((c) => ({
-    id: c.id,
-    name: c.name,
-    clicks: clicksById[c.id] ?? 0,
-  }));
-  const max = Math.max(0, ...withClicks.map((c) => c.clicks));
-  return withClicks.map((c) => ({
-    ...c,
-    pct: max > 0 ? Math.round((c.clicks / max) * 100) : 0,
-  }));
-}
-
-/**
- * 과정별 클릭률 뷰. 현재는 클릭 집계 소스가 없어 모두 "집계 전"(clicks 0).
- * TODO(다음 작업): GA Data API 또는 자체 카운터 테이블의 집계를 clicksById로 주입.
- */
-export async function getCourseClicks(): Promise<CourseClickView[]> {
-  const courses = await getAdminCourses();
-  return toCourseClickViews(courses);
-}
-
 export interface AdminPhotoView {
   id: number;
   label: string;

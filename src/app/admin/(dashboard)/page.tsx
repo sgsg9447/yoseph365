@@ -6,22 +6,21 @@ import { StatusChip } from "@/components/admin/StatusChip";
 import { EmptyState } from "@/components/admin/EmptyState";
 import { Users, Clipboard, Message, Hammer } from "@/components/icons";
 import { DEMO_KPI } from "@/app/admin/demo";
-import {
-  getOpenCourseCount,
-  getAdminCourses,
-  getEnrollments,
-  toCourseClickViews,
-} from "@/lib/queries/admin";
+import { getOpenCourseCount, getAdminCourses, getEnrollments } from "@/lib/queries/admin";
+import { getCourseFunnel } from "@/lib/analytics/events";
+import { viewBarPct } from "@/lib/analytics/funnel";
 
 export default async function DashboardPage() {
-  const [openCount, courses, enrollments] = await Promise.all([
+  const [openCount, courses, enrollments, funnel] = await Promise.all([
     getOpenCourseCount(),
     getAdminCourses(),
     getEnrollments(),
+    getCourseFunnel(),
   ]);
   const recent = enrollments.slice(0, 4);
   const totalCourses = courses.length;
-  const clickViews = toCourseClickViews(courses).slice(0, 5);
+  const clickViews = funnel.slice(0, 5);
+  const maxViews = Math.max(0, ...clickViews.map((c) => c.views));
 
   return (
     <div>
@@ -66,15 +65,15 @@ export default async function DashboardPage() {
           ) : (
             <div className="flex flex-col gap-3">
               {clickViews.map((course) =>
-                course.clicks > 0 ? (
+                course.views > 0 ? (
                   <div key={course.id}>
                     <div className="flex justify-between mb-1">
                       <span className="text-[14px] text-body-strong">{course.name}</span>
                       <span className="text-[13px] text-muted">
-                        {course.clicks.toLocaleString()} 클릭
+                        {course.views.toLocaleString()}회 · 전환 {course.conversionPct}%
                       </span>
                     </div>
-                    <ProgressBar pct={course.pct} />
+                    <ProgressBar pct={viewBarPct(course.views, maxViews)} />
                   </div>
                 ) : (
                   <div key={course.id} className="flex items-center justify-between">
