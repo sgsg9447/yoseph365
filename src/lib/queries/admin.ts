@@ -17,13 +17,15 @@ export interface EnrollmentView {
   phone: string;
   date: string;
   status: EnrollStatus;
-  /** 신청 시 추가 입력에서 파싱한 생년월일·성별(테이블 표시용) */
+  /** 신청 시 추가 입력에서 파싱(테이블 표시용) */
   birth: string;
   gender: string;
+  /** 펼침 상세용 추가 정보 */
+  address: string;
+  career: string;
+  motivation: string;
   /** 운영자 메모(admin_memo) */
   memo: string;
-  /** 신청 시 추가 입력(생년월일·성별·주소·관련경력·지원동기 등) — additional_note 원문 */
-  note: string;
 }
 
 /** additional_note("라벨: 값" 줄글)에서 라벨에 해당하는 값을 추출. 없으면 "". */
@@ -83,8 +85,10 @@ export function toEnrollmentView(
     status: r.status,
     birth: extractNoteField(note, "생년월일"),
     gender: extractNoteField(note, "성별"),
+    address: extractNoteField(note, "주소"),
+    career: extractNoteField(note, "관련 경력"),
+    motivation: extractNoteField(note, "지원동기"),
     memo: r.admin_memo ?? "",
-    note,
   };
 }
 

@@ -35,27 +35,32 @@ describe("toEnrollmentView", () => {
     expect(v.memo).toBe("전화 연결 안 됨");
   });
 
-  it("추가 정보(additional_note)를 노출한다", () => {
-    const v = toEnrollmentView(appRow);
-    expect(v.note).toBe(appRow.additional_note);
-  });
-
   it("생년월일·성별을 additional_note에서 파싱해 노출한다", () => {
     const v = toEnrollmentView(appRow);
     expect(v.birth).toBe("1980.05.01");
     expect(v.gender).toBe("남");
   });
 
-  it("생년월일·성별이 없으면 빈 문자열", () => {
+  it("주소·관련경력·지원동기를 additional_note에서 파싱해 노출한다", () => {
+    const v = toEnrollmentView(appRow);
+    expect(v.address).toBe("수원시");
+    expect(v.career).toBe("목공 2년");
+    expect(v.motivation).toBe("취업");
+  });
+
+  it("항목이 없으면 빈 문자열", () => {
     const v = toEnrollmentView({ ...appRow, additional_note: "주소: 수원시" });
     expect(v.birth).toBe("");
     expect(v.gender).toBe("");
+    expect(v.address).toBe("수원시");
+    expect(v.career).toBe("");
+    expect(v.motivation).toBe("");
   });
 
   it("메모·추가정보가 null이면 빈 문자열", () => {
     const v = toEnrollmentView({ ...appRow, admin_memo: null, additional_note: null });
     expect(v.memo).toBe("");
-    expect(v.note).toBe("");
+    expect(v.address).toBe("");
   });
 });
 
@@ -78,9 +83,9 @@ describe("extractNoteField", () => {
 
 describe("filterEnrollments", () => {
   const rows: EnrollmentView[] = [
-    { id: 1, name: "A", course: "목공", courses: ["목공"], phone: "p", date: "d", status: "신규", birth: "", gender: "", memo: "", note: "" },
-    { id: 2, name: "B", course: "집수리", courses: ["집수리", "목공"], phone: "p", date: "d", status: "등록확인", birth: "", gender: "", memo: "", note: "" },
-    { id: 3, name: "C", course: "인테리어", courses: ["인테리어"], phone: "p", date: "d", status: "신규", birth: "", gender: "", memo: "", note: "" },
+    { id: 1, name: "A", course: "목공", courses: ["목공"], phone: "p", date: "d", status: "신규", birth: "", gender: "", address: "", career: "", motivation: "", memo: "" },
+    { id: 2, name: "B", course: "집수리", courses: ["집수리", "목공"], phone: "p", date: "d", status: "등록확인", birth: "", gender: "", address: "", career: "", motivation: "", memo: "" },
+    { id: 3, name: "C", course: "인테리어", courses: ["인테리어"], phone: "p", date: "d", status: "신규", birth: "", gender: "", address: "", career: "", motivation: "", memo: "" },
   ];
 
   it("전체/전체면 모두 통과", () => {
@@ -104,8 +109,8 @@ describe("filterEnrollments", () => {
 
   it("이름 검색(query)으로 필터링 — 대소문자 무시", () => {
     const named: EnrollmentView[] = [
-      { id: 1, name: "김철수", course: "x", courses: ["x"], phone: "p", date: "d", status: "신규", birth: "", gender: "", memo: "", note: "" },
-      { id: 2, name: "이영희", course: "x", courses: ["x"], phone: "p", date: "d", status: "신규", birth: "", gender: "", memo: "", note: "" },
+      { id: 1, name: "김철수", course: "x", courses: ["x"], phone: "p", date: "d", status: "신규", birth: "", gender: "", address: "", career: "", motivation: "", memo: "" },
+      { id: 2, name: "이영희", course: "x", courses: ["x"], phone: "p", date: "d", status: "신규", birth: "", gender: "", address: "", career: "", motivation: "", memo: "" },
     ];
     const r = filterEnrollments(named, { status: "전체", course: "전체", query: "영희" });
     expect(r.map((x) => x.id)).toEqual([2]);

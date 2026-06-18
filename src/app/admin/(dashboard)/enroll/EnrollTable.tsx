@@ -156,19 +156,17 @@ function EnrollRow({ row }: { row: EnrollmentView }) {
   return (
     <div className="border-t border-hairline-soft">
       <div className="grid items-center px-5 py-4 text-[15px] gap-y-1" style={{ gridTemplateColumns: GRID }}>
+        <span className="font-semibold text-ink">{row.name}</span>
+        <span className="text-body">{row.courses.join(", ")}</span>
         <span className="flex flex-col">
-          <span className="font-semibold text-ink">{row.name}</span>
+          <a href={`tel:${row.phone.replace(/[^0-9]/g, "")}`} className="text-primary">
+            {row.phone}
+          </a>
           {(row.birth || row.gender) && (
             <span className="text-[12px] text-muted">
               {[row.birth, row.gender].filter(Boolean).join(" · ")}
             </span>
           )}
-        </span>
-        <span className="text-body">{row.courses.join(", ")}</span>
-        <span className="text-body">
-          <a href={`tel:${row.phone.replace(/[^0-9]/g, "")}`} className="text-primary">
-            {row.phone}
-          </a>
         </span>
         <span className="text-muted">{row.date}</span>
         <span>
@@ -201,8 +199,27 @@ function EnrollRow({ row }: { row: EnrollmentView }) {
         <div className="px-5 pb-4 flex flex-col gap-3 bg-canvas-soft">
           <div className="pt-3">
             <span className="block text-[13px] font-semibold text-body-strong mb-1">추가 정보</span>
-            {row.note.trim() ? (
-              <p className="text-[14px] text-body leading-[1.6] whitespace-pre-wrap">{row.note}</p>
+            {row.address || row.career || row.motivation ? (
+              <dl className="flex flex-col gap-1 text-[14px] leading-[1.6]">
+                {row.address && (
+                  <div>
+                    <dt className="inline text-muted">주소: </dt>
+                    <dd className="inline text-body">{row.address}</dd>
+                  </div>
+                )}
+                {row.career && (
+                  <div>
+                    <dt className="inline text-muted">관련 경력: </dt>
+                    <dd className="inline text-body">{row.career}</dd>
+                  </div>
+                )}
+                {row.motivation && (
+                  <div>
+                    <dt className="inline text-muted">지원동기: </dt>
+                    <dd className="inline text-body whitespace-pre-wrap">{row.motivation}</dd>
+                  </div>
+                )}
+              </dl>
             ) : (
               <p className="text-[14px] text-muted-soft">추가로 입력한 정보가 없습니다.</p>
             )}
