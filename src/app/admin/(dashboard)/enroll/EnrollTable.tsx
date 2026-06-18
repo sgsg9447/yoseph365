@@ -15,6 +15,7 @@ const STATUS_FILTERS = ["전체", "신규", "상담중", "등록확인", "보류
 const STATUSES: EnrollStatus[] = ["신규", "상담중", "등록확인", "보류"];
 const GRID = "1fr 1.3fr 1.1fr 0.9fr 0.5fr 0.7fr 0.8fr 0.8fr";
 const PER_PAGE = 10;
+const ROW_H = 57; // 한 행(접힌 상태) 대략 높이 — 빈 행 채움·빈 상태 최소 높이 기준
 
 interface EnrollTableProps {
   rows: EnrollmentView[];
@@ -71,25 +72,36 @@ export function EnrollTable({ rows, courseOptions }: EnrollTableProps) {
       </div>
 
       <SectionCard padding={0}>
+        <div
+          className="hidden md:grid items-center px-5 py-3 bg-canvas-soft text-[13px] font-semibold text-muted"
+          style={{ gridTemplateColumns: GRID }}
+        >
+          <span>신청자</span>
+          <span>과정</span>
+          <span>연락처</span>
+          <span>생년월일</span>
+          <span>성별</span>
+          <span>신청일</span>
+          <span>상태</span>
+          <span className="text-right">관리</span>
+        </div>
         {total === 0 ? (
-          <EmptyState message="조건에 맞는 수강신청 내역이 없습니다." />
+          <div className="flex items-center justify-center" style={{ minHeight: PER_PAGE * ROW_H }}>
+            <EmptyState message="조건에 맞는 수강신청 내역이 없습니다." />
+          </div>
         ) : (
           <div>
-            <div
-              className="hidden md:grid items-center px-5 py-3 bg-canvas-soft text-[13px] font-semibold text-muted"
-              style={{ gridTemplateColumns: GRID }}
-            >
-              <span>신청자</span>
-              <span>과정</span>
-              <span>연락처</span>
-              <span>생년월일</span>
-              <span>성별</span>
-              <span>신청일</span>
-              <span>상태</span>
-              <span className="text-right">관리</span>
-            </div>
             {items.map((r) => (
               <EnrollRow key={r.id} row={r} />
+            ))}
+            {/* 데이터가 10개 미만이어도 표 높이를 10행으로 유지(레이아웃 흔들림 방지) */}
+            {Array.from({ length: Math.max(0, PER_PAGE - items.length) }).map((_, i) => (
+              <div
+                key={`filler-${i}`}
+                className="border-t border-hairline-soft"
+                style={{ height: ROW_H }}
+                aria-hidden
+              />
             ))}
           </div>
         )}
@@ -187,7 +199,9 @@ function EnrollRow({ row }: { row: EnrollmentView }) {
             aria-expanded={open}
             className={[
               "inline-flex items-center gap-1 text-[13px] font-semibold rounded-full px-3 py-1",
-              hasMemo ? "bg-primary-soft text-primary" : "text-body-strong bg-surface-strong",
+              hasMemo
+                ? "bg-primary-soft text-primary"
+                : "border border-hairline-strong text-body-strong bg-transparent hover:bg-hairline-soft",
             ].join(" ")}
           >
             {hasMemo ? "메모 있음" : "관리"}
@@ -294,16 +308,9 @@ function StatusMenu({
         aria-haspopup="listbox"
         aria-expanded={open}
         aria-label="상태 변경"
-        className="inline-flex items-center gap-1 disabled:opacity-60"
+        className="inline-flex items-center disabled:opacity-60 cursor-pointer"
       >
         <StatusChip status={value} />
-        <svg
-          width="13" height="13" viewBox="0 0 24 24" fill="none"
-          stroke="var(--color-muted)" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"
-          aria-hidden className="transition-transform" style={{ transform: open ? "rotate(180deg)" : "none" }}
-        >
-          <path d="m6 9 6 6 6-6" />
-        </svg>
       </button>
       {open && (
         <div
