@@ -15,6 +15,7 @@ const appRow = {
   selected_courses: ["목공 기초 종합반", "집수리 실무반"],
   status: "신규" as const, created_at: "2026-06-15T02:00:00Z",
   admin_memo: "전화 연결 안 됨",
+  additional_note: "주소: 수원시\n관련 경력: 목공 2년\n지원동기: 취업",
 };
 
 describe("toEnrollmentView", () => {
@@ -33,17 +34,23 @@ describe("toEnrollmentView", () => {
     expect(v.memo).toBe("전화 연결 안 됨");
   });
 
-  it("메모(admin_memo)가 null이면 빈 문자열", () => {
-    const v = toEnrollmentView({ ...appRow, admin_memo: null });
+  it("추가 정보(additional_note)를 노출한다", () => {
+    const v = toEnrollmentView(appRow);
+    expect(v.note).toBe("주소: 수원시\n관련 경력: 목공 2년\n지원동기: 취업");
+  });
+
+  it("메모·추가정보가 null이면 빈 문자열", () => {
+    const v = toEnrollmentView({ ...appRow, admin_memo: null, additional_note: null });
     expect(v.memo).toBe("");
+    expect(v.note).toBe("");
   });
 });
 
 describe("filterEnrollments", () => {
   const rows: EnrollmentView[] = [
-    { id: 1, name: "A", course: "목공", courses: ["목공"], phone: "p", date: "d", status: "신규", memo: "" },
-    { id: 2, name: "B", course: "집수리", courses: ["집수리", "목공"], phone: "p", date: "d", status: "등록확인", memo: "" },
-    { id: 3, name: "C", course: "인테리어", courses: ["인테리어"], phone: "p", date: "d", status: "신규", memo: "" },
+    { id: 1, name: "A", course: "목공", courses: ["목공"], phone: "p", date: "d", status: "신규", memo: "", note: "" },
+    { id: 2, name: "B", course: "집수리", courses: ["집수리", "목공"], phone: "p", date: "d", status: "등록확인", memo: "", note: "" },
+    { id: 3, name: "C", course: "인테리어", courses: ["인테리어"], phone: "p", date: "d", status: "신규", memo: "", note: "" },
   ];
 
   it("전체/전체면 모두 통과", () => {
@@ -67,8 +74,8 @@ describe("filterEnrollments", () => {
 
   it("이름 검색(query)으로 필터링 — 대소문자 무시", () => {
     const named: EnrollmentView[] = [
-      { id: 1, name: "김철수", course: "x", courses: ["x"], phone: "p", date: "d", status: "신규", memo: "" },
-      { id: 2, name: "이영희", course: "x", courses: ["x"], phone: "p", date: "d", status: "신규", memo: "" },
+      { id: 1, name: "김철수", course: "x", courses: ["x"], phone: "p", date: "d", status: "신규", memo: "", note: "" },
+      { id: 2, name: "이영희", course: "x", courses: ["x"], phone: "p", date: "d", status: "신규", memo: "", note: "" },
     ];
     const r = filterEnrollments(named, { status: "전체", course: "전체", query: "영희" });
     expect(r.map((x) => x.id)).toEqual([2]);

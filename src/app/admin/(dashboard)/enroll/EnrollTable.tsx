@@ -192,8 +192,16 @@ function EnrollRow({ row }: { row: EnrollmentView }) {
 
       {open && (
         <div className="px-5 pb-4 flex flex-col gap-3 bg-canvas-soft">
+          <div className="pt-3">
+            <span className="block text-[13px] font-semibold text-body-strong mb-1">추가 정보</span>
+            {row.note.trim() ? (
+              <p className="text-[14px] text-body leading-[1.6] whitespace-pre-wrap">{row.note}</p>
+            ) : (
+              <p className="text-[14px] text-muted-soft">추가로 입력한 정보가 없습니다.</p>
+            )}
+          </div>
           {row.status === "신규" && (
-            <div className="flex items-center justify-between gap-3 pt-3">
+            <div className="flex items-center justify-between gap-3">
               <span className="text-[14px] text-muted">아직 확인하지 않은 새 신청입니다.</span>
               <Button size="sm" onClick={confirm} disabled={confirming}>
                 {confirming ? "처리 중…" : "확인 처리"}

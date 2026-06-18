@@ -19,6 +19,8 @@ export interface EnrollmentView {
   status: EnrollStatus;
   /** 운영자 메모(admin_memo) */
   memo: string;
+  /** 신청 시 추가 입력(생년월일·성별·주소·관련경력·지원동기 등) — additional_note 원문 */
+  note: string;
 }
 
 export interface InquiryView {
@@ -46,7 +48,14 @@ function fmtDate(iso: string): string {
 export function toEnrollmentView(
   r: Pick<
     ApplicationRow,
-    "id" | "name" | "phone" | "selected_courses" | "status" | "created_at" | "admin_memo"
+    | "id"
+    | "name"
+    | "phone"
+    | "selected_courses"
+    | "status"
+    | "created_at"
+    | "admin_memo"
+    | "additional_note"
   >,
 ): EnrollmentView {
   // 관리자(authenticated) 화면 — 신청 처리를 위해 이름·연락처를 마스킹하지 않고 그대로 노출한다.
@@ -59,6 +68,7 @@ export function toEnrollmentView(
     date: fmtDate(r.created_at),
     status: r.status,
     memo: r.admin_memo ?? "",
+    note: r.additional_note ?? "",
   };
 }
 
@@ -93,7 +103,7 @@ export async function getEnrollments(): Promise<EnrollmentView[]> {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("application")
-    .select("id,name,phone,selected_courses,status,created_at,admin_memo")
+    .select("id,name,phone,selected_courses,status,created_at,admin_memo,additional_note")
     .order("created_at", { ascending: false });
   if (error) throw error;
   return (data ?? []).map(toEnrollmentView);
