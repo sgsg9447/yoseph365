@@ -7,7 +7,9 @@ import {
   countNewInquiries,
   extractNoteField,
   type EnrollmentView,
+  type InquiryView,
 } from "./admin";
+import { filterInquiries } from "@/lib/admin/inquiry";
 import { filterEnrollments, paginate } from "@/lib/admin/enroll";
 
 const appRow = {
@@ -164,10 +166,10 @@ describe("toInquiryView", () => {
     created_at: "2026-06-17T05:00:00Z",
   };
 
-  it("마스킹 + 라벨 매핑 + interest=category (과정명 없음)", () => {
+  it("관리자용 — 이름·연락처를 마스킹하지 않고 그대로 노출", () => {
     const v = toInquiryView(baseRow);
-    expect(v.name).toBe("박O수");
-    expect(v.phone).toBe("010-5555-••••");
+    expect(v.name).toBe("박민수");
+    expect(v.phone).toBe("01055556666");
     expect(v.interest).toBe("국비지원");
     expect(v.status).toBe("신규");
     expect(v.message).toBe("문의합니다");
@@ -176,6 +178,21 @@ describe("toInquiryView", () => {
   it("과정명 전달 시 interest=과정명", () => {
     const v = toInquiryView(baseRow, "목공 기초 종합반");
     expect(v.interest).toBe("목공 기초 종합반");
+  });
+});
+
+describe("filterInquiries", () => {
+  const rows: InquiryView[] = [
+    { id: 1, name: "A", phone: "p", interest: "x", message: "m", date: "d", status: "신규" },
+    { id: 2, name: "B", phone: "p", interest: "x", message: "m", date: "d", status: "완료" },
+    { id: 3, name: "C", phone: "p", interest: "x", message: "m", date: "d", status: "신규" },
+  ];
+  it("전체는 모두", () => {
+    expect(filterInquiries(rows, "전체")).toHaveLength(3);
+  });
+  it("신규/완료 필터", () => {
+    expect(filterInquiries(rows, "신규").map((r) => r.id)).toEqual([1, 3]);
+    expect(filterInquiries(rows, "완료").map((r) => r.id)).toEqual([2]);
   });
 });
 

@@ -49,6 +49,13 @@ export const applicationStatusSchema = z.object({
 });
 export type ApplicationStatusInput = z.infer<typeof applicationStatusSchema>;
 
+// 관리자 — 상담문의 상태 변경
+export const inquiryStatusSchema = z.object({
+  id: z.number().int().positive(),
+  status: z.enum(["답변대기", "답변완료"]),
+});
+export type InquiryStatusInput = z.infer<typeof inquiryStatusSchema>;
+
 // 관리자 — 과정(course) 표시 데이터 편집
 const optStr = (max: number) => z.string().trim().max(max).optional().default("");
 const optInt = z.number().int().min(0).nullable().optional().default(null);

@@ -1,4 +1,3 @@
-import { maskName, maskPhone } from "@/lib/admin/mask";
 import type { Database } from "@/lib/supabase/database.types";
 import { createClient } from "@/lib/supabase/server";
 
@@ -100,10 +99,11 @@ export function toInquiryView(
   r: Pick<InquiryRow, "id" | "name" | "phone" | "category" | "content" | "status" | "created_at">,
   courseName?: string | null,
 ): InquiryView {
+  // 관리자(authenticated) 화면 — 상담 처리를 위해 이름·연락처를 그대로 노출.
   return {
     id: r.id,
-    name: maskName(r.name),
-    phone: maskPhone(r.phone),
+    name: r.name,
+    phone: r.phone,
     interest: courseName ?? r.category,
     message: r.content,
     date: fmtDate(r.created_at),
@@ -258,6 +258,49 @@ export async function getSidebarCounts(): Promise<{ pending: number; newInquirie
     supabase.from("inquiry").select("id", { count: "exact", head: true }).eq("status", "답변대기"),
   ]);
   return { pending: pending ?? 0, newInquiries: newInquiries ?? 0 };
+}
+
+/** 대시보드 KPI — 세부 페이지와 동일한 실데이터 집계. */
+export async function getDashboardStats(): Promise<{
+  todayViews: number;
+  monthEnroll: number;
+  pendingConsult: number;
+}> {
+  const supabase = await createClient();
+  const now = new Date();
+  const monthStart = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1)).toISOString();
+  const todayStart = new Date(
+    Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()),
+  ).toISOString();
+
+  const [enrollRes, consultRes] = await Promise.all([
+    supabase
+      .from("application")
+      .select("id", { count: "exact", head: true })
+      .gte("created_at", monthStart),
+    supabase
+      .from("inquiry")
+      .select("id", { count: "exact", head: true })
+      .eq("status", "답변대기"),
+  ]);
+
+  let todayViews = 0;
+  try {
+    const { count } = await supabase
+      .from("event_log")
+      .select("id", { count: "exact", head: true })
+      .eq("name", "course_view")
+      .gte("created_at", todayStart);
+    todayViews = count ?? 0;
+  } catch {
+    // event_log 미적용 시 0
+  }
+
+  return {
+    todayViews,
+    monthEnroll: enrollRes.count ?? 0,
+    pendingConsult: consultRes.count ?? 0,
+  };
 }
 
 export async function getOpenCourseCount(): Promise<number> {

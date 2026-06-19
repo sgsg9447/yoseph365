@@ -5,7 +5,19 @@ import {
   applicationMemoSchema,
   applicationStatusSchema,
   courseEditSchema,
+  inquiryStatusSchema,
 } from "./forms";
+
+describe("inquiryStatusSchema", () => {
+  it("유효한 상태값 통과", () => {
+    expect(inquiryStatusSchema.safeParse({ id: 1, status: "답변완료" }).success).toBe(true);
+    expect(inquiryStatusSchema.safeParse({ id: 1, status: "답변대기" }).success).toBe(true);
+  });
+  it("정의되지 않은 상태/잘못된 id 실패", () => {
+    expect(inquiryStatusSchema.safeParse({ id: 1, status: "완료" }).success).toBe(false);
+    expect(inquiryStatusSchema.safeParse({ id: 0, status: "답변완료" }).success).toBe(false);
+  });
+});
 
 describe("courseEditSchema", () => {
   const base = {
