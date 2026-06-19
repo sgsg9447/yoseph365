@@ -1,12 +1,13 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import type { CourseEditView } from "@/lib/queries/admin";
+import type { CourseEditView, CourseBundle } from "@/lib/queries/admin";
 import { parseCsvList } from "@/lib/admin/parse";
 import { Card } from "@/components/ui/Card";
 import { Field } from "@/components/ui/Field";
 import { Button } from "@/components/ui/Button";
 import { updateCourse } from "./actions";
+import { CurriculumEditor } from "./CurriculumEditor";
 
 const STATUSES = ["모집예정", "모집중", "마감"] as const;
 
@@ -36,12 +37,44 @@ function toDraft(c: CourseEditView): Draft {
   };
 }
 
-export function CourseEditor({ initial }: { initial: CourseEditView[] }) {
+export function CourseEditor({ bundles }: { bundles: CourseBundle[] }) {
+  const [selectedId, setSelectedId] = useState(bundles[0]?.course.id ?? "");
+  const selected = bundles.find((b) => b.course.id === selectedId) ?? bundles[0];
+  if (!selected) return null;
+
   return (
-    <div className="flex flex-col gap-[14px]">
-      {initial.map((c) => (
-        <CourseCard key={c.id} course={c} />
-      ))}
+    <div className="flex flex-col lg:flex-row gap-4">
+      {/* 좌: 과정 선택 */}
+      <div className="lg:w-52 flex-shrink-0 flex lg:flex-col gap-1 overflow-x-auto">
+        {bundles.map((b) => (
+          <button
+            key={b.course.id}
+            type="button"
+            onClick={() => setSelectedId(b.course.id)}
+            className={[
+              "text-left rounded-lg px-3 py-2 text-[14px] font-semibold whitespace-nowrap",
+              b.course.id === selectedId
+                ? "bg-primary-soft text-primary"
+                : "text-body-strong hover:bg-hairline-soft",
+            ].join(" ")}
+          >
+            {b.course.name}
+          </button>
+        ))}
+      </div>
+
+      {/* 우: 선택 과정 디테일 */}
+      <div className="flex-1 min-w-0 flex flex-col gap-4">
+        <CourseCard key={`${selected.course.id}-fields`} course={selected.course} />
+        <Card padding={20}>
+          <h3 className="text-[15px] font-bold text-ink mb-3">커리큘럼 (회차표)</h3>
+          <CurriculumEditor
+            key={`${selected.course.id}-cur`}
+            courseId={selected.course.id}
+            initial={selected.curriculum}
+          />
+        </Card>
+      </div>
     </div>
   );
 }

@@ -206,6 +206,42 @@ export async function getCoursesForEdit(): Promise<CourseEditView[]> {
   }));
 }
 
+export interface CurriculumEditRow {
+  round: number;
+  unit: string;
+  contents: string[];
+  hours: number | null;
+  place: string;
+}
+
+export interface CourseBundle {
+  course: CourseEditView;
+  curriculum: CurriculumEditRow[];
+}
+
+/** 과정 수정용 — 과정별 기본정보 + 커리큘럼 묶음. */
+export async function getCourseEditBundles(): Promise<CourseBundle[]> {
+  const supabase = await createClient();
+  const courses = await getCoursesForEdit();
+  const { data } = await supabase
+    .from("curriculum_item")
+    .select("course_id,round,unit,contents,hours,place");
+
+  const byCourse: Record<string, CurriculumEditRow[]> = {};
+  for (const r of data ?? []) {
+    (byCourse[r.course_id] ??= []).push({
+      round: r.round,
+      unit: r.unit ?? "",
+      contents: r.contents ?? [],
+      hours: r.hours,
+      place: r.place ?? "",
+    });
+  }
+  for (const k of Object.keys(byCourse)) byCourse[k].sort((a, b) => a.round - b.round);
+
+  return courses.map((c) => ({ course: c, curriculum: byCourse[c.id] ?? [] }));
+}
+
 export interface AdminPhotoView {
   id: number;
   label: string;

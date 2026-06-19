@@ -73,6 +73,20 @@ export const courseEditSchema = z.object({
 });
 export type CourseEditInput = z.infer<typeof courseEditSchema>;
 
+// 관리자 — 커리큘럼(회차표) 저장
+export const curriculumRowSchema = z.object({
+  round: z.number().int().min(1),
+  unit: z.string().trim().max(200).optional().default(""),
+  contents: z.array(z.string().trim().min(1)).max(30).optional().default([]),
+  hours: z.number().int().min(0).nullable().optional().default(null),
+  place: z.string().trim().max(100).optional().default(""),
+});
+export const curriculumSaveSchema = z.object({
+  courseId: z.string().trim().min(1),
+  rows: z.array(curriculumRowSchema).max(100),
+});
+export type CurriculumSaveInput = z.infer<typeof curriculumSaveSchema>;
+
 // 관리자 — 공지 작성
 export const noticeCreateSchema = z.object({
   title: z.string().trim().min(1, "제목을 입력해 주세요").max(200),

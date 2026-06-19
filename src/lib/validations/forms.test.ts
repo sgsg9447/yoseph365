@@ -7,7 +7,32 @@ import {
   courseEditSchema,
   inquiryStatusSchema,
   noticeCreateSchema,
+  curriculumSaveSchema,
 } from "./forms";
+
+describe("curriculumSaveSchema", () => {
+  const base = {
+    courseId: "course_weekday_carpentry",
+    rows: [
+      { round: 1, unit: "목공이론", contents: ["오리엔테이션"], hours: 6, place: "강의실" },
+      { round: 2, unit: "", contents: [], hours: null, place: "" },
+    ],
+  };
+  it("유효한 입력 통과", () => {
+    expect(curriculumSaveSchema.safeParse(base).success).toBe(true);
+  });
+  it("courseId 없으면 실패", () => {
+    expect(curriculumSaveSchema.safeParse({ ...base, courseId: "" }).success).toBe(false);
+  });
+  it("round가 1 미만이면 실패", () => {
+    expect(
+      curriculumSaveSchema.safeParse({
+        ...base,
+        rows: [{ round: 0, unit: "x", contents: [], hours: null, place: "" }],
+      }).success,
+    ).toBe(false);
+  });
+});
 
 describe("noticeCreateSchema", () => {
   it("제목·본문 있으면 통과", () => {
