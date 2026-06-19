@@ -1,7 +1,7 @@
 import { getAdminNotices } from "@/lib/queries/admin";
-import { NoticeCompose } from "./NoticeCompose";
+import { NoticeBoard } from "./NoticeBoard";
 
 export default async function NoticePage() {
   const notices = await getAdminNotices();
-  return <NoticeCompose initial={notices} />;
+  return <NoticeBoard initial={notices} />;
 }

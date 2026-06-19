@@ -6,7 +6,21 @@ import {
   applicationStatusSchema,
   courseEditSchema,
   inquiryStatusSchema,
+  noticeCreateSchema,
 } from "./forms";
+
+describe("noticeCreateSchema", () => {
+  it("제목·본문 있으면 통과", () => {
+    expect(noticeCreateSchema.safeParse({ title: "여름 휴무 안내", body: "<p>내용</p>" }).success).toBe(true);
+  });
+  it("제목이 비면 실패", () => {
+    expect(noticeCreateSchema.safeParse({ title: " ", body: "<p>x</p>" }).success).toBe(false);
+  });
+  it("pinned 기본 false", () => {
+    const r = noticeCreateSchema.safeParse({ title: "t", body: "b" });
+    expect(r.success && r.data.pinned).toBe(false);
+  });
+});
 
 describe("inquiryStatusSchema", () => {
   it("유효한 상태값 통과", () => {

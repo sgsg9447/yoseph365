@@ -3,6 +3,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import DOMPurify from "isomorphic-dompurify";
 import { getNotices, getNoticeById } from "@/lib/queries/notice";
 
 export const revalidate = 3600;
@@ -91,19 +92,16 @@ export default async function NoticeDetailPage({
         )}
 
         <div
+          className="rich-content"
           style={{
             marginTop: 24,
             paddingTop: 24,
             borderTop: "1px solid var(--color-hairline)",
             fontSize: 16,
-            color: "var(--color-body)",
             lineHeight: 1.85,
-            whiteSpace: "pre-line",
-            wordBreak: "keep-all",
           }}
-        >
-          {notice.body}
-        </div>
+          dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(notice.body) }}
+        />
 
         {notice.tags.length > 0 && (
           <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 28 }}>

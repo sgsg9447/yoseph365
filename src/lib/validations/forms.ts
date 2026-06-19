@@ -73,6 +73,14 @@ export const courseEditSchema = z.object({
 });
 export type CourseEditInput = z.infer<typeof courseEditSchema>;
 
+// 관리자 — 공지 작성
+export const noticeCreateSchema = z.object({
+  title: z.string().trim().min(1, "제목을 입력해 주세요").max(200),
+  body: z.string().max(50000).optional().default(""),
+  pinned: z.boolean().optional().default(false),
+});
+export type NoticeCreateInput = z.infer<typeof noticeCreateSchema>;
+
 // 이벤트 트래킹(/api/track) — 범용 기획 지표 로깅
 export const trackEventSchema = z.object({
   name: z.string().trim().min(1).max(50),
