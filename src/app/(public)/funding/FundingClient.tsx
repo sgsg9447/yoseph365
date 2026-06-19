@@ -246,7 +246,7 @@ function DotList({ items }: DotListProps) {
 
 const ORG_TINTS: Record<string, { bg: string; fg: string }> = {
   고용센터: { bg: "#ebf2fa", fg: "#3a6294" },
-  "HRD-Net": { bg: "#f2edf8", fg: "#6b5b8a" },
+  고용24: { bg: "#f2edf8", fg: "#6b5b8a" },
   훈련기관: { bg: "#edf6f0", fg: "#3f7d5f" },
   신청인: { bg: "#fbf0e8", fg: "#b06a44" },
   공단: { bg: "#f9eef1", fg: "#a3596e" },
@@ -437,18 +437,13 @@ function NbCardTab({ onConsult }: { onConsult: () => void }) {
 
 function ProcessTab() {
   const steps = [
-    { t: "훈련 상담", org: "고용센터" },
-    { t: "훈련계획서 등록", org: "고용센터" },
-    { t: "온라인 수강신청", org: "HRD-Net" },
-    { t: "수강신청 접수", org: "훈련기관" },
-    { t: "신청내역 검토", org: "훈련기관" },
-    { t: "훈련생 등록", org: "훈련기관" },
+    { t: "국민내일배움카드 발급", org: "고용24" },
+    { t: "학원으로 가등록 전화", org: "훈련기관" },
+    { t: "온라인 수강신청", org: "고용24" },
   ];
   const notes = [
-    "140시간 이상 훈련과정은 고용센터를 통한 훈련상담 후 온라인 수강신청이 가능합니다.",
-    "자비부담금이 있는 훈련과정은 반드시 훈련기관에 방문하여 자비부담금을 결제해야 최종적으로 훈련생 등록이 가능합니다.",
-    "온라인 수강신청 이력은 HRD-Net 「My서비스 > 훈련관리 > 온라인수강신청이력」 메뉴에서 확인할 수 있습니다.",
-    "선발된 이후 수강신청 취소는 훈련기관에 문의해 주세요.",
+    "140시간 이상 훈련과정은 온라인 수강신청 후 고용센터와 통화하셔야 수강신청이 접수됩니다.",
+    "온라인 수강신청 이력은 고용24 「마이페이지 > 직업훈련관리 > 온라인수강신청이력」 메뉴에서 확인할 수 있습니다.",
   ];
   const rels = [
     {
@@ -832,7 +827,7 @@ function SanjaeTab({ onConsult }: { onConsult: () => void }) {
 
       <FundCard title="1인당 지원금액">
         <FundRow
-          label={<>훈련비 — HRD 승인 훈련과정(구직자 과정)</>}
+          label={<>훈련비 — 고용24 승인 훈련과정(구직자 과정)</>}
           value="전액 지원"
         />
         <FundRow
@@ -919,10 +914,10 @@ function SanjaeTab({ onConsult }: { onConsult: () => void }) {
         />
       </FundCard>
 
-      <FundCard title="HRD 전산망 통합 및 내일배움카드 발급">
+      <FundCard title="고용24 통합 및 내일배움카드 발급">
         <DotList
           items={[
-            "산재노동자 직업훈련은 HRD-Net 통합으로 HRD 전산망에서 위탁 훈련생 확인이 가능합니다.",
+            "산재노동자 직업훈련은 고용24 통합으로 위탁 훈련생 확인이 가능합니다.",
             "출결 확인을 위해 내일배움카드가 발급됩니다.",
           ]}
         />

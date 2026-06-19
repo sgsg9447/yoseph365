@@ -12,7 +12,7 @@ import type { ScheduleCourse } from "@/lib/queries/types";
 const INTENT_COURSE_IDS: Record<string, string[]> = {
   "재취업 준비": ["course_weekday_repair", "course_weekday_carpentry"],
   "창업·부업": ["course_weekend_carpentry", "course_weekend_interior_film"],
-  "내 집 직접 수리": ["course_weekend_carpentry", "course_weekend_interior_film"],
+  "내 집 직접 수리": ["course_weekday_repair"],
   "자격증 취득": ["course_architecture_certificate"],
 };
 
