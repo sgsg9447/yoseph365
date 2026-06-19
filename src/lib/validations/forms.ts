@@ -49,6 +49,23 @@ export const applicationStatusSchema = z.object({
 });
 export type ApplicationStatusInput = z.infer<typeof applicationStatusSchema>;
 
+// 관리자 — 과정(course) 표시 데이터 편집
+const optStr = (max: number) => z.string().trim().max(max).optional().default("");
+const optInt = z.number().int().min(0).nullable().optional().default(null);
+export const courseEditSchema = z.object({
+  id: z.string().trim().min(1),
+  name: z.string().trim().min(1, "과정명을 입력해 주세요").max(100),
+  summary: optStr(500),
+  skills: z.array(z.string().trim().min(1)).max(30).optional().default([]),
+  tuition: optStr(50),
+  selfPay: optStr(50),
+  sessionsTotal: optInt,
+  sessionHours: optStr(20),
+  totalHours: optInt,
+  recruitStatus: z.enum(["모집예정", "모집중", "마감"]),
+});
+export type CourseEditInput = z.infer<typeof courseEditSchema>;
+
 // 이벤트 트래킹(/api/track) — 범용 기획 지표 로깅
 export const trackEventSchema = z.object({
   name: z.string().trim().min(1).max(50),

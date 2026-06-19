@@ -168,6 +168,44 @@ export async function getAdminCourses(): Promise<AdminCourseView[]> {
   }));
 }
 
+export interface CourseEditView {
+  id: string;
+  name: string;
+  summary: string;
+  skills: string[];
+  tuition: string;
+  selfPay: string;
+  sessionsTotal: number | null;
+  sessionHours: string;
+  totalHours: number | null;
+  recruitStatus: Database["public"]["Enums"]["recruit_status"];
+}
+
+/** 과정 수정용 — 공개 화면에 표시되는 course 필드 일체. */
+export async function getCoursesForEdit(): Promise<CourseEditView[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("course")
+    .select(
+      "id,name,summary,skills,tuition,self_pay,sessions_total,session_hours,total_hours,recruit_status",
+    )
+    .eq("is_deleted", false)
+    .order("sort_order", { ascending: true });
+  if (error) throw error;
+  return (data ?? []).map((c) => ({
+    id: c.id,
+    name: c.name,
+    summary: c.summary ?? "",
+    skills: c.skills ?? [],
+    tuition: c.tuition ?? "",
+    selfPay: c.self_pay ?? "",
+    sessionsTotal: c.sessions_total,
+    sessionHours: c.session_hours ?? "",
+    totalHours: c.total_hours,
+    recruitStatus: c.recruit_status,
+  }));
+}
+
 export interface AdminPhotoView {
   id: number;
   label: string;

@@ -1,102 +1,149 @@
 "use client";
 
-import { useState } from "react";
-import type { AdminCourseView } from "@/lib/queries/admin";
+import { useState, useTransition } from "react";
+import type { CourseEditView } from "@/lib/queries/admin";
+import { parseCsvList } from "@/lib/admin/parse";
 import { Card } from "@/components/ui/Card";
 import { Field } from "@/components/ui/Field";
 import { Button } from "@/components/ui/Button";
+import { updateCourse } from "./actions";
 
-interface EditableCourse {
-  id: string;
+const STATUSES = ["모집예정", "모집중", "마감"] as const;
+
+interface Draft {
   name: string;
-  open: boolean;
-  capacity: string;
-  start: string;
+  summary: string;
+  skills: string; // 쉼표 구분 입력
+  tuition: string;
+  selfPay: string;
+  sessionsTotal: string;
+  sessionHours: string;
+  totalHours: string;
+  recruitStatus: CourseEditView["recruitStatus"];
 }
 
-interface CourseEditorProps {
-  initial: AdminCourseView[];
+function toDraft(c: CourseEditView): Draft {
+  return {
+    name: c.name,
+    summary: c.summary,
+    skills: c.skills.join(", "),
+    tuition: c.tuition,
+    selfPay: c.selfPay,
+    sessionsTotal: c.sessionsTotal == null ? "" : String(c.sessionsTotal),
+    sessionHours: c.sessionHours,
+    totalHours: c.totalHours == null ? "" : String(c.totalHours),
+    recruitStatus: c.recruitStatus,
+  };
 }
 
-export function CourseEditor({ initial }: CourseEditorProps) {
-  const [courses, setCourses] = useState<EditableCourse[]>(
-    initial.map((c) => ({
-      id: c.id,
-      name: c.name,
-      open: c.open,
-      capacity: "",
-      start: "",
-    }))
+export function CourseEditor({ initial }: { initial: CourseEditView[] }) {
+  return (
+    <div className="flex flex-col gap-[14px]">
+      {initial.map((c) => (
+        <CourseCard key={c.id} course={c} />
+      ))}
+    </div>
   );
+}
 
-  function patch(id: string, key: keyof EditableCourse, val: string | boolean) {
-    setCourses((prev) =>
-      prev.map((c) => (c.id === id ? { ...c, [key]: val } : c))
-    );
+function CourseCard({ course }: { course: CourseEditView }) {
+  const [draft, setDraft] = useState<Draft>(() => toDraft(course));
+  const [pending, startSave] = useTransition();
+  const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
+
+  function set<K extends keyof Draft>(key: K, val: Draft[K]) {
+    setDraft((d) => ({ ...d, [key]: val }));
+    setMsg(null);
+  }
+
+  function save() {
+    setMsg(null);
+    startSave(async () => {
+      const res = await updateCourse({
+        id: course.id,
+        name: draft.name,
+        summary: draft.summary,
+        skills: parseCsvList(draft.skills),
+        tuition: draft.tuition,
+        selfPay: draft.selfPay,
+        sessionsTotal: draft.sessionsTotal.trim() === "" ? null : Number(draft.sessionsTotal),
+        sessionHours: draft.sessionHours,
+        totalHours: draft.totalHours.trim() === "" ? null : Number(draft.totalHours),
+        recruitStatus: draft.recruitStatus,
+      });
+      setMsg(res.ok ? { ok: true, text: "저장되었습니다." } : { ok: false, text: res.error });
+    });
   }
 
   return (
-    <div className="flex flex-col gap-[14px]">
-      {courses.map((course) => (
-        <Card key={course.id} padding={20}>
-          {/* Header */}
-          <div className="flex items-center justify-between">
-            <span className="text-[14px] text-muted font-semibold">
-              과정 #{course.id}
-            </span>
-            <button
-              type="button"
-              onClick={() => patch(course.id, "open", !course.open)}
-              className={[
-                "inline-flex items-center gap-1.5 rounded-full px-3 h-8 text-[13px] font-semibold cursor-pointer",
-                course.open
-                  ? "bg-success-soft text-success"
-                  : "bg-surface-strong text-muted",
-              ].join(" ")}
-            >
-              <span
-                className={[
-                  "w-1.5 h-1.5 rounded-full",
-                  course.open ? "bg-success" : "bg-muted-soft",
-                ].join(" ")}
-              />
-              {course.open ? "모집중" : "마감"}
-            </button>
-          </div>
+    <Card padding={20}>
+      <div className="flex items-center justify-between mb-4">
+        <span className="text-[14px] text-muted font-semibold">{course.name}</span>
+        <label className="flex items-center gap-2 text-[13px] text-muted">
+          모집상태
+          <select
+            value={draft.recruitStatus}
+            onChange={(e) => set("recruitStatus", e.target.value as Draft["recruitStatus"])}
+            className="h-9 rounded-button border border-hairline-strong bg-surface-card text-ink text-[14px] px-2 outline-none focus:border-2 focus:border-primary"
+          >
+            {STATUSES.map((s) => (
+              <option key={s} value={s}>
+                {s}
+              </option>
+            ))}
+          </select>
+        </label>
+      </div>
 
-          {/* Body */}
-          <div className="grid grid-cols-1 md:grid-cols-[2fr_1fr_1.3fr] gap-3 mt-4">
-            <Field
-              label="과정명"
-              value={course.name}
-              onChange={(e) => patch(course.id, "name", e.target.value)}
-            />
-            <Field
-              label="정원"
-              value={course.capacity}
-              onChange={(e) => patch(course.id, "capacity", e.target.value)}
-              placeholder="예: 20명"
-            />
-            <Field
-              label="개강일"
-              value={course.start}
-              onChange={(e) => patch(course.id, "start", e.target.value)}
-              placeholder="신청 시 안내"
-            />
-          </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <Field label="과정명" value={draft.name} onChange={(e) => set("name", e.target.value)} />
+        <Field
+          label="기술·태그 (쉼표로 구분)"
+          value={draft.skills}
+          onChange={(e) => set("skills", e.target.value)}
+          placeholder="예: 벽설치, 천장설치, 타일"
+        />
+        <div className="md:col-span-2">
+          <Field
+            label="요약 설명"
+            as="textarea"
+            rows={2}
+            value={draft.summary}
+            onChange={(e) => set("summary", e.target.value)}
+          />
+        </div>
+        <Field label="수강료" value={draft.tuition} onChange={(e) => set("tuition", e.target.value)} />
+        <Field label="자부담" value={draft.selfPay} onChange={(e) => set("selfPay", e.target.value)} />
+        <Field
+          label="총 회차"
+          type="number"
+          value={draft.sessionsTotal}
+          onChange={(e) => set("sessionsTotal", e.target.value)}
+          placeholder="예: 31"
+        />
+        <Field
+          label="회차당 시간"
+          value={draft.sessionHours}
+          onChange={(e) => set("sessionHours", e.target.value)}
+          placeholder="예: 6H"
+        />
+        <Field
+          label="총 훈련시간"
+          type="number"
+          value={draft.totalHours}
+          onChange={(e) => set("totalHours", e.target.value)}
+          placeholder="예: 186"
+        />
+      </div>
 
-          {/* Footer */}
-          <div className="mt-4 flex justify-end">
-            <Button
-              variant="primary"
-              size="sm"
-              onClick={() => console.log("저장", course)}
-            >
-              저장
-            </Button>
-          </div>
-        </Card>
-      ))}
-    </div>
+      <div className="mt-4 flex items-center justify-end gap-3">
+        {msg && (
+          <span className={`text-[13px] ${msg.ok ? "text-success" : "text-error"}`}>{msg.text}</span>
+        )}
+        <Button variant="primary" size="sm" onClick={save} disabled={pending}>
+          {pending ? "저장 중…" : "저장"}
+        </Button>
+      </div>
+    </Card>
   );
 }

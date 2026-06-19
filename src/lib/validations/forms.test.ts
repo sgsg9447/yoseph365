@@ -4,7 +4,39 @@ import {
   consultSchema,
   applicationMemoSchema,
   applicationStatusSchema,
+  courseEditSchema,
 } from "./forms";
+
+describe("courseEditSchema", () => {
+  const base = {
+    id: "course_weekday_repair",
+    name: "평일 집수리과정",
+    summary: "주택수리 NCS 종합 과정",
+    skills: ["타일", "욕실시공"],
+    tuition: "1,950,480원",
+    selfPay: "상담 안내",
+    sessionsTotal: 33,
+    sessionHours: "8H",
+    totalHours: 264,
+    recruitStatus: "모집중",
+  };
+
+  it("유효한 입력을 통과시킨다", () => {
+    expect(courseEditSchema.safeParse(base).success).toBe(true);
+  });
+  it("id·name이 비면 실패", () => {
+    expect(courseEditSchema.safeParse({ ...base, name: " " }).success).toBe(false);
+    expect(courseEditSchema.safeParse({ ...base, id: "" }).success).toBe(false);
+  });
+  it("회차·총시간은 null 허용", () => {
+    expect(
+      courseEditSchema.safeParse({ ...base, sessionsTotal: null, totalHours: null }).success,
+    ).toBe(true);
+  });
+  it("정의되지 않은 모집상태는 실패", () => {
+    expect(courseEditSchema.safeParse({ ...base, recruitStatus: "종료" }).success).toBe(false);
+  });
+});
 
 describe("applicationStatusSchema", () => {
   it("유효한 상태값을 통과시킨다", () => {

@@ -1,0 +1,39 @@
+"use server";
+
+import { revalidatePath } from "next/cache";
+import { createClient } from "@/lib/supabase/server";
+import { courseEditSchema } from "@/lib/validations/forms";
+
+export type CourseResult = { ok: true } | { ok: false; error: string };
+
+/** 과정(course) 표시 데이터 저장 — 관리자(authenticated)만. 공개 페이지(ISR) 재검증 포함. */
+export async function updateCourse(input: unknown): Promise<CourseResult> {
+  const parsed = courseEditSchema.safeParse(input);
+  if (!parsed.success) {
+    return { ok: false, error: parsed.error.issues[0]?.message ?? "입력값을 확인해 주세요." };
+  }
+  const v = parsed.data;
+
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("course")
+    .update({
+      name: v.name,
+      summary: v.summary || null,
+      skills: v.skills,
+      tuition: v.tuition || null,
+      self_pay: v.selfPay || null,
+      sessions_total: v.sessionsTotal,
+      session_hours: v.sessionHours || null,
+      total_hours: v.totalHours,
+      recruit_status: v.recruitStatus,
+    })
+    .eq("id", v.id);
+  if (error) return { ok: false, error: "저장 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요." };
+
+  // 공개 화면(ISR)·관리자 목록 재검증
+  revalidatePath("/courses");
+  revalidatePath(`/courses/${v.id}`);
+  revalidatePath("/admin/courses");
+  return { ok: true };
+}
