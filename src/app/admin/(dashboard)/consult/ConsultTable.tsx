@@ -10,25 +10,45 @@ import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Phone } from "@/components/icons";
 import { EmptyState } from "@/components/admin/EmptyState";
+import { ConsultCalendar } from "./ConsultCalendar";
 import { updateInquiryStatus } from "./actions";
 
 const PER_PAGE = 10;
 
 export function ConsultTable({ rows }: { rows: InquiryView[] }) {
   const [status, setStatus] = useState("전체");
+  const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [page, setPage] = useState(1);
 
-  const filtered = filterInquiries(rows, status);
+  const byStatus = filterInquiries(rows, status);
+  const filtered = selectedDate ? byStatus.filter((r) => r.date === selectedDate) : byStatus;
   const { items, page: current, totalPages, total } = paginate(filtered, page, PER_PAGE);
 
   function changeStatus(v: string) {
     setStatus(v);
     setPage(1);
   }
+  function selectDate(d: string | null) {
+    setSelectedDate(d);
+    setPage(1);
+  }
 
   return (
     <div className="flex flex-col gap-4">
-      <FilterPills items={["전체", "신규", "완료"]} active="전체" onChange={changeStatus} />
+      <ConsultCalendar rows={rows} selected={selectedDate} onSelect={selectDate} />
+
+      <div className="flex flex-wrap items-center gap-2">
+        <FilterPills items={["전체", "신규", "완료"]} active="전체" onChange={changeStatus} />
+        {selectedDate && (
+          <button
+            type="button"
+            onClick={() => selectDate(null)}
+            className="ml-auto text-[13px] font-semibold text-primary"
+          >
+            {selectedDate} 선택됨 · 전체 보기 ✕
+          </button>
+        )}
+      </div>
 
       {total === 0 ? (
         <EmptyState message="조건에 맞는 상담 문의가 없습니다." />
