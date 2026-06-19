@@ -274,3 +274,20 @@ values
     '{"내일배움카드 사용시 최대자비부담금 355,540원","훈련별 자비부담금이 다르니 고용24 사이트에서 확인하시기 바랍니다."}',
     '{"학원으로 전화하여 등록 여부 확인","학원으로 방문 또는 전화하여 가등록 신청","고용24 사이트에서 수강신청 후 자비부담금 결제","등록 완료"}',
     '{"현재 상용직으로 취업상태인 자","실업자훈련 등 다른 훈련과정을 수강중인 자","부정수급 등으로 수강제한 처분 중인 자","사업자등록증 보유자 (단, 최근년도 매출 1억 5천만원 이하인 경우 참여가능)","6개월 이내 즉시 취업이 어려운 자","전년도 동일한 직종을 수강한 자","당해연도에 숙련건설기능인력 양성사업 교육에 기 참여한 자"}');
+
+-- ── 콘텐츠 수정 반영 (마이그레이션 20260619110000과 동일, 멱등) ─────────────────
+-- seed는 db reset 시 마이그레이션 이후 마지막에 실행되므로, 위 insert를 덮어쓰도록 끝에 둔다.
+update course_apply_info
+set qualifications = case when '일반' = any (qualifications) then qualifications else array_append(qualifications, '일반') end,
+    recruit_period = '개강 전까지 선착순 모집',
+    exclusions = '{}'
+where course_id in ('course_weekday_repair', 'course_weekend_carpentry', 'course_weekend_interior_film');
+
+insert into about_history_item (history_id, content, is_highlighted, display_order)
+select ah.id, '이수자평가 A등급 획득', true, 2
+from about_history ah
+where ah.year = 2025
+  and not exists (
+    select 1 from about_history_item i
+    where i.history_id = ah.id and i.content = '이수자평가 A등급 획득'
+  );
