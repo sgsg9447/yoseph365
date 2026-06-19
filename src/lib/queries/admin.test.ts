@@ -9,7 +9,7 @@ import {
   type EnrollmentView,
   type InquiryView,
 } from "./admin";
-import { filterInquiries } from "@/lib/admin/inquiry";
+import { filterInquiries, summarizeInquiries } from "@/lib/admin/inquiry";
 import { filterEnrollments, paginate } from "@/lib/admin/enroll";
 
 const appRow = {
@@ -193,6 +193,17 @@ describe("filterInquiries", () => {
   it("신규/완료 필터", () => {
     expect(filterInquiries(rows, "신규").map((r) => r.id)).toEqual([1, 3]);
     expect(filterInquiries(rows, "완료").map((r) => r.id)).toEqual([2]);
+  });
+});
+
+describe("summarizeInquiries", () => {
+  const rows = [
+    { date: "2026.06.20", status: "신규" },
+    { date: "2026.06.20", status: "완료" },
+    { date: "2026.06.19", status: "신규" },
+  ];
+  it("전체·신규·오늘 건수 집계", () => {
+    expect(summarizeInquiries(rows, "2026.06.20")).toEqual({ total: 3, pending: 2, today: 2 });
   });
 });
 

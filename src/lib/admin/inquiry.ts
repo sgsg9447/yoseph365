@@ -7,3 +7,15 @@ export function filterInquiries(rows: InquiryView[], status: string): InquiryVie
   if (status === "전체") return rows;
   return rows.filter((r) => r.status === status);
 }
+
+/** 상단 요약(전체·신규·오늘) 집계. today는 "YYYY.MM.DD". */
+export function summarizeInquiries(
+  rows: { date: string; status: string }[],
+  today: string,
+): { total: number; pending: number; today: number } {
+  return {
+    total: rows.length,
+    pending: rows.filter((r) => r.status === "신규").length,
+    today: rows.filter((r) => r.date === today).length,
+  };
+}

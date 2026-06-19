@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import type { InquiryView } from "@/lib/queries/admin";
-import { filterInquiries } from "@/lib/admin/inquiry";
+import { filterInquiries, summarizeInquiries } from "@/lib/admin/inquiry";
 import { paginate } from "@/lib/admin/enroll";
 import { FilterPills } from "@/components/admin/FilterPills";
 import { Card } from "@/components/ui/Card";
@@ -10,45 +10,44 @@ import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Phone } from "@/components/icons";
 import { EmptyState } from "@/components/admin/EmptyState";
-import { ConsultCalendar } from "./ConsultCalendar";
 import { updateInquiryStatus } from "./actions";
 
 const PER_PAGE = 10;
 
+function todayKst(): string {
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Seoul",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(new Date());
+  const get = (t: string) => parts.find((p) => p.type === t)?.value ?? "";
+  return `${get("year")}.${get("month")}.${get("day")}`;
+}
+
 export function ConsultTable({ rows }: { rows: InquiryView[] }) {
   const [status, setStatus] = useState("전체");
-  const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [page, setPage] = useState(1);
 
-  const byStatus = filterInquiries(rows, status);
-  const filtered = selectedDate ? byStatus.filter((r) => r.date === selectedDate) : byStatus;
+  const summary = summarizeInquiries(rows, todayKst());
+  const filtered = filterInquiries(rows, status);
   const { items, page: current, totalPages, total } = paginate(filtered, page, PER_PAGE);
 
   function changeStatus(v: string) {
     setStatus(v);
     setPage(1);
   }
-  function selectDate(d: string | null) {
-    setSelectedDate(d);
-    setPage(1);
-  }
 
   return (
     <div className="flex flex-col gap-4">
-      <ConsultCalendar rows={rows} selected={selectedDate} onSelect={selectDate} />
-
-      <div className="flex flex-wrap items-center gap-2">
-        <FilterPills items={["전체", "신규", "완료"]} active="전체" onChange={changeStatus} />
-        {selectedDate && (
-          <button
-            type="button"
-            onClick={() => selectDate(null)}
-            className="ml-auto text-[13px] font-semibold text-primary"
-          >
-            {selectedDate} 선택됨 · 전체 보기 ✕
-          </button>
-        )}
+      {/* 요약 칩 */}
+      <div className="flex flex-wrap gap-2">
+        <SummaryChip label="신규" value={summary.pending} tone="primary" />
+        <SummaryChip label="오늘" value={summary.today} />
+        <SummaryChip label="전체" value={summary.total} />
       </div>
+
+      <FilterPills items={["전체", "신규", "완료"]} active="전체" onChange={changeStatus} />
 
       {total === 0 ? (
         <EmptyState message="조건에 맞는 상담 문의가 없습니다." />
@@ -86,6 +85,24 @@ export function ConsultTable({ rows }: { rows: InquiryView[] }) {
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+function SummaryChip({ label, value, tone }: { label: string; value: number; tone?: "primary" }) {
+  return (
+    <div
+      className={[
+        "flex items-baseline gap-1.5 rounded-full px-4 py-2",
+        tone === "primary" ? "bg-primary-soft" : "bg-surface-strong",
+      ].join(" ")}
+    >
+      <span className={`text-[13px] font-semibold ${tone === "primary" ? "text-primary" : "text-muted"}`}>
+        {label}
+      </span>
+      <span className={`text-[16px] font-bold ${tone === "primary" ? "text-primary" : "text-ink"}`}>
+        {value}
+      </span>
     </div>
   );
 }
