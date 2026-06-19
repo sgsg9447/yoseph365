@@ -5,17 +5,22 @@ import { ProgressBar } from "@/components/admin/ProgressBar";
 import { StatusChip } from "@/components/admin/StatusChip";
 import { EmptyState } from "@/components/admin/EmptyState";
 import { Users, Clipboard, Message, Hammer } from "@/components/icons";
-import { DEMO_KPI } from "@/app/admin/demo";
-import { getOpenCourseCount, getAdminCourses, getEnrollments } from "@/lib/queries/admin";
+import {
+  getOpenCourseCount,
+  getAdminCourses,
+  getEnrollments,
+  getDashboardStats,
+} from "@/lib/queries/admin";
 import { getCourseFunnel } from "@/lib/analytics/events";
 import { viewBarPct } from "@/lib/analytics/funnel";
 
 export default async function DashboardPage() {
-  const [openCount, courses, enrollments, funnel] = await Promise.all([
+  const [openCount, courses, enrollments, funnel, stats] = await Promise.all([
     getOpenCourseCount(),
     getAdminCourses(),
     getEnrollments(),
     getCourseFunnel(),
+    getDashboardStats(),
   ]);
   const recent = enrollments.slice(0, 4);
   const totalCourses = courses.length;
@@ -26,21 +31,21 @@ export default async function DashboardPage() {
     <div>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <KpiCard
-          label="오늘 방문자"
-          value={String(DEMO_KPI.visitors)}
-          delta={DEMO_KPI.visitorsDelta}
+          label="오늘 과정 조회"
+          value={`${stats.todayViews.toLocaleString()}회`}
+          delta="과정 상세 페이지 조회"
           icon={<Users size={18} />}
         />
         <KpiCard
           label="이번 달 수강신청"
-          value={`${DEMO_KPI.enroll}건`}
-          delta={DEMO_KPI.enrollDelta}
+          value={`${stats.monthEnroll}건`}
+          delta="이번 달 접수"
           icon={<Clipboard size={18} />}
         />
         <KpiCard
           label="상담 대기"
-          value={`${DEMO_KPI.consult}건`}
-          delta={DEMO_KPI.consultNew}
+          value={`${stats.pendingConsult}건`}
+          delta="답변 대기 중"
           icon={<Message size={18} />}
         />
         <KpiCard
