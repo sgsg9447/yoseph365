@@ -29,14 +29,14 @@ describe("patternToStartDate", () => {
 });
 
 describe("curriculumToTable", () => {
-  it("builds 4-col rows joined by newline, sorted by round", () => {
+  it("builds 5-col rows(회차·능력단위·내용·시간·장소) joined by newline, sorted by round", () => {
     const rows = [
-      { round: 2, unit: "U2", contents: ["a", "b"], hours: 8, place: "실습실" },
-      { round: 1, unit: "U1", contents: ["x"], hours: 8, place: "강의실" },
+      { round: 2, unit: "U2", contents: ["a", "b"], hours: 6, place: "실습실" },
+      { round: 1, unit: "U1", contents: ["x"], hours: 6, place: "강의실" },
     ];
     expect(curriculumToTable(rows)).toEqual([
-      ["1", "U1", "x", "강의실"],
-      ["2", "U2", "a\nb", "실습실"],
+      ["1", "U1", "x", "6H", "강의실"],
+      ["2", "U2", "a\nb", "6H", "실습실"],
     ]);
   });
 });

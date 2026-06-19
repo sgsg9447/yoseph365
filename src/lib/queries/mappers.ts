@@ -45,7 +45,13 @@ interface CurriculumRow {
 export function curriculumToTable(rows: CurriculumRow[]): string[][] {
   return [...rows]
     .sort((a, b) => a.round - b.round)
-    .map((r) => [String(r.round), r.unit ?? "", r.contents.join("\n"), r.place ?? ""]);
+    .map((r) => [
+      String(r.round),
+      r.unit ?? "",
+      r.contents.join("\n"),
+      r.hours != null ? `${r.hours}H` : "",
+      r.place ?? "",
+    ]);
 }
 
 function md(date: string | null): string {

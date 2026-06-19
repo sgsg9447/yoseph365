@@ -293,9 +293,9 @@ export function CourseDetailView({ course }: { course: CatalogCourse }) {
               <span style={{ fontWeight: 600, color: "var(--color-body-strong)" }}>{r[1]}</span>
               <span style={{ color: "var(--color-body)", whiteSpace: "pre-line" }}>{r[2]}</span>
               <span className="ncs-sub" style={{ fontVariantNumeric: "tabular-nums" }}>
-                8H
+                {r[3]}
               </span>
-              <span className="ncs-sub">{r[3]}</span>
+              <span className="ncs-sub">{r[4]}</span>
             </div>
           ))}
         </Card>
