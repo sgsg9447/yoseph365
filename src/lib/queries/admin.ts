@@ -1,5 +1,7 @@
 import type { Database } from "@/lib/supabase/database.types";
 import { createClient } from "@/lib/supabase/server";
+import { applyInfoRowToView } from "./mappers";
+import type { ApplyInfoView } from "./types";
 
 type ApplicationRow = Database["public"]["Tables"]["application"]["Row"];
 type InquiryRow = Database["public"]["Tables"]["inquiry"]["Row"];
@@ -217,18 +219,20 @@ export interface CurriculumEditRow {
 export interface CourseBundle {
   course: CourseEditView;
   curriculum: CurriculumEditRow[];
+  applyInfo: ApplyInfoView | null;
 }
 
-/** 과정 수정용 — 과정별 기본정보 + 커리큘럼 묶음. */
+/** 과정 수정용 — 과정별 기본정보 + 커리큘럼 + 신청안내 묶음. */
 export async function getCourseEditBundles(): Promise<CourseBundle[]> {
   const supabase = await createClient();
   const courses = await getCoursesForEdit();
-  const { data } = await supabase
-    .from("curriculum_item")
-    .select("course_id,round,unit,contents,hours,place");
+  const [curRes, infoRes] = await Promise.all([
+    supabase.from("curriculum_item").select("course_id,round,unit,contents,hours,place"),
+    supabase.from("course_apply_info").select("*"),
+  ]);
 
   const byCourse: Record<string, CurriculumEditRow[]> = {};
-  for (const r of data ?? []) {
+  for (const r of curRes.data ?? []) {
     (byCourse[r.course_id] ??= []).push({
       round: r.round,
       unit: r.unit ?? "",
@@ -239,7 +243,14 @@ export async function getCourseEditBundles(): Promise<CourseBundle[]> {
   }
   for (const k of Object.keys(byCourse)) byCourse[k].sort((a, b) => a.round - b.round);
 
-  return courses.map((c) => ({ course: c, curriculum: byCourse[c.id] ?? [] }));
+  const infoByCourse: Record<string, ApplyInfoView> = {};
+  for (const row of infoRes.data ?? []) infoByCourse[row.course_id] = applyInfoRowToView(row);
+
+  return courses.map((c) => ({
+    course: c,
+    curriculum: byCourse[c.id] ?? [],
+    applyInfo: infoByCourse[c.id] ?? null,
+  }));
 }
 
 export interface AdminPhotoView {

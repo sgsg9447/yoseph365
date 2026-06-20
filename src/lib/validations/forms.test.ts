@@ -8,7 +8,33 @@ import {
   inquiryStatusSchema,
   noticeCreateSchema,
   curriculumSaveSchema,
+  applyInfoSchema,
 } from "./forms";
+
+describe("applyInfoSchema", () => {
+  const base = {
+    courseId: "course_weekday_repair",
+    qualifications: ["내일배움카드 보유자", "일반"],
+    applyMethod: [],
+    recruitPeriod: "개강 전까지 선착순 모집",
+    trainingPeriod: "26.08.24 ~ 26.10.13",
+    trainingTime: ["09:00 ~ 17:40"],
+    capacity: "16명",
+    cost: "1,950,480원",
+    costNotes: [],
+    steps: ["전화 확인", "가등록", "수강신청"],
+    exclusions: [],
+  };
+  it("유효한 입력 통과", () => {
+    expect(applyInfoSchema.safeParse(base).success).toBe(true);
+  });
+  it("배열·문자 기본값 허용(부분 입력)", () => {
+    expect(applyInfoSchema.safeParse({ courseId: "c" }).success).toBe(true);
+  });
+  it("courseId 없으면 실패", () => {
+    expect(applyInfoSchema.safeParse({ ...base, courseId: "" }).success).toBe(false);
+  });
+});
 
 describe("curriculumSaveSchema", () => {
   const base = {

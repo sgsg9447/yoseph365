@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
-import { courseEditSchema, curriculumSaveSchema } from "@/lib/validations/forms";
+import { courseEditSchema, curriculumSaveSchema, applyInfoSchema } from "@/lib/validations/forms";
 
 export type CourseResult = { ok: true } | { ok: false; error: string };
 
@@ -68,6 +68,40 @@ export async function updateCurriculum(input: unknown): Promise<CourseResult> {
 
   revalidatePath("/courses");
   revalidatePath(`/courses/${courseId}`);
+  revalidatePath("/admin/courses");
+  return { ok: true };
+}
+
+/** 과정 신청안내(course_apply_info) 저장(upsert). */
+export async function updateApplyInfo(input: unknown): Promise<CourseResult> {
+  const parsed = applyInfoSchema.safeParse(input);
+  if (!parsed.success) {
+    return { ok: false, error: parsed.error.issues[0]?.message ?? "입력값을 확인해 주세요." };
+  }
+  const v = parsed.data;
+
+  const supabase = await createClient();
+  const { error } = await supabase.from("course_apply_info").upsert(
+    {
+      course_id: v.courseId,
+      qualifications: v.qualifications,
+      apply_method: v.applyMethod,
+      recruit_period: v.recruitPeriod || null,
+      training_period: v.trainingPeriod || null,
+      training_time: v.trainingTime,
+      capacity: v.capacity || null,
+      cost: v.cost || null,
+      cost_notes: v.costNotes,
+      steps: v.steps,
+      exclusions: v.exclusions,
+    },
+    { onConflict: "course_id" },
+  );
+  if (error) return { ok: false, error: GENERIC };
+
+  revalidatePath("/courses");
+  revalidatePath(`/courses/${v.courseId}`);
+  revalidatePath("/apply");
   revalidatePath("/admin/courses");
   return { ok: true };
 }

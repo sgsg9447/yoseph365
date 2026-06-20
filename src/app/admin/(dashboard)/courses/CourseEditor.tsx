@@ -8,6 +8,7 @@ import { Field } from "@/components/ui/Field";
 import { Button } from "@/components/ui/Button";
 import { updateCourse } from "./actions";
 import { CurriculumEditor } from "./CurriculumEditor";
+import { ApplyInfoEditor } from "./ApplyInfoEditor";
 
 const STATUSES = ["모집예정", "모집중", "마감"] as const;
 
@@ -72,6 +73,14 @@ export function CourseEditor({ bundles }: { bundles: CourseBundle[] }) {
             key={`${selected.course.id}-cur`}
             courseId={selected.course.id}
             initial={selected.curriculum}
+          />
+        </Card>
+        <Card padding={20}>
+          <h3 className="text-[15px] font-bold text-ink mb-3">신청안내 (수강신청 페이지)</h3>
+          <ApplyInfoEditor
+            key={`${selected.course.id}-info`}
+            courseId={selected.course.id}
+            initial={selected.applyInfo}
           />
         </Card>
       </div>

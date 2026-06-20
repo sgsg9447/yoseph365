@@ -73,6 +73,23 @@ export const courseEditSchema = z.object({
 });
 export type CourseEditInput = z.infer<typeof courseEditSchema>;
 
+// 관리자 — 신청안내(course_apply_info) 저장
+const strList = z.array(z.string().trim().min(1)).max(50).optional().default([]);
+export const applyInfoSchema = z.object({
+  courseId: z.string().trim().min(1),
+  qualifications: strList,
+  applyMethod: strList,
+  recruitPeriod: z.string().trim().max(200).optional().default(""),
+  trainingPeriod: z.string().trim().max(200).optional().default(""),
+  trainingTime: strList,
+  capacity: z.string().trim().max(100).optional().default(""),
+  cost: z.string().trim().max(100).optional().default(""),
+  costNotes: strList,
+  steps: strList,
+  exclusions: strList,
+});
+export type ApplyInfoInput = z.infer<typeof applyInfoSchema>;
+
 // 관리자 — 커리큘럼(회차표) 저장
 export const curriculumRowSchema = z.object({
   round: z.number().int().min(1),
