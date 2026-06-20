@@ -11,6 +11,7 @@ import {
   noticeUpdateSchema,
   curriculumSaveSchema,
   applyInfoSchema,
+  trainingPhotoAddSchema,
 } from "./forms";
 
 describe("applyInfoSchema", () => {
@@ -225,5 +226,26 @@ describe("consultSchema", () => {
   });
   it("연락처 형식이 틀리면 실패", () => {
     expect(consultSchema.safeParse({ ...base, phone: "abc" }).success).toBe(false);
+  });
+});
+
+describe("trainingPhotoAddSchema", () => {
+  it("키·라벨 목록을 통과시킨다", () => {
+    const r = trainingPhotoAddSchema.safeParse({
+      photos: [{ key: "a.jpg", label: "현장" }, { key: "b.png", label: "" }],
+    });
+    expect(r.success).toBe(true);
+  });
+  it("빈 배열은 거부", () => {
+    expect(trainingPhotoAddSchema.safeParse({ photos: [] }).success).toBe(false);
+  });
+  it("key 누락은 거부", () => {
+    expect(
+      trainingPhotoAddSchema.safeParse({ photos: [{ label: "x" }] }).success,
+    ).toBe(false);
+  });
+  it("50장 초과는 거부", () => {
+    const photos = Array.from({ length: 51 }, (_, i) => ({ key: `${i}.jpg`, label: "" }));
+    expect(trainingPhotoAddSchema.safeParse({ photos }).success).toBe(false);
   });
 });

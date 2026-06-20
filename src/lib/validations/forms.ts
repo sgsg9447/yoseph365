@@ -131,3 +131,17 @@ export const trackEventSchema = z.object({
   courseId: z.string().trim().max(80).optional(),
 });
 export type TrackEventInput = z.infer<typeof trackEventSchema>;
+
+// 관리자 — 훈련사진 추가(업로드 완료된 객체 키 목록)
+export const trainingPhotoAddSchema = z.object({
+  photos: z
+    .array(
+      z.object({
+        key: z.string().trim().min(1).max(200),
+        label: z.string().trim().max(100).default(""),
+      }),
+    )
+    .min(1, "업로드할 사진이 없습니다")
+    .max(50, "한 번에 최대 50장까지 올릴 수 있습니다"),
+});
+export type TrainingPhotoAddInput = z.infer<typeof trainingPhotoAddSchema>;
