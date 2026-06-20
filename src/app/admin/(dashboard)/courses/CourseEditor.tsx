@@ -5,6 +5,7 @@ import type { CourseEditView, CourseBundle } from "@/lib/queries/admin";
 import { parseCsvList } from "@/lib/admin/parse";
 import { Card } from "@/components/ui/Card";
 import { Field } from "@/components/ui/Field";
+import { Select } from "@/components/ui/Select";
 import { Button } from "@/components/ui/Button";
 import { updateCourse } from "./actions";
 import { CurriculumEditor } from "./CurriculumEditor";
@@ -121,20 +122,17 @@ function CourseCard({ course }: { course: CourseEditView }) {
     <Card padding={20}>
       <div className="flex items-center justify-between mb-4">
         <span className="text-[14px] text-muted font-semibold">{course.name}</span>
-        <label className="flex items-center gap-2 text-[13px] text-muted">
+        <div className="flex items-center gap-2 text-[13px] text-muted">
           모집상태
-          <select
-            value={draft.recruitStatus}
-            onChange={(e) => set("recruitStatus", e.target.value as Draft["recruitStatus"])}
-            className="h-9 rounded-button border border-hairline-strong bg-surface-card text-ink text-[14px] px-2 outline-none focus:border-2 focus:border-primary"
-          >
-            {STATUSES.map((s) => (
-              <option key={s} value={s}>
-                {s}
-              </option>
-            ))}
-          </select>
-        </label>
+          <div className="w-32">
+            <Select
+              value={draft.recruitStatus}
+              ariaLabel="모집상태"
+              options={STATUSES.map((s) => ({ value: s, label: s }))}
+              onChange={(v) => set("recruitStatus", v as Draft["recruitStatus"])}
+            />
+          </div>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">

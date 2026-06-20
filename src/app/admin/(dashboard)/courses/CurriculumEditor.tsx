@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useEffect, useRef, useTransition } from "react";
 import type { CurriculumEditRow } from "@/lib/queries/admin";
 import { parseLines } from "@/lib/admin/banner";
 import { Button } from "@/components/ui/Button";
@@ -25,7 +25,7 @@ function toDraft(r: CurriculumEditRow): RowDraft {
 }
 
 const inputCls =
-  "w-full bg-surface-card text-ink text-[14px] rounded-md border border-hairline-strong px-2 py-1 outline-none focus:border-primary";
+  "w-full bg-surface-card text-ink text-[14px] rounded-[6px] border border-hairline px-2.5 py-1.5 outline-none focus:border-primary focus:bg-white";
 
 export function CurriculumEditor({
   courseId,
@@ -86,11 +86,10 @@ export function CurriculumEditor({
         >
           <input className={inputCls} value={r.round} onChange={(e) => patch(i, "round", e.target.value)} />
           <input className={inputCls} value={r.unit} onChange={(e) => patch(i, "unit", e.target.value)} placeholder="능력단위" />
-          <textarea
-            className={`${inputCls} resize-y min-h-[38px]`}
-            rows={2}
+          <AutoGrowTextarea
+            className={inputCls}
             value={r.contents}
-            onChange={(e) => patch(i, "contents", e.target.value)}
+            onChange={(v) => patch(i, "contents", v)}
             placeholder="훈련내용(여러 줄 가능)"
           />
           <input className={inputCls} value={r.hours} onChange={(e) => patch(i, "hours", e.target.value)} placeholder="6" />
@@ -118,5 +117,37 @@ export function CurriculumEditor({
         </div>
       </div>
     </div>
+  );
+}
+
+/** 내용 높이에 맞춰 자동으로 늘어나는 textarea — 한 줄일 땐 다른 입력칸과 같은 높이. */
+function AutoGrowTextarea({
+  value,
+  onChange,
+  className,
+  placeholder,
+}: {
+  value: string;
+  onChange: (value: string) => void;
+  className?: string;
+  placeholder?: string;
+}) {
+  const ref = useRef<HTMLTextAreaElement>(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    el.style.height = "auto";
+    el.style.height = `${el.scrollHeight + 2}px`; // +2 = 위·아래 1px 테두리 보정
+  }, [value]);
+  return (
+    <textarea
+      ref={ref}
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      placeholder={placeholder}
+      rows={1}
+      className={className}
+      style={{ resize: "none", overflow: "hidden" }}
+    />
   );
 }

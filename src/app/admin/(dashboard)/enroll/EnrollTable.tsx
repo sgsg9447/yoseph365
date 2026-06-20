@@ -70,7 +70,7 @@ export function EnrollTable({ rows, courseOptions }: EnrollTableProps) {
             value={query}
             onChange={(e) => changeQuery(e.target.value)}
             placeholder="신청자 이름 검색"
-            className="w-44 sm:w-52 h-[42px] bg-surface-card text-ink text-[15px] rounded-[14px] border border-hairline-strong px-4 outline-none focus:border-2 focus:border-primary"
+            className="w-44 sm:w-52 py-[11px] bg-surface-card text-ink text-[15px] rounded-[14px] border border-hairline-strong px-4 outline-none focus:border-2 focus:border-primary"
           />
         </div>
       </div>
