@@ -13,7 +13,8 @@
     "db:start": "supabase start",
     "db:stop": "supabase stop",
     "db:reset": "supabase db reset",
-    "gen:types": "SUPABASE_ACCESS_TOKEN=local supabase gen types --local > src/lib/supabase/database.types.ts"
+    "gen:types": "SUPABASE_ACCESS_TOKEN=local supabase gen types --local > src/lib/supabase/database.types.ts",
+    "seed:photos": "node --env-file=.env.local scripts/seed-training-photos.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.0",
