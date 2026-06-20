@@ -12,11 +12,6 @@ import {
   useCallback,
 } from "react";
 
-// /public/photos/training-detail/1.JPG … 25.JPG
-const PHOTOS = Array.from(
-  { length: 25 },
-  (_, i) => `/photos/training-detail/${i + 1}.JPG`,
-);
 const GAP = 10;
 const FALLBACK_RATIO = 1.4; // 로드 전 임시 비율(레이아웃 점프 최소화)
 const SINGLE_COL_BP = 560; // 이 폭 미만(모바일)에서는 한 줄에 한 장씩
@@ -49,7 +44,8 @@ function buildRows(
   return rows;
 }
 
-export function TrainingGallery() {
+export function TrainingGallery({ photos }: { photos: string[] }) {
+  const PHOTOS = photos;
   const containerRef = useRef<HTMLDivElement>(null);
   const [width, setWidth] = useState(0);
   const [ratios, setRatios] = useState<number[]>(() =>
@@ -97,7 +93,7 @@ export function TrainingGallery() {
   const go = useCallback(
     (d: number) =>
       setZoom((p) => (p === null ? p : (p + d + PHOTOS.length) % PHOTOS.length)),
-    [],
+    [PHOTOS.length],
   );
   useEffect(() => {
     if (zoom === null) return;
