@@ -49,9 +49,14 @@ export async function deleteTrainingPhoto(id: number): Promise<PhotoResult> {
     .from("post")
     .select("images")
     .eq("id", id)
+    .eq("category", "훈련사진")
     .single();
 
-  const { error } = await supabase.from("post").update({ is_deleted: true }).eq("id", id);
+  const { error } = await supabase
+    .from("post")
+    .update({ is_deleted: true })
+    .eq("id", id)
+    .eq("category", "훈련사진");
   if (error) return { ok: false, error: GENERIC };
 
   const key = row?.images?.[0];
