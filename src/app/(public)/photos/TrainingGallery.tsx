@@ -19,6 +19,7 @@ const PHOTOS = Array.from(
 );
 const GAP = 10;
 const FALLBACK_RATIO = 1.4; // 로드 전 임시 비율(레이아웃 점프 최소화)
+const SINGLE_COL_BP = 560; // 이 폭 미만(모바일)에서는 한 줄에 한 장씩
 
 type Cell = { i: number; w: number; h: number };
 
@@ -82,8 +83,15 @@ export function TrainingGallery() {
     [],
   );
 
-  const targetH = width < 560 ? 150 : width < 900 ? 200 : 240;
-  const rows = width > 0 ? buildRows(ratios, width, targetH) : null;
+  // 모바일(< SINGLE_COL_BP)은 한 줄에 한 장씩 꽉 채워 보여준다.
+  // 그 이상(태블릿·데스크톱)은 행마다 높이를 맞춘 justified 배치.
+  const targetH = width < 900 ? 200 : 240;
+  const rows =
+    width > 0
+      ? width < SINGLE_COL_BP
+        ? ratios.map((r, i) => [{ i, w: width, h: width / r }])
+        : buildRows(ratios, width, targetH)
+      : null;
 
   // 라이트박스: ESC 닫기 / 좌우 이동
   const go = useCallback(
