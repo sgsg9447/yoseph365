@@ -1,5 +1,6 @@
 import type { Database } from "@/lib/supabase/database.types";
 import { createClient } from "@/lib/supabase/server";
+import { publicUrl } from "@/lib/storage/keys";
 import { applyInfoRowToView } from "./mappers";
 import type { ApplyInfoView } from "./types";
 
@@ -273,7 +274,11 @@ export async function getTrainingPhotos(): Promise<AdminPhotoView[]> {
     .eq("is_deleted", false)
     .order("created_at", { ascending: false });
   if (error) throw error;
-  return (data ?? []).map((p) => ({ id: p.id, label: p.title, image: p.images[0] ?? null }));
+  return (data ?? []).map((p) => ({
+    id: p.id,
+    label: p.title,
+    image: p.images[0] ? publicUrl(p.images[0]) : null,
+  }));
 }
 
 export interface AdminNoticeView {
