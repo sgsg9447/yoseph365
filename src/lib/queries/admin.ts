@@ -47,6 +47,7 @@ export interface InquiryView {
   message: string;
   date: string;
   status: "신규" | "완료";
+  memo: string;
 }
 
 /** ISO → "YYYY.MM.DD" (Asia/Seoul 기준) */
@@ -98,7 +99,10 @@ export function inquiryStatusLabel(s: InquiryRow["status"]): "신규" | "완료"
 }
 
 export function toInquiryView(
-  r: Pick<InquiryRow, "id" | "name" | "phone" | "category" | "content" | "status" | "created_at">,
+  r: Pick<
+    InquiryRow,
+    "id" | "name" | "phone" | "category" | "content" | "status" | "created_at" | "admin_memo"
+  >,
   courseName?: string | null,
 ): InquiryView {
   // 관리자(authenticated) 화면 — 상담 처리를 위해 이름·연락처를 그대로 노출.
@@ -110,6 +114,7 @@ export function toInquiryView(
     message: r.content,
     date: fmtDate(r.created_at),
     status: inquiryStatusLabel(r.status),
+    memo: r.admin_memo ?? "",
   };
 }
 
@@ -136,7 +141,7 @@ export async function getInquiries(): Promise<InquiryView[]> {
   const [inquiryRes, courses] = await Promise.all([
     supabase
       .from("inquiry")
-      .select("id,name,phone,category,course_id,content,status,created_at")
+      .select("id,name,phone,category,course_id,content,status,created_at,admin_memo")
       .order("created_at", { ascending: false }),
     getAdminCourses(),
   ]);
@@ -295,6 +300,26 @@ export async function getAdminNotices(): Promise<AdminNoticeView[]> {
     date: fmtDate(n.published_at ?? n.created_at),
     pinned: n.is_pinned,
   }));
+}
+
+/** 공지 단건 조회(수정 폼 prefill용). 없으면 null. */
+export async function getAdminNotice(id: number): Promise<AdminNoticeView | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("notice")
+    .select("id,title,body,is_pinned,published_at,created_at")
+    .eq("id", id)
+    .eq("is_deleted", false)
+    .maybeSingle();
+  if (error) throw error;
+  if (!data) return null;
+  return {
+    id: data.id,
+    title: data.title,
+    body: data.body,
+    date: fmtDate(data.published_at ?? data.created_at),
+    pinned: data.is_pinned,
+  };
 }
 
 /** 사이드바 카운트 */

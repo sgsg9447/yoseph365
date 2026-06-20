@@ -1,16 +1,24 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useEffect, useRef, useTransition } from "react";
 import type { InquiryView } from "@/lib/queries/admin";
-import { filterInquiries, summarizeInquiries } from "@/lib/admin/inquiry";
+import {
+  filterInquiries,
+  countInquiriesByStatus,
+  filterInquiriesByMonth,
+  stepMonth,
+  inquiryYearRange,
+  searchInquiriesByName,
+} from "@/lib/admin/inquiry";
 import { paginate } from "@/lib/admin/enroll";
-import { FilterPills } from "@/components/admin/FilterPills";
+import { Select } from "@/components/ui/Select";
+import { Modal } from "@/components/ui/Modal";
 import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
-import { Phone } from "@/components/icons";
+import { Phone, ChevronRight } from "@/components/icons";
 import { EmptyState } from "@/components/admin/EmptyState";
-import { updateInquiryStatus } from "./actions";
+import { updateInquiryStatus, updateInquiryMemo } from "./actions";
 
 const PER_PAGE = 10;
 
@@ -26,28 +34,93 @@ function todayKst(): string {
 }
 
 export function ConsultTable({ rows }: { rows: InquiryView[] }) {
+  const [todayY, todayM] = todayKst().split(".");
+  const nowYear = Number(todayY);
+  const nowMonth = Number(todayM);
+
   const [status, setStatus] = useState("전체");
+  const [year, setYear] = useState(nowYear);
+  const [month, setMonth] = useState(nowMonth);
+  const [query, setQuery] = useState("");
   const [page, setPage] = useState(1);
 
-  const summary = summarizeInquiries(rows, todayKst());
-  const filtered = filterInquiries(rows, status);
+  const trimmed = query.trim();
+  const searching = trimmed !== "";
+  // 검색 중이면 월 무시·전체 기간에서, 아니면 선택한 달에서.
+  const base = searching
+    ? searchInquiriesByName(rows, trimmed)
+    : filterInquiriesByMonth(rows, year, month);
+  const counts = countInquiriesByStatus(base);
+  const filtered = filterInquiries(base, status);
   const { items, page: current, totalPages, total } = paginate(filtered, page, PER_PAGE);
+
+  const baseYears = inquiryYearRange(rows, nowYear);
+  const years = baseYears.includes(year) ? baseYears : [...baseYears, year].sort((a, b) => b - a);
+  const disableNext = year > nowYear || (year === nowYear && month >= nowMonth);
 
   function changeStatus(v: string) {
     setStatus(v);
     setPage(1);
   }
 
+  function changeMonth(y: number, m: number) {
+    setYear(y);
+    setMonth(m);
+    setPage(1);
+  }
+
+  function changeQuery(v: string) {
+    setQuery(v);
+    setPage(1);
+  }
+
   return (
     <div className="flex flex-col gap-4">
-      {/* 요약 칩 */}
-      <div className="flex flex-wrap gap-2">
-        <SummaryChip label="신규" value={summary.pending} tone="primary" />
-        <SummaryChip label="오늘" value={summary.today} />
-        <SummaryChip label="전체" value={summary.total} />
+      {/* 검색 + 상태 필터 + 월 네비게이터 — 한 줄 */}
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+        <input
+          type="search"
+          value={query}
+          onChange={(e) => changeQuery(e.target.value)}
+          placeholder="이름 검색"
+          className="w-full sm:w-52 py-[11px] bg-surface-card text-ink text-[15px] rounded-[14px] border border-hairline-strong px-4 outline-none focus:border-2 focus:border-primary"
+        />
+        <div className="flex flex-wrap items-center gap-2">
+          {(["전체", "신규", "완료"] as const).map((item) => {
+            const isActive = item === status;
+            return (
+              <button
+                key={item}
+                type="button"
+                aria-pressed={isActive}
+                onClick={() => changeStatus(item)}
+                className={[
+                  "rounded-full px-4 h-9 text-[14px] font-semibold inline-flex items-center gap-1.5 transition",
+                  isActive
+                    ? "bg-primary text-white"
+                    : "bg-transparent text-body border border-hairline-strong hover:bg-hairline-soft",
+                ].join(" ")}
+              >
+                <span>{item}</span>
+                <span className={isActive ? "text-white/85" : "text-muted"}>{counts[item]}</span>
+              </button>
+            );
+          })}
+        </div>
+        <div className="ml-auto">
+          {searching ? (
+            <span className="text-[13px] text-muted">전체 기간에서 검색 중</span>
+          ) : (
+            <MonthNav
+              year={year}
+              month={month}
+              years={years}
+              disableNext={disableNext}
+              onChange={changeMonth}
+            />
+          )}
+        </div>
       </div>
-
-      <FilterPills items={["전체", "신규", "완료"]} active="전체" onChange={changeStatus} />
 
       {total === 0 ? (
         <EmptyState message="조건에 맞는 상담 문의가 없습니다." />
@@ -89,20 +162,59 @@ export function ConsultTable({ rows }: { rows: InquiryView[] }) {
   );
 }
 
-function SummaryChip({ label, value, tone }: { label: string; value: number; tone?: "primary" }) {
+function MonthNav({
+  year,
+  month,
+  years,
+  disableNext,
+  onChange,
+}: {
+  year: number;
+  month: number;
+  years: number[];
+  disableNext: boolean;
+  onChange: (year: number, month: number) => void;
+}) {
+  function step(delta: number) {
+    const next = stepMonth(year, month, delta);
+    onChange(next.year, next.month);
+  }
+  const arrow =
+    "flex h-9 w-9 flex-none items-center justify-center rounded-full border border-hairline-strong text-body-strong hover:bg-hairline-soft disabled:opacity-40 disabled:cursor-not-allowed";
+
   return (
-    <div
-      className={[
-        "flex items-baseline gap-1.5 rounded-full px-4 py-2",
-        tone === "primary" ? "bg-primary-soft" : "bg-surface-strong",
-      ].join(" ")}
-    >
-      <span className={`text-[13px] font-semibold ${tone === "primary" ? "text-primary" : "text-muted"}`}>
-        {label}
-      </span>
-      <span className={`text-[16px] font-bold ${tone === "primary" ? "text-primary" : "text-ink"}`}>
-        {value}
-      </span>
+    <div className="flex items-center gap-2">
+      <button type="button" aria-label="이전 달" onClick={() => step(-1)} className={arrow}>
+        <ChevronRight size={18} className="rotate-180" />
+      </button>
+      <div className="w-32">
+        <Select
+          value={String(year)}
+          ariaLabel="년 선택"
+          options={years.map((y) => ({ value: String(y), label: `${y}년` }))}
+          onChange={(v) => onChange(Number(v), month)}
+        />
+      </div>
+      <div className="w-24">
+        <Select
+          value={String(month)}
+          ariaLabel="월 선택"
+          options={Array.from({ length: 12 }, (_, i) => ({
+            value: String(i + 1),
+            label: `${i + 1}월`,
+          }))}
+          onChange={(v) => onChange(year, Number(v))}
+        />
+      </div>
+      <button
+        type="button"
+        aria-label="다음 달"
+        onClick={() => step(1)}
+        disabled={disableNext}
+        className={arrow}
+      >
+        <ChevronRight size={18} />
+      </button>
     </div>
   );
 }
@@ -111,6 +223,19 @@ function ConsultCard({ q }: { q: InquiryView }) {
   const [done, setDone] = useState(q.status === "완료");
   const [pending, start] = useTransition();
   const [error, setError] = useState<string | null>(null);
+
+  const [memoOpen, setMemoOpen] = useState(false);
+  const [memo, setMemo] = useState(q.memo);
+  const [savedMemo, setSavedMemo] = useState(q.memo);
+  const [memoPending, startMemo] = useTransition();
+  const [memoError, setMemoError] = useState<string | null>(null);
+  const [memoClamped, setMemoClamped] = useState(false);
+  const memoRef = useRef<HTMLParagraphElement>(null);
+
+  useEffect(() => {
+    const el = memoRef.current;
+    setMemoClamped(el ? el.scrollHeight > el.clientHeight + 1 : false);
+  }, [savedMemo]);
 
   function complete() {
     setError(null);
@@ -121,33 +246,120 @@ function ConsultCard({ q }: { q: InquiryView }) {
     });
   }
 
+  function openMemo() {
+    setMemo(savedMemo);
+    setMemoError(null);
+    setMemoOpen(true);
+  }
+
+  function saveMemo() {
+    setMemoError(null);
+    startMemo(async () => {
+      const res = await updateInquiryMemo({ id: q.id, memo });
+      if (res.ok) {
+        setSavedMemo(memo);
+        setMemoOpen(false);
+      } else {
+        setMemoError(res.error);
+      }
+    });
+  }
+
   return (
-    <Card padding={20}>
-      <div className="flex items-center gap-2 flex-wrap">
-        <span className="text-[16px] font-bold text-ink">{q.name}</span>
-        <span className="text-muted text-[14px]">{q.phone}</span>
-        <span className="text-[12px] font-semibold text-primary bg-primary-soft rounded-full px-2.5 py-1">
-          {q.interest}
-        </span>
-        <span className="ml-auto">
-          <Badge tone={done ? "success" : "solid"}>{done ? "완료" : "신규"}</Badge>
-        </span>
-      </div>
-      <p className="mt-3 text-body text-[15px] leading-[1.6] whitespace-pre-wrap">{q.message}</p>
-      <div className="mt-3 flex items-center gap-2">
-        <span className="text-muted-soft text-[13px] mr-auto">{q.date}</span>
-        {error && <span className="text-error text-[13px]">{error}</span>}
-        <a href={`tel:${q.phone.replace(/[^0-9]/g, "")}`}>
-          <Button size="sm" leftIcon={<Phone size={15} />}>
-            전화 상담
-          </Button>
-        </a>
-        {!done && (
-          <Button size="sm" variant="outline" onClick={complete} disabled={pending}>
-            {pending ? "처리 중…" : "완료 처리"}
-          </Button>
+    <>
+      <Card padding={20}>
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className="text-[16px] font-bold text-ink">{q.name}</span>
+          <span className="text-muted text-[14px]">{q.phone}</span>
+          <span className="text-[12px] font-semibold text-primary bg-primary-soft rounded-full px-2.5 py-1">
+            {q.interest}
+          </span>
+          <span className="ml-auto">
+            <Badge tone={done ? "success" : "solid"}>{done ? "완료" : "신규"}</Badge>
+          </span>
+        </div>
+        <p className="mt-3 text-body text-[15px] leading-[1.6] whitespace-pre-wrap">{q.message}</p>
+        {savedMemo && (
+          <div className="mt-2 bg-canvas-soft rounded-button px-3 py-2">
+            <span className="block text-[12px] font-semibold text-body-strong mb-0.5">메모</span>
+            <p
+              ref={memoRef}
+              className="text-[13px] text-muted leading-[1.6] whitespace-pre-wrap line-clamp-2"
+            >
+              {savedMemo}
+            </p>
+            {memoClamped && (
+              <button
+                type="button"
+                onClick={openMemo}
+                className="mt-1 text-[13px] font-semibold text-primary hover:underline"
+              >
+                더보기
+              </button>
+            )}
+          </div>
         )}
-      </div>
-    </Card>
+        <div className="mt-3 flex items-center gap-2">
+          <span className="text-muted-soft text-[13px] mr-auto">{q.date}</span>
+          {error && <span className="text-error text-[13px]">{error}</span>}
+          <a href={`tel:${q.phone.replace(/[^0-9]/g, "")}`}>
+            <Button size="sm" leftIcon={<Phone size={15} />}>
+              전화 상담
+            </Button>
+          </a>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={openMemo}
+            leftIcon={
+              savedMemo ? <span className="w-1.5 h-1.5 rounded-full bg-primary" aria-hidden /> : undefined
+            }
+          >
+            메모
+          </Button>
+          {!done && (
+            <Button size="sm" variant="outline" onClick={complete} disabled={pending}>
+              {pending ? "처리 중…" : "완료 처리"}
+            </Button>
+          )}
+        </div>
+      </Card>
+
+      <Modal
+        open={memoOpen}
+        onClose={() => {
+          setMemo(savedMemo);
+          setMemoError(null);
+          setMemoOpen(false);
+        }}
+        title={`${q.name} · 상담 메모`}
+      >
+        <div className="flex flex-col gap-3">
+          <div>
+            <span className="block text-[13px] font-semibold text-body-strong mb-1">문의 내용</span>
+            <p className="text-[14px] text-body leading-[1.6] whitespace-pre-wrap">{q.message}</p>
+          </div>
+          <div>
+            <label className="block text-[13px] font-semibold text-body-strong mb-1">메모</label>
+            <textarea
+              value={memo}
+              onChange={(e) => setMemo(e.target.value)}
+              rows={5}
+              placeholder="상담 내용·처리 메모를 입력하세요"
+              className="w-full bg-surface-card text-ink text-[15px] rounded-button border border-hairline-strong px-3 py-2 outline-none focus:border-2 focus:border-primary resize-y"
+            />
+            {memoError && <p className="text-[13px] text-error mt-1">{memoError}</p>}
+            <div className="flex justify-end gap-2 mt-3">
+              <Button size="sm" variant="outline" onClick={() => setMemo(savedMemo)}>
+                되돌리기
+              </Button>
+              <Button size="sm" onClick={saveMemo} disabled={memoPending}>
+                {memoPending ? "저장 중…" : "메모 저장"}
+              </Button>
+            </div>
+          </div>
+        </div>
+      </Modal>
+    </>
   );
 }

@@ -56,6 +56,13 @@ export const inquiryStatusSchema = z.object({
 });
 export type InquiryStatusInput = z.infer<typeof inquiryStatusSchema>;
 
+// 관리자 — 상담문의 메모(admin_memo) 갱신
+export const inquiryMemoSchema = z.object({
+  id: z.number().int().positive(),
+  memo: z.string().trim().max(2000, "메모는 2000자 이내로 입력해 주세요"),
+});
+export type InquiryMemoInput = z.infer<typeof inquiryMemoSchema>;
+
 // 관리자 — 과정(course) 표시 데이터 편집
 const optStr = (max: number) => z.string().trim().max(max).optional().default("");
 const optInt = z.number().int().min(0).nullable().optional().default(null);
@@ -111,6 +118,12 @@ export const noticeCreateSchema = z.object({
   pinned: z.boolean().optional().default(false),
 });
 export type NoticeCreateInput = z.infer<typeof noticeCreateSchema>;
+
+// 관리자 — 공지 수정(작성 필드 + id)
+export const noticeUpdateSchema = noticeCreateSchema.extend({
+  id: z.number().int().positive(),
+});
+export type NoticeUpdateInput = z.infer<typeof noticeUpdateSchema>;
 
 // 이벤트 트래킹(/api/track) — 범용 기획 지표 로깅
 export const trackEventSchema = z.object({

@@ -415,6 +415,7 @@ export type Database = {
       }
       inquiry: {
         Row: {
+          admin_memo: string | null
           answer: string | null
           category: Database["public"]["Enums"]["inquiry_category"]
           content: string
@@ -429,6 +430,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          admin_memo?: string | null
           answer?: string | null
           category: Database["public"]["Enums"]["inquiry_category"]
           content: string
@@ -443,6 +445,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          admin_memo?: string | null
           answer?: string | null
           category?: Database["public"]["Enums"]["inquiry_category"]
           content?: string

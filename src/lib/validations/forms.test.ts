@@ -6,7 +6,9 @@ import {
   applicationStatusSchema,
   courseEditSchema,
   inquiryStatusSchema,
+  inquiryMemoSchema,
   noticeCreateSchema,
+  noticeUpdateSchema,
   curriculumSaveSchema,
   applyInfoSchema,
 } from "./forms";
@@ -73,6 +75,21 @@ describe("noticeCreateSchema", () => {
   });
 });
 
+describe("noticeUpdateSchema", () => {
+  it("id·제목·본문 있으면 통과", () => {
+    expect(
+      noticeUpdateSchema.safeParse({ id: 1, title: "수정 제목", body: "<p>x</p>", pinned: true })
+        .success,
+    ).toBe(true);
+  });
+  it("제목이 비면 실패", () => {
+    expect(noticeUpdateSchema.safeParse({ id: 1, title: " ", body: "<p>x</p>" }).success).toBe(false);
+  });
+  it("id가 양의 정수가 아니면 실패", () => {
+    expect(noticeUpdateSchema.safeParse({ id: 0, title: "t", body: "b" }).success).toBe(false);
+  });
+});
+
 describe("inquiryStatusSchema", () => {
   it("유효한 상태값 통과", () => {
     expect(inquiryStatusSchema.safeParse({ id: 1, status: "답변완료" }).success).toBe(true);
@@ -81,6 +98,19 @@ describe("inquiryStatusSchema", () => {
   it("정의되지 않은 상태/잘못된 id 실패", () => {
     expect(inquiryStatusSchema.safeParse({ id: 1, status: "완료" }).success).toBe(false);
     expect(inquiryStatusSchema.safeParse({ id: 0, status: "답변완료" }).success).toBe(false);
+  });
+});
+
+describe("inquiryMemoSchema", () => {
+  it("id·메모 있으면 통과", () => {
+    expect(inquiryMemoSchema.safeParse({ id: 1, memo: "전화 상담 완료" }).success).toBe(true);
+  });
+  it("빈 메모도 허용(메모 삭제)", () => {
+    expect(inquiryMemoSchema.safeParse({ id: 1, memo: "" }).success).toBe(true);
+  });
+  it("2000자 초과·잘못된 id 실패", () => {
+    expect(inquiryMemoSchema.safeParse({ id: 1, memo: "a".repeat(2001) }).success).toBe(false);
+    expect(inquiryMemoSchema.safeParse({ id: 0, memo: "x" }).success).toBe(false);
   });
 });
 
