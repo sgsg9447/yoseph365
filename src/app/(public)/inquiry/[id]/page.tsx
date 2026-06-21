@@ -177,7 +177,7 @@ export default async function InquiryDetailPage({ params }: Props) {
               marginBottom: 14,
             }}
           >
-            <Badge tone={answered ? "success" : "neutral"}>{post.status}</Badge>
+            <Badge tone={post.status === "답변완료" ? "success" : "neutral"}>{post.status}</Badge>
             <Badge tone="neutral">{CAT_MAP[post.category] ?? post.category}</Badge>
           </div>
           <h1

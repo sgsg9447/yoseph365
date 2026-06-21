@@ -2,7 +2,7 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi } from "vitest";
 import { ConsultSheet } from "./ConsultSheet";
-import { submitConsult, submitInquiryPost } from "@/lib/actions/submit";
+import { submitInquiryPost } from "@/lib/actions/submit";
 
 // 서버 액션·Supabase 클라이언트는 테스트 환경에서 모킹
 vi.mock("@/lib/actions/submit", () => ({
