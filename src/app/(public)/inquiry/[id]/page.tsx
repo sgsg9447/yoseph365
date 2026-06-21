@@ -3,16 +3,15 @@
 
 import type { Metadata } from "next";
 import Link from "next/link";
-import {
-  getInquiryById,
-  getAdjacentInquiries,
-  type Inquiry,
-} from "@/lib/data/inquiries";
+import { fetchPublicInquiry } from "@/lib/queries/inquiry";
+import { SecretReveal } from "./SecretReveal";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Message, ChevronRight, Clock } from "@/components/icons";
 import { PHONE_MAIN } from "@/lib/data/site";
 import { InquiryWriteButton } from "./InquiryWriteButton";
+
+export const dynamic = "force-dynamic";
 
 // Next 16: params is a Promise
 interface Props {
@@ -21,13 +20,15 @@ interface Props {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
-  const post = getInquiryById(Number(id));
+  const post = await fetchPublicInquiry(Number(id)).catch(() => null);
   return {
     title: post
       ? `${post.title} — 상담문의 — 성요셉목수학교`
       : "상담문의 — 성요셉목수학교",
   };
 }
+
+const CAT_MAP: Record<string, string> = { 국비지원: "국비지원", 과정문의: "과정 문의", 기타: "기타" };
 
 // ── 본문 단락 분리 ────────────────────────────────────────────────────────────
 
@@ -57,90 +58,6 @@ function Paragraphs({
         </p>
       ))}
     </>
-  );
-}
-
-// ── 이전/다음 글 행 ───────────────────────────────────────────────────────────
-
-function NavRow({ dir, post }: { dir: "prev" | "next"; post: Inquiry | null }) {
-  const label = dir === "prev" ? "이전글" : "다음글";
-  if (!post) {
-    return (
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "64px 1fr",
-          alignItems: "center",
-          gap: 16,
-          padding: "16px 4px",
-          borderBottom: "1px solid var(--color-hairline)",
-        }}
-      >
-        <span
-          style={{
-            fontSize: 13.5,
-            fontWeight: 700,
-            color: "var(--color-muted-soft)",
-          }}
-        >
-          {label}
-        </span>
-        <span style={{ fontSize: 15, color: "var(--color-muted-soft)" }}>
-          {dir === "prev" ? "이전 글이 없습니다" : "다음 글이 없습니다"}
-        </span>
-      </div>
-    );
-  }
-  return (
-    <Link
-      href={`/inquiry/${post.id}`}
-      className="board-link"
-      style={{
-        display: "grid",
-        gridTemplateColumns: "64px 1fr auto",
-        alignItems: "center",
-        gap: 16,
-        padding: "16px 4px",
-        borderBottom: "1px solid var(--color-hairline)",
-        textDecoration: "none",
-        color: "inherit",
-      }}
-    >
-      <span
-        style={{
-          fontSize: 13.5,
-          fontWeight: 700,
-          color: "var(--color-body-strong)",
-        }}
-      >
-        {label}
-      </span>
-      <span
-        className="board-title"
-        style={{
-          fontSize: 15.5,
-          fontWeight: 600,
-          color: "var(--color-ink)",
-          lineHeight: 1.5,
-          wordBreak: "keep-all",
-          overflow: "hidden",
-          textOverflow: "ellipsis",
-          whiteSpace: "nowrap",
-        }}
-      >
-        {post.title}
-      </span>
-      <span
-        style={{
-          fontSize: 13.5,
-          color: "var(--color-muted)",
-          fontVariantNumeric: "tabular-nums",
-          whiteSpace: "nowrap",
-        }}
-      >
-        {post.date}
-      </span>
-    </Link>
   );
 }
 
@@ -176,7 +93,7 @@ function MetaItem({ label, value }: { label: string; value: string | number }) {
 
 export default async function InquiryDetailPage({ params }: Props) {
   const { id } = await params;
-  const post = getInquiryById(Number(id));
+  const post = await fetchPublicInquiry(Number(id)).catch(() => null);
 
   if (!post) {
     return (
@@ -196,7 +113,6 @@ export default async function InquiryDetailPage({ params }: Props) {
     );
   }
 
-  const { prev, next } = getAdjacentInquiries(post.id);
   const answered = !!post.answer;
 
   return (
@@ -262,7 +178,7 @@ export default async function InquiryDetailPage({ params }: Props) {
             }}
           >
             <Badge tone={answered ? "success" : "neutral"}>{post.status}</Badge>
-            <Badge tone="neutral">{post.cat}</Badge>
+            <Badge tone="neutral">{CAT_MAP[post.category] ?? post.category}</Badge>
           </div>
           <h1
             style={{
@@ -286,150 +202,150 @@ export default async function InquiryDetailPage({ params }: Props) {
               gap: "6px 20px",
             }}
           >
-            <MetaItem label="작성자" value={post.author} />
-            <MetaItem label="작성일" value={post.date} />
-            <MetaItem label="조회" value={post.views} />
+            <MetaItem label="작성자" value={post.authorMasked} />
+            <MetaItem label="작성일" value={post.createdAt.slice(0, 10)} />
           </div>
         </div>
 
-        {/* 문의 본문 */}
-        <div
-          style={{
-            padding: "32px 4px 36px",
-            borderBottom: "1px solid var(--color-hairline)",
-          }}
-        >
-          <Paragraphs text={post.body} color="var(--color-body)" size={17} />
-        </div>
-
-        {/* 답변 */}
-        {answered ? (
-          <div
-            style={{
-              marginTop: 28,
-              background: "var(--color-primary-soft)",
-              border: "1px solid var(--color-primary-border)",
-              borderRadius: 18,
-              padding: "clamp(22px, 3.5vw, 32px)",
-            }}
-          >
+        {/* 본문 / 비밀글 */}
+        {post.isSecret ? (
+          <SecretReveal id={post.id} />
+        ) : (
+          <>
+            {/* 문의 본문 */}
             <div
               style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 11,
-                marginBottom: 16,
+                padding: "32px 4px 36px",
+                borderBottom: "1px solid var(--color-hairline)",
               }}
             >
-              <span
-                style={{
-                  width: 38,
-                  height: 38,
-                  flex: "0 0 auto",
-                  display: "grid",
-                  placeItems: "center",
-                  borderRadius: 10,
-                  background: "var(--color-primary)",
-                  color: "#fff",
-                  fontFamily: "var(--font-display)",
-                  fontSize: 17,
-                  fontWeight: 800,
-                }}
-              >
-                A
-              </span>
-              <span style={{ display: "flex", flexDirection: "column", gap: 2 }}>
-                <span
-                  style={{
-                    fontSize: 16,
-                    fontWeight: 700,
-                    color: "var(--color-ink)",
-                    letterSpacing: "-0.3px",
-                  }}
-                >
-                  성요셉목수학교 답변
-                </span>
-                <span style={{ fontSize: 13, color: "var(--color-muted)" }}>
-                  교육상담팀 · 1영업일 내 답변
-                </span>
-              </span>
+              <Paragraphs text={post.content ?? ""} color="var(--color-body)" size={17} />
             </div>
-            <Paragraphs
-              text={post.answer!}
-              color="var(--color-body-strong)"
-              size={16.5}
-            />
-          </div>
-        ) : (
-          <div
-            style={{
-              marginTop: 28,
-              background: "var(--color-surface-strong)",
-              border: "1px solid var(--color-hairline)",
-              borderRadius: 18,
-              padding: "clamp(22px, 3.5vw, 30px)",
-            }}
-          >
-            <div
-              style={{ display: "flex", alignItems: "flex-start", gap: 12 }}
-            >
-              <span
+
+            {/* 답변 */}
+            {answered ? (
+              <div
                 style={{
-                  width: 38,
-                  height: 38,
-                  flex: "0 0 auto",
-                  display: "grid",
-                  placeItems: "center",
-                  borderRadius: 10,
-                  background: "var(--color-surface-card)",
-                  border: "1px solid var(--color-hairline)",
-                  color: "var(--color-muted)",
+                  marginTop: 28,
+                  background: "var(--color-primary-soft)",
+                  border: "1px solid var(--color-primary-border)",
+                  borderRadius: 18,
+                  padding: "clamp(22px, 3.5vw, 32px)",
                 }}
               >
-                <Clock size={19} strokeWidth={2.1} />
-              </span>
-              <span style={{ display: "flex", flexDirection: "column", gap: 5 }}>
-                <span
+                <div
                   style={{
-                    fontSize: 16,
-                    fontWeight: 700,
-                    color: "var(--color-ink)",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 11,
+                    marginBottom: 16,
                   }}
                 >
-                  답변을 준비하고 있습니다
-                </span>
-                <span
-                  style={{
-                    fontSize: 14.5,
-                    color: "var(--color-muted)",
-                    lineHeight: 1.65,
-                    wordBreak: "keep-all",
-                  }}
-                >
-                  남겨주신 문의는 확인 후 전화 또는 게시판으로
-                  답변드립니다. 급하시면{" "}
-                  <a
-                    href={"tel:" + PHONE_MAIN}
+                  <span
                     style={{
-                      color: "var(--color-primary)",
-                      fontWeight: 700,
-                      textDecoration: "none",
+                      width: 38,
+                      height: 38,
+                      flex: "0 0 auto",
+                      display: "grid",
+                      placeItems: "center",
+                      borderRadius: 10,
+                      background: "var(--color-primary)",
+                      color: "#fff",
+                      fontFamily: "var(--font-display)",
+                      fontSize: 17,
+                      fontWeight: 800,
                     }}
                   >
-                    {PHONE_MAIN}
-                  </a>{" "}
-                  으로 전화 주세요.
-                </span>
-              </span>
-            </div>
-          </div>
+                    A
+                  </span>
+                  <span style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                    <span
+                      style={{
+                        fontSize: 16,
+                        fontWeight: 700,
+                        color: "var(--color-ink)",
+                        letterSpacing: "-0.3px",
+                      }}
+                    >
+                      성요셉목수학교 답변
+                    </span>
+                    <span style={{ fontSize: 13, color: "var(--color-muted)" }}>
+                      교육상담팀 · 1영업일 내 답변
+                    </span>
+                  </span>
+                </div>
+                <Paragraphs
+                  text={post.answer!}
+                  color="var(--color-body-strong)"
+                  size={16.5}
+                />
+              </div>
+            ) : (
+              <div
+                style={{
+                  marginTop: 28,
+                  background: "var(--color-surface-strong)",
+                  border: "1px solid var(--color-hairline)",
+                  borderRadius: 18,
+                  padding: "clamp(22px, 3.5vw, 30px)",
+                }}
+              >
+                <div
+                  style={{ display: "flex", alignItems: "flex-start", gap: 12 }}
+                >
+                  <span
+                    style={{
+                      width: 38,
+                      height: 38,
+                      flex: "0 0 auto",
+                      display: "grid",
+                      placeItems: "center",
+                      borderRadius: 10,
+                      background: "var(--color-surface-card)",
+                      border: "1px solid var(--color-hairline)",
+                      color: "var(--color-muted)",
+                    }}
+                  >
+                    <Clock size={19} strokeWidth={2.1} />
+                  </span>
+                  <span style={{ display: "flex", flexDirection: "column", gap: 5 }}>
+                    <span
+                      style={{
+                        fontSize: 16,
+                        fontWeight: 700,
+                        color: "var(--color-ink)",
+                      }}
+                    >
+                      답변을 준비하고 있습니다
+                    </span>
+                    <span
+                      style={{
+                        fontSize: 14.5,
+                        color: "var(--color-muted)",
+                        lineHeight: 1.65,
+                        wordBreak: "keep-all",
+                      }}
+                    >
+                      남겨주신 문의는 확인 후 전화 또는 게시판으로
+                      답변드립니다. 급하시면{" "}
+                      <a
+                        href={"tel:" + PHONE_MAIN}
+                        style={{
+                          color: "var(--color-primary)",
+                          fontWeight: 700,
+                          textDecoration: "none",
+                        }}
+                      >
+                        {PHONE_MAIN}
+                      </a>{" "}
+                      으로 전화 주세요.
+                    </span>
+                  </span>
+                </div>
+              </div>
+            )}
+          </>
         )}
-
-        {/* 이전 · 다음 글 */}
-        <div style={{ marginTop: 40, borderTop: "1px solid var(--color-hairline-strong)" }}>
-          <NavRow dir="prev" post={prev} />
-          <NavRow dir="next" post={next} />
-        </div>
 
         {/* 하단 액션 */}
         <div
