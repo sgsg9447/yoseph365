@@ -35,6 +35,39 @@ export const consultSchema = z.object({
 });
 export type ConsultInput = z.infer<typeof consultSchema>;
 
+const pin4 = z.string().trim().regex(/^[0-9]{4}$/, "비밀번호는 숫자 4자리로 입력해 주세요");
+
+// 게시판 글쓰기(공개 문의글) — 비밀글이면 PIN 필수
+export const inquiryPostSchema = z
+  .object({
+    name: z.string().trim().min(1, "이름을 입력해 주세요").max(50),
+    phone,
+    category: z.enum(["국비지원", "과정문의", "기타"]),
+    courseId: optText(80),
+    title: z.string().trim().min(1, "제목을 입력해 주세요").max(200),
+    content: z.string().trim().min(1, "문의 내용을 입력해 주세요").max(1000),
+    email: optEmail,
+    isSecret: z.boolean().optional().default(false),
+    password: z.string().trim().optional().default(""),
+  })
+  .superRefine((v, ctx) => {
+    if (v.isSecret && !/^[0-9]{4}$/.test(v.password)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["password"],
+        message: "비밀글 비밀번호는 숫자 4자리로 입력해 주세요",
+      });
+    }
+  });
+export type InquiryPostInput = z.infer<typeof inquiryPostSchema>;
+
+// 비밀글 열람 검증
+export const verifySecretSchema = z.object({
+  id: z.number().int().positive(),
+  password: pin4,
+});
+export type VerifySecretInput = z.infer<typeof verifySecretSchema>;
+
 // 관리자 — 수강신청 메모(admin_memo) 갱신
 export const applicationMemoSchema = z.object({
   id: z.number().int().positive(),

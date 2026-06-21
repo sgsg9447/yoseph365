@@ -12,6 +12,8 @@ import {
   curriculumSaveSchema,
   applyInfoSchema,
   trainingPhotoAddSchema,
+  inquiryPostSchema,
+  verifySecretSchema,
 } from "./forms";
 
 describe("applyInfoSchema", () => {
@@ -247,5 +249,59 @@ describe("trainingPhotoAddSchema", () => {
   it("50장 초과는 거부", () => {
     const photos = Array.from({ length: 51 }, (_, i) => ({ key: `${i}.jpg`, label: "" }));
     expect(trainingPhotoAddSchema.safeParse({ photos }).success).toBe(false);
+  });
+});
+
+describe("inquiryPostSchema", () => {
+  const base = {
+    name: "홍길동",
+    phone: "010-1234-5678",
+    category: "과정문의",
+    courseId: "",
+    title: "수업 시간이 궁금합니다",
+    content: "오후반도 있나요?",
+    email: "",
+    isSecret: false,
+    password: "",
+  };
+
+  it("기본 공개글을 통과시킨다", () => {
+    expect(inquiryPostSchema.safeParse(base).success).toBe(true);
+  });
+
+  it("제목이 비면 거부한다", () => {
+    expect(inquiryPostSchema.safeParse({ ...base, title: "" }).success).toBe(false);
+  });
+
+  it("본문이 비면 거부한다", () => {
+    expect(inquiryPostSchema.safeParse({ ...base, content: "" }).success).toBe(false);
+  });
+
+  it("비밀글이면 4자리 숫자 PIN을 요구한다", () => {
+    expect(
+      inquiryPostSchema.safeParse({ ...base, isSecret: true, password: "" }).success,
+    ).toBe(false);
+    expect(
+      inquiryPostSchema.safeParse({ ...base, isSecret: true, password: "12" }).success,
+    ).toBe(false);
+    expect(
+      inquiryPostSchema.safeParse({ ...base, isSecret: true, password: "abcd" }).success,
+    ).toBe(false);
+    expect(
+      inquiryPostSchema.safeParse({ ...base, isSecret: true, password: "1234" }).success,
+    ).toBe(true);
+  });
+
+  it("잘못된 카테고리를 거부한다", () => {
+    expect(inquiryPostSchema.safeParse({ ...base, category: "엉뚱" }).success).toBe(false);
+  });
+});
+
+describe("verifySecretSchema", () => {
+  it("숫자 4자리만 통과시킨다", () => {
+    expect(verifySecretSchema.safeParse({ id: 1, password: "1234" }).success).toBe(true);
+    expect(verifySecretSchema.safeParse({ id: 1, password: "12" }).success).toBe(false);
+    expect(verifySecretSchema.safeParse({ id: 1, password: "abcd" }).success).toBe(false);
+    expect(verifySecretSchema.safeParse({ id: 0, password: "1234" }).success).toBe(false);
   });
 });
