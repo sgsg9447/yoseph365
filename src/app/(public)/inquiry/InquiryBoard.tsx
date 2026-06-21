@@ -5,23 +5,31 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Phone } from "@/components/icons";
+import { Phone, Lock } from "@/components/icons";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { useConsult } from "@/components/layout/SiteShell";
-import { INQUIRY_POSTS } from "@/lib/data/inquiries";
+import type { PublicInquiryListItem } from "@/lib/queries/inquiry";
 import { PHONE_MAIN } from "@/lib/data/site";
 
 const CATS = ["전체", "국비지원", "과정 문의", "기타"] as const;
 
-export function InquiryBoard() {
+const CAT_MAP: Record<string, string> = { 국비지원: "국비지원", 과정문의: "과정 문의", 기타: "기타" };
+
+export function InquiryBoard({
+  posts,
+  loadError,
+}: {
+  posts: PublicInquiryListItem[];
+  loadError: boolean;
+}) {
   const [cat, setCat] = useState<string>("전체");
   const [q, setQ] = useState("");
   const { openConsult } = useConsult();
 
-  const list = INQUIRY_POSTS.filter(
+  const list = posts.filter(
     (p) =>
-      (cat === "전체" || p.cat === cat) &&
+      (cat === "전체" || CAT_MAP[p.category] === cat) &&
       (!q || p.title.includes(q)),
   );
 
@@ -168,7 +176,22 @@ export function InquiryBoard() {
           </span>
         </div>
 
-        {list.map((p) => (
+        {loadError ? (
+          <div style={{ padding: "40px 0", textAlign: "center" }}>
+            <p style={{ fontSize: 15, color: "var(--color-muted)", margin: "0 0 12px" }}>
+              목록을 불러오지 못했습니다.
+            </p>
+            <a href={"tel:" + PHONE_MAIN} style={{ color: "var(--color-primary)", fontWeight: 700 }}>
+              전화 문의 {PHONE_MAIN}
+            </a>
+          </div>
+        ) : list.length === 0 ? (
+          <p style={{ padding: "40px 0", textAlign: "center", fontSize: 15, color: "var(--color-muted)", margin: 0 }}>
+            {posts.length === 0 ? "아직 등록된 문의가 없습니다. 첫 문의를 남겨보세요." : "검색 결과가 없습니다."}
+          </p>
+        ) : null}
+
+        {!loadError && list.map((p) => (
           <Link
             key={p.id}
             href={`/inquiry/${p.id}`}
@@ -189,6 +212,9 @@ export function InquiryBoard() {
               >
                 {p.status}
               </Badge>
+              {p.isSecret && (
+                <Lock size={14} strokeWidth={2.2} className="flex-shrink-0 text-muted" aria-label="비밀글" />
+              )}
               <span
                 className="board-title"
                 style={{
@@ -206,7 +232,7 @@ export function InquiryBoard() {
               className="board-cat"
               style={{ fontSize: 14, color: "var(--color-muted)" }}
             >
-              {p.cat}
+              {CAT_MAP[p.category] ?? p.category}
             </span>
             <span
               style={{
@@ -215,24 +241,10 @@ export function InquiryBoard() {
                 fontVariantNumeric: "tabular-nums",
               }}
             >
-              {p.date}
+              {p.createdAt.slice(0, 10)}
             </span>
           </Link>
         ))}
-
-        {list.length === 0 && (
-          <p
-            style={{
-              padding: "40px 0",
-              textAlign: "center",
-              fontSize: 15,
-              color: "var(--color-muted)",
-              margin: 0,
-            }}
-          >
-            검색 결과가 없습니다.
-          </p>
-        )}
       </div>
 
       {/* 문의 남기기 */}
