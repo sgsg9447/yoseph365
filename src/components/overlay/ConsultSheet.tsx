@@ -9,6 +9,7 @@ import { Phone, Check } from "@/components/icons";
 import { PHONE_MAIN } from "@/lib/data/site";
 import { createClient } from "@/lib/supabase/client";
 import { submitConsult } from "@/lib/actions/submit";
+import { InquiryPostForm } from "./InquiryPostForm";
 import { formatPhoneInput } from "@/lib/formatters/input";
 
 const PHONE = PHONE_MAIN;
@@ -270,11 +271,14 @@ export function ConsultSheet({ open, onClose, mode }: ConsultSheetProps) {
             <Check size={28} strokeWidth={2.6} />
           </span>
           <p className="text-[17px] text-body leading-[1.7] mb-[22px] break-keep">
-            상담이 접수되었어요. 담당 선생님이 1영업일 안에 전화드려
-            국비지원 자격과 과정을 안내해 드립니다.
+            {isInquiry
+              ? "문의가 등록되었어요. 작성하신 내용은 게시판에서 확인하실 수 있고, 관리자가 1영업일 안에 답변드립니다."
+              : "상담이 접수되었어요. 담당 선생님이 1영업일 안에 전화드려 국비지원 자격과 과정을 안내해 드립니다."}
           </p>
           <Button variant="primary" size="lg" fullWidth onClick={handleClose}>확인</Button>
         </div>
+      ) : isInquiry ? (
+        <InquiryPostForm onDone={() => setDone(true)} />
       ) : (
         <ConsultForm onDone={() => setDone(true)} submitLabel={submitLabel} />
       )}
