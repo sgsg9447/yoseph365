@@ -165,6 +165,10 @@ describe("toInquiryView", () => {
     content: "문의합니다", status: "답변대기" as const,
     created_at: "2026-06-17T05:00:00Z",
     admin_memo: "상담 메모",
+    title: null,
+    is_public_post: false,
+    is_secret: false,
+    is_published: true,
   };
 
   it("관리자용 — 이름·연락처를 마스킹하지 않고 그대로 노출", () => {
@@ -189,9 +193,9 @@ describe("toInquiryView", () => {
 
 describe("filterInquiries", () => {
   const rows: InquiryView[] = [
-    { id: 1, name: "A", phone: "p", interest: "x", message: "m", date: "d", status: "신규", memo: "" },
-    { id: 2, name: "B", phone: "p", interest: "x", message: "m", date: "d", status: "완료", memo: "" },
-    { id: 3, name: "C", phone: "p", interest: "x", message: "m", date: "d", status: "신규", memo: "" },
+    { id: 1, name: "A", phone: "p", interest: "x", message: "m", date: "d", status: "신규", memo: "", title: null, isPublicPost: false, isSecret: false, isPublished: true },
+    { id: 2, name: "B", phone: "p", interest: "x", message: "m", date: "d", status: "완료", memo: "", title: null, isPublicPost: false, isSecret: false, isPublished: true },
+    { id: 3, name: "C", phone: "p", interest: "x", message: "m", date: "d", status: "신규", memo: "", title: null, isPublicPost: false, isSecret: false, isPublished: true },
   ];
   it("전체는 모두", () => {
     expect(filterInquiries(rows, "전체")).toHaveLength(3);

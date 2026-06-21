@@ -49,6 +49,10 @@ export interface InquiryView {
   date: string;
   status: "신규" | "완료";
   memo: string;
+  title: string | null;
+  isPublicPost: boolean;
+  isSecret: boolean;
+  isPublished: boolean;
 }
 
 /** ISO → "YYYY.MM.DD" (Asia/Seoul 기준) */
@@ -102,7 +106,18 @@ export function inquiryStatusLabel(s: InquiryRow["status"]): "신규" | "완료"
 export function toInquiryView(
   r: Pick<
     InquiryRow,
-    "id" | "name" | "phone" | "category" | "content" | "status" | "created_at" | "admin_memo"
+    | "id"
+    | "name"
+    | "phone"
+    | "category"
+    | "content"
+    | "status"
+    | "created_at"
+    | "admin_memo"
+    | "title"
+    | "is_public_post"
+    | "is_secret"
+    | "is_published"
   >,
   courseName?: string | null,
 ): InquiryView {
@@ -116,6 +131,10 @@ export function toInquiryView(
     date: fmtDate(r.created_at),
     status: inquiryStatusLabel(r.status),
     memo: r.admin_memo ?? "",
+    title: r.title,
+    isPublicPost: r.is_public_post,
+    isSecret: r.is_secret,
+    isPublished: r.is_published,
   };
 }
 
@@ -142,7 +161,7 @@ export async function getInquiries(): Promise<InquiryView[]> {
   const [inquiryRes, courses] = await Promise.all([
     supabase
       .from("inquiry")
-      .select("id,name,phone,category,course_id,content,status,created_at,admin_memo")
+      .select("id,name,phone,category,course_id,content,status,created_at,admin_memo,title,is_public_post,is_secret,is_published")
       .order("created_at", { ascending: false }),
     getAdminCourses(),
   ]);

@@ -37,3 +37,12 @@ export async function updateInquiryMemo(input: unknown): Promise<InquiryResult> 
   revalidatePath("/admin/consult");
   return { ok: true };
 }
+
+/** 공개 게시판 글 숨김/공개 토글 — 관리자(authenticated)만. */
+export async function updateInquiryPublished(id: number, published: boolean): Promise<InquiryResult> {
+  const sb = await createClient();
+  const { error } = await sb.from("inquiry").update({ is_published: published }).eq("id", id);
+  if (error) return { ok: false as const, error: "변경에 실패했습니다." };
+  revalidatePath("/admin/consult");
+  return { ok: true as const };
+}

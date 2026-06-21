@@ -16,9 +16,9 @@ import { Modal } from "@/components/ui/Modal";
 import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
-import { Phone, ChevronRight } from "@/components/icons";
+import { Phone, ChevronRight, Lock } from "@/components/icons";
 import { EmptyState } from "@/components/admin/EmptyState";
-import { updateInquiryStatus, updateInquiryMemo } from "./actions";
+import { updateInquiryStatus, updateInquiryMemo, updateInquiryPublished } from "./actions";
 
 const PER_PAGE = 10;
 
@@ -274,6 +274,14 @@ function ConsultCard({ q }: { q: InquiryView }) {
           <span className="text-[12px] font-semibold text-primary bg-primary-soft rounded-full px-2.5 py-1">
             {q.interest}
           </span>
+          {q.isPublicPost && (
+            <span className="inline-flex items-center gap-1">
+              {q.isSecret && <Lock size={13} strokeWidth={2.2} className="text-muted" aria-label="비밀글" />}
+              <Badge tone="neutral">
+                {q.isPublished ? "게시판" : "숨김"}
+              </Badge>
+            </span>
+          )}
           <span className="ml-auto">
             <Badge tone={done ? "success" : "solid"}>{done ? "완료" : "신규"}</Badge>
           </span>
@@ -320,6 +328,19 @@ function ConsultCard({ q }: { q: InquiryView }) {
           {!done && (
             <Button size="sm" variant="outline" onClick={complete} disabled={pending}>
               {pending ? "처리 중…" : "완료 처리"}
+            </Button>
+          )}
+          {q.isPublicPost && (
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() =>
+                start(async () => {
+                  await updateInquiryPublished(q.id, !q.isPublished);
+                })
+              }
+            >
+              {q.isPublished ? "게시판에서 숨기기" : "다시 공개"}
             </Button>
           )}
         </div>
