@@ -1,10 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { Field, ReqLabel } from "@/components/ui/Field";
 import { Lock } from "@/components/icons";
-import { createClient } from "@/lib/supabase/client";
 import { submitInquiryPost } from "@/lib/actions/submit";
 import { formatPhoneInput } from "@/lib/formatters/input";
 
@@ -19,31 +18,15 @@ export function InquiryPostForm({ onDone }: { onDone: () => void }) {
   const [email, setEmail] = useState("");
   const [isSecret, setIsSecret] = useState(false);
   const [password, setPassword] = useState("");
-  const [courseId, setCourseId] = useState("");
-  const [courses, setCourses] = useState<{ id: string; name: string }[]>([]);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    const sb = createClient();
-    sb.from("course")
-      .select("id, name")
-      .eq("is_deleted", false)
-      .order("sort_order")
-      .then(({ data }) => setCourses(data ?? []));
-  }, []);
-
-  // courseId is fetched but not exposed in the form UI per design — reserved for future use
-  void courses;
-  void courseId;
-  void setCourseId;
 
   const handleSubmit = async () => {
     if (pending) return;
     setError(null);
     setPending(true);
     const res = await submitInquiryPost({
-      name, phone, category, courseId, title, content, email, isSecret, password,
+      name, phone, category, courseId: "", title, content, email, isSecret, password,
     });
     setPending(false);
     if (res.ok) onDone();
