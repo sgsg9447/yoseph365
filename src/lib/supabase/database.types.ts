@@ -422,7 +422,11 @@ export type Database = {
           course_id: string | null
           created_at: string
           id: number
+          is_public_post: boolean
+          is_published: boolean
+          is_secret: boolean
           name: string
+          password_hash: string | null
           phone: string
           privacy_agreed: boolean
           status: Database["public"]["Enums"]["inquiry_status"]
@@ -437,7 +441,11 @@ export type Database = {
           course_id?: string | null
           created_at?: string
           id?: never
+          is_public_post?: boolean
+          is_published?: boolean
+          is_secret?: boolean
           name: string
+          password_hash?: string | null
           phone: string
           privacy_agreed?: boolean
           status?: Database["public"]["Enums"]["inquiry_status"]
@@ -452,7 +460,11 @@ export type Database = {
           course_id?: string | null
           created_at?: string
           id?: never
+          is_public_post?: boolean
+          is_published?: boolean
+          is_secret?: boolean
           name?: string
+          password_hash?: string | null
           phone?: string
           privacy_agreed?: boolean
           status?: Database["public"]["Enums"]["inquiry_status"]
@@ -679,7 +691,43 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      submit_public_inquiry: {
+        Args: {
+          p_name: string; p_phone: string;
+          p_category: Database["public"]["Enums"]["inquiry_category"];
+          p_course_id: string; p_title: string; p_content: string;
+          p_is_secret: boolean; p_password: string;
+        };
+        Returns: number;
+      };
+      list_public_inquiries: {
+        Args: Record<PropertyKey, never>;
+        Returns: {
+          id: number; title: string;
+          category: Database["public"]["Enums"]["inquiry_category"];
+          status: Database["public"]["Enums"]["inquiry_status"];
+          is_secret: boolean; author_masked: string; created_at: string;
+        }[];
+      };
+      get_public_inquiry: {
+        Args: { p_id: number };
+        Returns: {
+          id: number; title: string;
+          category: Database["public"]["Enums"]["inquiry_category"];
+          status: Database["public"]["Enums"]["inquiry_status"];
+          is_secret: boolean; author_masked: string;
+          content: string | null; answer: string | null; created_at: string;
+        }[];
+      };
+      verify_secret_inquiry: {
+        Args: { p_id: number; p_password: string };
+        Returns: {
+          id: number; title: string;
+          category: Database["public"]["Enums"]["inquiry_category"];
+          status: Database["public"]["Enums"]["inquiry_status"];
+          author_masked: string; content: string; answer: string | null; created_at: string;
+        }[];
+      };
     }
     Enums: {
       application_status: "신규" | "상담중" | "등록확인" | "보류"
