@@ -21,7 +21,7 @@ create or replace function submit_public_inquiry(
 ) returns bigint
 language plpgsql
 security definer
-set search_path = public
+set search_path = public, extensions
 as $$
 declare
   v_id bigint;
@@ -52,7 +52,7 @@ returns table (
 )
 language sql
 security definer
-set search_path = public
+set search_path = public, extensions
 as $$
   select i.id, i.title, i.category, i.status, i.is_secret,
          left(i.name, 1) || repeat('*', greatest(char_length(i.name) - 1, 0)),
@@ -70,7 +70,7 @@ returns table (
 )
 language sql
 security definer
-set search_path = public
+set search_path = public, extensions
 as $$
   select i.id, i.title, i.category, i.status, i.is_secret,
          left(i.name, 1) || repeat('*', greatest(char_length(i.name) - 1, 0)),
@@ -89,7 +89,7 @@ returns table (
 )
 language sql
 security definer
-set search_path = public
+set search_path = public, extensions
 as $$
   select i.id, i.title, i.category, i.status,
          left(i.name, 1) || repeat('*', greatest(char_length(i.name) - 1, 0)),
