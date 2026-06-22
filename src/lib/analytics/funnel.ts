@@ -1,3 +1,9 @@
+/**
+ * 전환율(%)을 표시할 최소 조회 표본. 이보다 조회가 적으면 신청 1건에 %가 크게 출렁여
+ * 수치가 오해를 부르므로, 전환율 대신 "표본 적음"으로 처리한다.
+ */
+export const MIN_VIEWS_FOR_RATE = 100;
+
 export interface CourseFunnelView {
   id: string;
   name: string;
@@ -7,6 +13,8 @@ export interface CourseFunnelView {
   applies: number;
   /** 전환율(%) = 신청/조회 */
   conversionPct: number;
+  /** 전환율을 믿을 만한 표본(조회 ≥ MIN_VIEWS_FOR_RATE)인지 */
+  rateReliable: boolean;
 }
 
 /** 전환율(%). 조회 0이면 0. */
@@ -34,7 +42,14 @@ export function toCourseFunnel(
     .map((c) => {
       const views = viewsById[c.id] ?? 0;
       const applies = appliesByName[c.name] ?? 0;
-      return { id: c.id, name: c.name, views, applies, conversionPct: conversionRate(applies, views) };
+      return {
+        id: c.id,
+        name: c.name,
+        views,
+        applies,
+        conversionPct: conversionRate(applies, views),
+        rateReliable: views >= MIN_VIEWS_FOR_RATE,
+      };
     })
     .sort((a, b) => b.views - a.views);
 }

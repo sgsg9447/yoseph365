@@ -45,4 +45,10 @@ describe("toCourseFunnel", () => {
     const f = toCourseFunnel(courses, { a: 10, b: 80 }, {});
     expect(f.map((x) => x.id)).toEqual(["b", "a"]);
   });
+
+  it("조회 표본이 임계 이상일 때만 전환율을 신뢰(rateReliable)", () => {
+    const f = toCourseFunnel(courses, { a: 100, b: 50 }, {});
+    expect(f.find((x) => x.id === "a")!.rateReliable).toBe(true); // 100건 → 신뢰
+    expect(f.find((x) => x.id === "b")!.rateReliable).toBe(false); // 50건 → 표본 적음
+  });
 });

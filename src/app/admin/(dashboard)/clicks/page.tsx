@@ -23,9 +23,15 @@ export default async function ClicksPage() {
                 <div key={course.id}>
                   <div className="flex items-baseline justify-between mb-1">
                     <p className="text-[15px] font-semibold text-ink">{course.name}</p>
-                    <p className="text-[13px] text-muted">
-                      전환 <strong className="text-primary">{course.conversionPct}%</strong>
-                    </p>
+                    {course.rateReliable ? (
+                      <p className="text-[13px] text-muted">
+                        전환 <strong className="text-primary">{course.conversionPct}%</strong>
+                      </p>
+                    ) : (
+                      <p className="text-[13px] text-muted-soft" title="조회 표본이 적어 전환율은 오차가 큽니다">
+                        표본 적음
+                      </p>
+                    )}
                   </div>
                   <p className="text-[14px] text-muted mb-2">
                     <strong>{course.views.toLocaleString()}</strong>회 조회 · 신청 {course.applies}건
