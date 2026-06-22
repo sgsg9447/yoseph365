@@ -4,10 +4,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { fetchPublicInquiry } from "@/lib/queries/inquiry";
+import { sanitizeRichHtml } from "@/lib/richtext/sanitize";
+import { inquiryReplyState } from "@/lib/inquiry/reply-state";
 import { SecretReveal } from "./SecretReveal";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
-import { Message, ChevronRight, Clock } from "@/components/icons";
+import { Message, ChevronRight, Clock, CheckCircle } from "@/components/icons";
 import { PHONE_MAIN } from "@/lib/data/site";
 import { InquiryWriteButton } from "./InquiryWriteButton";
 
@@ -113,7 +115,7 @@ export default async function InquiryDetailPage({ params }: Props) {
     );
   }
 
-  const answered = !!post.answer;
+  const replyState = inquiryReplyState(post);
 
   return (
     <section className="wrap band" style={{ paddingTop: 40 }}>
@@ -223,7 +225,7 @@ export default async function InquiryDetailPage({ params }: Props) {
             </div>
 
             {/* 답변 */}
-            {answered ? (
+            {replyState === "answered" ? (
               <div
                 style={{
                   marginTop: 28,
@@ -274,11 +276,61 @@ export default async function InquiryDetailPage({ params }: Props) {
                     </span>
                   </span>
                 </div>
-                <Paragraphs
-                  text={post.answer!}
-                  color="var(--color-body-strong)"
-                  size={16.5}
+                <div
+                  className="rich-content"
+                  style={{ fontSize: 16.5, color: "var(--color-body-strong)", lineHeight: 1.85 }}
+                  dangerouslySetInnerHTML={{ __html: sanitizeRichHtml(post.answer!) }}
                 />
+              </div>
+            ) : replyState === "replied-directly" ? (
+              <div
+                style={{
+                  marginTop: 28,
+                  background: "var(--color-surface-strong)",
+                  border: "1px solid var(--color-hairline)",
+                  borderRadius: 18,
+                  padding: "clamp(22px, 3.5vw, 30px)",
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>
+                  <span
+                    style={{
+                      width: 38,
+                      height: 38,
+                      flex: "0 0 auto",
+                      display: "grid",
+                      placeItems: "center",
+                      borderRadius: 10,
+                      background: "var(--color-surface-card)",
+                      border: "1px solid var(--color-hairline)",
+                      color: "var(--color-primary)",
+                    }}
+                  >
+                    <CheckCircle size={19} strokeWidth={2.1} />
+                  </span>
+                  <span style={{ display: "flex", flexDirection: "column", gap: 5 }}>
+                    <span style={{ fontSize: 16, fontWeight: 700, color: "var(--color-ink)" }}>
+                      답변이 완료되었습니다
+                    </span>
+                    <span
+                      style={{
+                        fontSize: 14.5,
+                        color: "var(--color-muted)",
+                        lineHeight: 1.65,
+                        wordBreak: "keep-all",
+                      }}
+                    >
+                      남겨주신 문의는 전화 또는 방문 상담으로 직접 답변드렸습니다. 추가 문의는{" "}
+                      <a
+                        href={"tel:" + PHONE_MAIN}
+                        style={{ color: "var(--color-primary)", fontWeight: 700, textDecoration: "none" }}
+                      >
+                        {PHONE_MAIN}
+                      </a>{" "}
+                      으로 전화 주세요.
+                    </span>
+                  </span>
+                </div>
               </div>
             ) : (
               <div

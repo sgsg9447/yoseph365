@@ -6,7 +6,7 @@ import Link from "next/link";
 import { Field } from "@/components/ui/Field";
 import { Button } from "@/components/ui/Button";
 import { SectionCard } from "@/components/admin/SectionCard";
-import { NoticeEditor } from "./NoticeEditor";
+import { RichEditor } from "@/components/admin/RichEditor";
 import { createNotice, updateNotice } from "./actions";
 
 export interface NoticeFormInitial {
@@ -52,7 +52,7 @@ export function NoticeForm({
         <Field label="제목" value={title} onChange={(e) => setTitle(e.target.value)} />
         <div>
           <span className="block text-[15px] font-semibold text-body-strong mb-[7px]">내용</span>
-          <NoticeEditor value={body} onChange={setBody} />
+          <RichEditor value={body} onChange={setBody} />
         </div>
         <label className="flex items-center gap-2 text-[14px] text-body-strong">
           <input type="checkbox" checked={pinned} onChange={(e) => setPinned(e.target.checked)} />

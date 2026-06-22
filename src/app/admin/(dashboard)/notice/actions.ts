@@ -2,23 +2,12 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
-import { createUploadTarget as makeTarget } from "@/lib/storage/server";
-import { sanitizeRichHtml } from "@/lib/notice/sanitize";
+import { sanitizeRichHtml } from "@/lib/richtext/sanitize";
 import { noticeCreateSchema, noticeUpdateSchema } from "@/lib/validations/forms";
-import type { UploadTarget } from "@/lib/storage/types";
 
 export type NoticeResult = { ok: true } | { ok: false; error: string };
 
 const GENERIC = "처리 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.";
-
-/** 에디터 본문 이미지 업로드 대상 발급(브라우저 직접 업로드용). */
-export async function createImageUploadTarget(
-  contentType: string,
-): Promise<{ ok: true; target: UploadTarget } | { ok: false; error: string }> {
-  const target = await makeTarget(contentType);
-  if (!target) return { ok: false, error: "JPG·PNG 이미지만 올릴 수 있습니다." };
-  return { ok: true, target };
-}
 
 /** 공지 작성 — 본문 HTML은 서버에서 새니타이즈 후 저장. */
 export async function createNotice(input: unknown): Promise<NoticeResult> {

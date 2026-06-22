@@ -18,7 +18,15 @@ import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Phone, ChevronRight, Lock } from "@/components/icons";
 import { EmptyState } from "@/components/admin/EmptyState";
-import { updateInquiryStatus, updateInquiryMemo, updateInquiryPublished } from "./actions";
+import { RichEditor } from "@/components/admin/RichEditor";
+import { isBlankHtml } from "@/lib/richtext/sanitize";
+import {
+  updateInquiryStatus,
+  updateInquiryMemo,
+  updateInquiryPublished,
+  answerInquiry,
+  getInquiryAnswer,
+} from "./actions";
 
 const PER_PAGE = 10;
 
@@ -232,6 +240,12 @@ function ConsultCard({ q }: { q: InquiryView }) {
   const [memoClamped, setMemoClamped] = useState(false);
   const memoRef = useRef<HTMLParagraphElement>(null);
 
+  const [answerOpen, setAnswerOpen] = useState(false);
+  const [answerHtml, setAnswerHtml] = useState("");
+  const [answerLoading, setAnswerLoading] = useState(false);
+  const [answerPending, startAnswer] = useTransition();
+  const [answerError, setAnswerError] = useState<string | null>(null);
+
   useEffect(() => {
     const el = memoRef.current;
     setMemoClamped(el ? el.scrollHeight > el.clientHeight + 1 : false);
@@ -243,6 +257,30 @@ function ConsultCard({ q }: { q: InquiryView }) {
       const res = await updateInquiryStatus({ id: q.id, status: "답변완료" });
       if (res.ok) setDone(true);
       else setError(res.error);
+    });
+  }
+
+  async function openAnswer() {
+    setAnswerError(null);
+    setAnswerHtml("");
+    setAnswerOpen(true);
+    setAnswerLoading(true);
+    const res = await getInquiryAnswer(q.id);
+    setAnswerLoading(false);
+    if (res.ok) setAnswerHtml(res.answer);
+    else setAnswerError(res.error);
+  }
+
+  function saveAnswer() {
+    setAnswerError(null);
+    startAnswer(async () => {
+      const res = await answerInquiry({ id: q.id, answer: answerHtml });
+      if (res.ok) {
+        setDone(!isBlankHtml(answerHtml));
+        setAnswerOpen(false);
+      } else {
+        setAnswerError(res.error);
+      }
     });
   }
 
@@ -311,10 +349,13 @@ function ConsultCard({ q }: { q: InquiryView }) {
           <span className="text-muted-soft text-[13px] mr-auto">{q.date}</span>
           {error && <span className="text-error text-[13px]">{error}</span>}
           <a href={`tel:${q.phone.replace(/[^0-9]/g, "")}`}>
-            <Button size="sm" leftIcon={<Phone size={15} />}>
+            <Button size="sm" variant="outline" leftIcon={<Phone size={15} />}>
               전화 상담
             </Button>
           </a>
+          <Button size="sm" onClick={openAnswer}>
+            답변 작성
+          </Button>
           <Button
             size="sm"
             variant="outline"
@@ -345,6 +386,37 @@ function ConsultCard({ q }: { q: InquiryView }) {
           )}
         </div>
       </Card>
+
+      <Modal open={answerOpen} onClose={() => setAnswerOpen(false)} title={`${q.name} · 답변 작성`}>
+        <div className="flex flex-col gap-3">
+          <div>
+            <span className="block text-[13px] font-semibold text-body-strong mb-1">문의 내용</span>
+            <p className="text-[14px] text-body leading-[1.6] whitespace-pre-wrap">{q.message}</p>
+          </div>
+          {!q.isPublicPost && (
+            <p className="text-[13px] text-muted bg-canvas-soft rounded-button px-3 py-2 leading-[1.6]">
+              비공개 문의라 답변이 공개 페이지에 표시되지 않습니다. 기록·전화 안내용으로만 저장됩니다.
+            </p>
+          )}
+          <div>
+            <label className="block text-[13px] font-semibold text-body-strong mb-1">답변</label>
+            {answerLoading ? (
+              <p className="text-[14px] text-muted text-center py-8">불러오는 중…</p>
+            ) : (
+              <RichEditor value={answerHtml} onChange={setAnswerHtml} />
+            )}
+            {answerError && <p className="text-[13px] text-error mt-1">{answerError}</p>}
+            <div className="flex justify-end gap-2 mt-3">
+              <Button size="sm" variant="outline" onClick={() => setAnswerOpen(false)}>
+                취소
+              </Button>
+              <Button size="sm" onClick={saveAnswer} disabled={answerPending || answerLoading}>
+                {answerPending ? "저장 중…" : "답변 저장"}
+              </Button>
+            </div>
+          </div>
+        </div>
+      </Modal>
 
       <Modal
         open={memoOpen}

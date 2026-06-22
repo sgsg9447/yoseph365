@@ -21,7 +21,7 @@ import {
 } from "@/components/icons";
 import { validatePhotoFile, publicUrl } from "@/lib/storage/keys";
 import { uploadToTarget } from "@/lib/storage/client";
-import { createImageUploadTarget } from "./actions";
+import { createImageUploadTarget } from "@/lib/storage/actions";
 
 /** DataTransfer/ClipboardData에서 이미지 파일만 추린다. */
 function imageFilesFrom(dt: DataTransfer | null): File[] {
@@ -29,8 +29,8 @@ function imageFilesFrom(dt: DataTransfer | null): File[] {
   return Array.from(dt.files).filter((f) => f.type.startsWith("image/"));
 }
 
-/** 공지 본문 리치 에디터(Tiptap). HTML 문자열을 value/onChange로 주고받는다. */
-export function NoticeEditor({
+/** 리치 텍스트 에디터(Tiptap). 공지 본문·상담 답변 공용. HTML 문자열을 value/onChange로 주고받는다. */
+export function RichEditor({
   value,
   onChange,
 }: {

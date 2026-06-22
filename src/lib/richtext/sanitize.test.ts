@@ -1,5 +1,27 @@
 import { describe, it, expect } from "vitest";
-import { sanitizeRichHtml } from "./sanitize";
+import { sanitizeRichHtml, isBlankHtml } from "./sanitize";
+
+describe("isBlankHtml", () => {
+  it("빈 문자열·공백은 빈 것으로 본다", () => {
+    expect(isBlankHtml("")).toBe(true);
+    expect(isBlankHtml("   ")).toBe(true);
+  });
+
+  it("에디터의 빈 단락·줄바꿈만 있는 HTML은 빈 것으로 본다", () => {
+    expect(isBlankHtml("<p></p>")).toBe(true);
+    expect(isBlankHtml("<p><br></p>")).toBe(true);
+    expect(isBlankHtml("<p>&nbsp;</p>")).toBe(true);
+  });
+
+  it("텍스트가 있으면 빈 것이 아니다", () => {
+    expect(isBlankHtml("<p>안녕하세요</p>")).toBe(false);
+  });
+
+  it("이미지·구분선만 있어도 빈 것이 아니다", () => {
+    expect(isBlankHtml('<p><img src="https://x/a.jpg"></p>')).toBe(false);
+    expect(isBlankHtml("<hr>")).toBe(false);
+  });
+});
 
 describe("sanitizeRichHtml", () => {
   it("이미지 태그와 src를 보존한다(에디터 본문 이미지)", () => {

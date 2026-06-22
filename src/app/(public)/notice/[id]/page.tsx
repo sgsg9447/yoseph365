@@ -3,7 +3,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { sanitizeRichHtml } from "@/lib/notice/sanitize";
+import { sanitizeRichHtml } from "@/lib/richtext/sanitize";
 import { getNotices, getNoticeById } from "@/lib/queries/notice";
 
 export const revalidate = 3600;

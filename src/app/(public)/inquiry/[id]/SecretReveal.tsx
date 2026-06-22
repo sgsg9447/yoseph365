@@ -5,6 +5,8 @@ import { Modal } from "@/components/ui/Modal";
 import { Button } from "@/components/ui/Button";
 import { Field } from "@/components/ui/Field";
 import { Lock } from "@/components/icons";
+import { sanitizeRichHtml } from "@/lib/richtext/sanitize";
+import { inquiryReplyState } from "@/lib/inquiry/reply-state";
 import { verifyInquiryPassword, type PublicInquiryDetail } from "@/lib/actions/submit";
 
 function Paragraphs({ text, color, size }: { text: string; color: string; size: number }) {
@@ -41,13 +43,24 @@ export function SecretReveal({ id }: { id: number }) {
   };
 
   if (post) {
+    const state = inquiryReplyState(post);
     return (
       <div style={{ padding: "32px 4px 36px", borderBottom: "1px solid var(--color-hairline)" }}>
         <Paragraphs text={post.content} color="var(--color-body)" size={17} />
-        {post.answer && (
+        {state === "answered" ? (
           <div style={{ marginTop: 28, background: "var(--color-primary-soft)", border: "1px solid var(--color-primary-border)", borderRadius: 18, padding: 24 }}>
             <strong style={{ display: "block", marginBottom: 10, color: "var(--color-ink)" }}>성요셉목수학교 답변</strong>
-            <Paragraphs text={post.answer} color="var(--color-body-strong)" size={16.5} />
+            <div
+              className="rich-content"
+              style={{ fontSize: 16.5, color: "var(--color-body-strong)", lineHeight: 1.85 }}
+              dangerouslySetInnerHTML={{ __html: sanitizeRichHtml(post.answer!) }}
+            />
+          </div>
+        ) : (
+          <div style={{ marginTop: 24, background: "var(--color-surface-strong)", border: "1px solid var(--color-hairline)", borderRadius: 14, padding: 18, fontSize: 14.5, color: "var(--color-muted)", lineHeight: 1.6, wordBreak: "keep-all" }}>
+            {state === "replied-directly"
+              ? "남겨주신 문의는 전화 또는 방문 상담으로 직접 답변드렸습니다."
+              : "답변을 준비하고 있습니다. 확인 후 전화 또는 게시판으로 답변드립니다."}
           </div>
         )}
       </div>
