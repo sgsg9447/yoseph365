@@ -144,6 +144,43 @@ export const curriculumSaveSchema = z.object({
 });
 export type CurriculumSaveInput = z.infer<typeof curriculumSaveSchema>;
 
+// 관리자 — 기능사 과정 트랙(course_track) + 실기 시험일정(exam_schedule) 저장
+const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
+// 빈 문자열("")은 null 로 정규화, 값이 있으면 YYYY-MM-DD 형식만 허용
+const optDate = z
+  .union([z.literal(""), z.string().regex(ISO_DATE, "날짜 형식(YYYY-MM-DD)이 올바르지 않습니다")])
+  .optional()
+  .default("")
+  .transform((s) => (s ? s : null));
+export const examRowSchema = z.object({
+  round: z.string().trim().min(1, "회차를 입력해 주세요").max(20),
+  applyStart: optDate,
+  applyEnd: optDate,
+  examStart: optDate,
+  examEnd: optDate,
+  // 빈 발표일은 제외하고, 남은 값은 YYYY-MM-DD 형식이어야 한다
+  resultDates: z
+    .array(z.string().trim())
+    .max(2)
+    .optional()
+    .default([])
+    .transform((arr) => arr.filter((s) => s.length > 0))
+    .refine((arr) => arr.every((s) => ISO_DATE.test(s)), "발표일 날짜 형식이 올바르지 않습니다"),
+});
+export const trackSaveSchema = z.object({
+  courseId: z.string().trim().min(1),
+  trackId: z.string().trim().min(1),
+  name: z.string().trim().min(1, "트랙명을 입력해 주세요").max(100),
+  description: optStr(200),
+  sessionsTotal: optInt,
+  price: optInt,
+  scheduleSummary: z.array(z.string().trim().min(1)).max(20).optional().default([]),
+  recruitStatus: z.enum(["모집예정", "모집중", "마감"]),
+  year: z.number().int().min(2000).max(2100),
+  exams: z.array(examRowSchema).max(20).optional().default([]),
+});
+export type TrackSaveInput = z.infer<typeof trackSaveSchema>;
+
 // 관리자 — 공지 작성
 export const noticeCreateSchema = z.object({
   title: z.string().trim().min(1, "제목을 입력해 주세요").max(200),

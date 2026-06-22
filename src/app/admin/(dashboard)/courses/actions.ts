@@ -2,7 +2,12 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
-import { courseEditSchema, curriculumSaveSchema, applyInfoSchema } from "@/lib/validations/forms";
+import {
+  courseEditSchema,
+  curriculumSaveSchema,
+  trackSaveSchema,
+  applyInfoSchema,
+} from "@/lib/validations/forms";
 
 export type CourseResult = { ok: true } | { ok: false; error: string };
 
@@ -68,6 +73,54 @@ export async function updateCurriculum(input: unknown): Promise<CourseResult> {
 
   revalidatePath("/courses");
   revalidatePath(`/courses/${courseId}`);
+  revalidatePath("/admin/courses");
+  return { ok: true };
+}
+
+/** 기능사 트랙(course_track) + 그 트랙 시험일정(exam_schedule) 저장. 시험행은 전체 교체. */
+export async function updateTrack(input: unknown): Promise<CourseResult> {
+  const parsed = trackSaveSchema.safeParse(input);
+  if (!parsed.success) {
+    return { ok: false, error: parsed.error.issues[0]?.message ?? "입력값을 확인해 주세요." };
+  }
+  const v = parsed.data;
+
+  const supabase = await createClient();
+  const upd = await supabase
+    .from("course_track")
+    .update({
+      name: v.name,
+      description: v.description || null,
+      sessions_total: v.sessionsTotal,
+      price: v.price,
+      schedule_summary: v.scheduleSummary,
+      recruit_status: v.recruitStatus,
+    })
+    .eq("id", v.trackId);
+  if (upd.error) return { ok: false, error: GENERIC };
+
+  const del = await supabase.from("exam_schedule").delete().eq("track_id", v.trackId);
+  if (del.error) return { ok: false, error: GENERIC };
+
+  if (v.exams.length > 0) {
+    const ins = await supabase.from("exam_schedule").insert(
+      v.exams.map((e, i) => ({
+        track_id: v.trackId,
+        year: v.year,
+        round: e.round,
+        apply_start: e.applyStart,
+        apply_end: e.applyEnd,
+        exam_start: e.examStart,
+        exam_end: e.examEnd,
+        result_dates: e.resultDates,
+        sort_order: i + 1,
+      })),
+    );
+    if (ins.error) return { ok: false, error: GENERIC };
+  }
+
+  revalidatePath("/courses");
+  revalidatePath(`/courses/${v.courseId}`);
   revalidatePath("/admin/courses");
   return { ok: true };
 }

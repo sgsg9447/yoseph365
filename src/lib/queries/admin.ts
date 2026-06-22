@@ -198,6 +198,7 @@ export async function getAdminCourses(): Promise<AdminCourseView[]> {
 export interface CourseEditView {
   id: string;
   name: string;
+  category: Database["public"]["Enums"]["course_category"];
   summary: string;
   skills: string[];
   tuition: string;
@@ -214,7 +215,7 @@ export async function getCoursesForEdit(): Promise<CourseEditView[]> {
   const { data, error } = await supabase
     .from("course")
     .select(
-      "id,name,summary,skills,tuition,self_pay,sessions_total,session_hours,total_hours,recruit_status",
+      "id,name,category,summary,skills,tuition,self_pay,sessions_total,session_hours,total_hours,recruit_status",
     )
     .eq("is_deleted", false)
     .order("sort_order", { ascending: true });
@@ -222,6 +223,7 @@ export async function getCoursesForEdit(): Promise<CourseEditView[]> {
   return (data ?? []).map((c) => ({
     id: c.id,
     name: c.name,
+    category: c.category,
     summary: c.summary ?? "",
     skills: c.skills ?? [],
     tuition: c.tuition ?? "",
@@ -241,18 +243,44 @@ export interface CurriculumEditRow {
   place: string;
 }
 
+/** 기능사 트랙의 시험일정 행(편집용). 빈 날짜는 "" 로 표현. */
+export interface TrackExamEditRow {
+  round: string;
+  applyStart: string;
+  applyEnd: string;
+  examStart: string;
+  examEnd: string;
+  resultDates: string[];
+}
+
+/** 기능사 과정 트랙(편집용) — 트랙 기본정보 + 그 트랙의 시험일정. */
+export interface TrackEditRow {
+  id: string;
+  name: string;
+  description: string;
+  sessionsTotal: number | null;
+  price: number | null;
+  scheduleSummary: string[];
+  recruitStatus: Database["public"]["Enums"]["recruit_status"];
+  year: number; // 시험 연도 — 그 트랙 시험행에서 도출(없으면 현재 연도)
+  exams: TrackExamEditRow[];
+}
+
 export interface CourseBundle {
   course: CourseEditView;
   curriculum: CurriculumEditRow[];
+  tracks: TrackEditRow[];
   applyInfo: ApplyInfoView | null;
 }
 
-/** 과정 수정용 — 과정별 기본정보 + 커리큘럼 + 신청안내 묶음. */
+/** 과정 수정용 — 과정별 기본정보 + 커리큘럼 + 트랙·시험일정 + 신청안내 묶음. */
 export async function getCourseEditBundles(): Promise<CourseBundle[]> {
   const supabase = await createClient();
   const courses = await getCoursesForEdit();
-  const [curRes, infoRes] = await Promise.all([
+  const [curRes, trackRes, examRes, infoRes] = await Promise.all([
     supabase.from("curriculum_item").select("course_id,round,unit,contents,hours,place"),
+    supabase.from("course_track").select("*").order("sort_order", { ascending: true }),
+    supabase.from("exam_schedule").select("*").order("sort_order", { ascending: true }),
     supabase.from("course_apply_info").select("*"),
   ]);
 
@@ -268,12 +296,47 @@ export async function getCourseEditBundles(): Promise<CourseBundle[]> {
   }
   for (const k of Object.keys(byCourse)) byCourse[k].sort((a, b) => a.round - b.round);
 
+  // 트랙별 시험일정 그룹
+  const examsByTrack: Record<string, TrackExamEditRow[]> = {};
+  for (const e of examRes.data ?? []) {
+    (examsByTrack[e.track_id] ??= []).push({
+      round: e.round,
+      applyStart: e.apply_start ?? "",
+      applyEnd: e.apply_end ?? "",
+      examStart: e.exam_start ?? "",
+      examEnd: e.exam_end ?? "",
+      resultDates: e.result_dates ?? [],
+    });
+  }
+  const yearByTrack: Record<string, number> = {};
+  for (const e of examRes.data ?? []) {
+    yearByTrack[e.track_id] = Math.max(yearByTrack[e.track_id] ?? 0, e.year);
+  }
+  const currentYear = new Date().getFullYear();
+
+  // 과정별 트랙 그룹
+  const tracksByCourse: Record<string, TrackEditRow[]> = {};
+  for (const t of trackRes.data ?? []) {
+    (tracksByCourse[t.course_id] ??= []).push({
+      id: t.id,
+      name: t.name,
+      description: t.description ?? "",
+      sessionsTotal: t.sessions_total,
+      price: t.price,
+      scheduleSummary: t.schedule_summary ?? [],
+      recruitStatus: t.recruit_status,
+      year: yearByTrack[t.id] ?? currentYear,
+      exams: examsByTrack[t.id] ?? [],
+    });
+  }
+
   const infoByCourse: Record<string, ApplyInfoView> = {};
   for (const row of infoRes.data ?? []) infoByCourse[row.course_id] = applyInfoRowToView(row);
 
   return courses.map((c) => ({
     course: c,
     curriculum: byCourse[c.id] ?? [],
+    tracks: tracksByCourse[c.id] ?? [],
     applyInfo: infoByCourse[c.id] ?? null,
   }));
 }

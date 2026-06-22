@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/Button";
 import { updateCourse } from "./actions";
 import { CurriculumEditor } from "./CurriculumEditor";
 import { ApplyInfoEditor } from "./ApplyInfoEditor";
+import { TrackEditor } from "./TrackEditor";
 
 const STATUSES = ["모집예정", "모집중", "마감"] as const;
 
@@ -44,6 +45,9 @@ export function CourseEditor({ bundles }: { bundles: CourseBundle[] }) {
   const selected = bundles.find((b) => b.course.id === selectedId) ?? bundles[0];
   if (!selected) return null;
 
+  // 기능사 과정: 커리큘럼 대신 트랙·시험일정 편집(모집상태는 트랙별로만 제어)
+  const isCert = selected.course.category === "기능사";
+
   return (
     <div className="flex flex-col lg:flex-row gap-4">
       {/* 좌: 과정 선택 */}
@@ -67,29 +71,42 @@ export function CourseEditor({ bundles }: { bundles: CourseBundle[] }) {
 
       {/* 우: 선택 과정 디테일 */}
       <div className="flex-1 min-w-0 flex flex-col gap-4">
-        <CourseCard key={`${selected.course.id}-fields`} course={selected.course} />
-        <Card padding={20}>
-          <h3 className="text-[15px] font-bold text-ink mb-3">커리큘럼 (회차표)</h3>
-          <CurriculumEditor
-            key={`${selected.course.id}-cur`}
-            courseId={selected.course.id}
-            initial={selected.curriculum}
-          />
-        </Card>
-        <Card padding={20}>
-          <h3 className="text-[15px] font-bold text-ink mb-3">신청안내 (수강신청 페이지)</h3>
-          <ApplyInfoEditor
-            key={`${selected.course.id}-info`}
-            courseId={selected.course.id}
-            initial={selected.applyInfo}
-          />
-        </Card>
+        <CourseCard key={`${selected.course.id}-fields`} course={selected.course} isCert={isCert} />
+        {isCert ? (
+          <Card padding={20}>
+            <h3 className="text-[15px] font-bold text-ink mb-3">트랙 · 실기 시험일정</h3>
+            <TrackEditor
+              key={`${selected.course.id}-track`}
+              courseId={selected.course.id}
+              initial={selected.tracks}
+            />
+          </Card>
+        ) : (
+          <>
+            <Card padding={20}>
+              <h3 className="text-[15px] font-bold text-ink mb-3">커리큘럼 (회차표)</h3>
+              <CurriculumEditor
+                key={`${selected.course.id}-cur`}
+                courseId={selected.course.id}
+                initial={selected.curriculum}
+              />
+            </Card>
+            <Card padding={20}>
+              <h3 className="text-[15px] font-bold text-ink mb-3">신청안내 (수강신청 페이지)</h3>
+              <ApplyInfoEditor
+                key={`${selected.course.id}-info`}
+                courseId={selected.course.id}
+                initial={selected.applyInfo}
+              />
+            </Card>
+          </>
+        )}
       </div>
     </div>
   );
 }
 
-function CourseCard({ course }: { course: CourseEditView }) {
+function CourseCard({ course, isCert }: { course: CourseEditView; isCert: boolean }) {
   const [draft, setDraft] = useState<Draft>(() => toDraft(course));
   const [pending, startSave] = useTransition();
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
@@ -122,17 +139,20 @@ function CourseCard({ course }: { course: CourseEditView }) {
     <Card padding={20}>
       <div className="flex items-center justify-between mb-4">
         <span className="text-[14px] text-muted font-semibold">{course.name}</span>
-        <div className="flex items-center gap-2 text-[13px] text-muted">
-          모집상태
-          <div className="w-32">
-            <Select
-              value={draft.recruitStatus}
-              ariaLabel="모집상태"
-              options={STATUSES.map((s) => ({ value: s, label: s }))}
-              onChange={(v) => set("recruitStatus", v as Draft["recruitStatus"])}
-            />
+        {/* 기능사 과정은 모집상태를 트랙별로 제어하므로 과정 전체 드롭다운 숨김 */}
+        {!isCert && (
+          <div className="flex items-center gap-2 text-[13px] text-muted">
+            모집상태
+            <div className="w-32">
+              <Select
+                value={draft.recruitStatus}
+                ariaLabel="모집상태"
+                options={STATUSES.map((s) => ({ value: s, label: s }))}
+                onChange={(v) => set("recruitStatus", v as Draft["recruitStatus"])}
+              />
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">

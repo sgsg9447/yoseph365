@@ -10,6 +10,7 @@ import {
   noticeCreateSchema,
   noticeUpdateSchema,
   curriculumSaveSchema,
+  trackSaveSchema,
   applyInfoSchema,
   trainingPhotoAddSchema,
   inquiryPostSchema,
@@ -61,6 +62,82 @@ describe("curriculumSaveSchema", () => {
         ...base,
         rows: [{ round: 0, unit: "x", contents: [], hours: null, place: "" }],
       }).success,
+    ).toBe(false);
+  });
+});
+
+describe("trackSaveSchema", () => {
+  const base = {
+    courseId: "course_architecture_certificate",
+    trackId: "track_architecture_woodwork",
+    name: "건축목공기능사",
+    description: "건축목공기능사 속성 대비반",
+    sessionsTotal: 5,
+    price: 600000,
+    scheduleSummary: ["4회 09:00~17:00 (1일 8시간)", "1회 09:00~14:00 (1일 5시간)"],
+    recruitStatus: "마감",
+    year: 2026,
+    exams: [
+      {
+        round: "제1회",
+        applyStart: "2026-02-02",
+        applyEnd: "2026-02-05",
+        examStart: "2026-03-14",
+        examEnd: "2026-04-01",
+        resultDates: ["2026-04-10", "2026-04-17"],
+      },
+    ],
+  };
+
+  it("유효한 입력 통과", () => {
+    expect(trackSaveSchema.safeParse(base).success).toBe(true);
+  });
+
+  it("courseId·trackId·name이 비면 실패", () => {
+    expect(trackSaveSchema.safeParse({ ...base, courseId: "" }).success).toBe(false);
+    expect(trackSaveSchema.safeParse({ ...base, trackId: "" }).success).toBe(false);
+    expect(trackSaveSchema.safeParse({ ...base, name: " " }).success).toBe(false);
+  });
+
+  it("정의되지 않은 모집상태는 실패", () => {
+    expect(trackSaveSchema.safeParse({ ...base, recruitStatus: "종료" }).success).toBe(false);
+  });
+
+  it("가격·회차는 null 허용", () => {
+    expect(
+      trackSaveSchema.safeParse({ ...base, price: null, sessionsTotal: null }).success,
+    ).toBe(true);
+  });
+
+  it("빈 발표일은 저장 시 제외된다", () => {
+    const r = trackSaveSchema.safeParse({
+      ...base,
+      exams: [{ ...base.exams[0], resultDates: ["2026-04-10", ""] }],
+    });
+    expect(r.success && r.data.exams[0].resultDates).toEqual(["2026-04-10"]);
+  });
+
+  it("빈 날짜 문자열은 null 로 정규화된다", () => {
+    const r = trackSaveSchema.safeParse({
+      ...base,
+      exams: [{ ...base.exams[0], applyStart: "", examEnd: "" }],
+    });
+    expect(r.success && r.data.exams[0].applyStart).toBe(null);
+    expect(r.success && r.data.exams[0].examEnd).toBe(null);
+  });
+
+  it("잘못된 날짜 형식은 실패", () => {
+    expect(
+      trackSaveSchema.safeParse({
+        ...base,
+        exams: [{ ...base.exams[0], applyStart: "2026/02/02" }],
+      }).success,
+    ).toBe(false);
+  });
+
+  it("회차(round)가 비면 실패", () => {
+    expect(
+      trackSaveSchema.safeParse({ ...base, exams: [{ ...base.exams[0], round: " " }] }).success,
     ).toBe(false);
   });
 });
