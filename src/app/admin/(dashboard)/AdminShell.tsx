@@ -65,10 +65,16 @@ export function AdminShell({ tabs, counts, children }: AdminShellProps) {
 
   const sidebarContent = (
     <>
-      {/* Logo */}
-      <div style={{ margin: "6px 6px 28px" }}>
+      {/* Logo → 어드민 홈 */}
+      <Link
+        href="/admin"
+        onClick={() => setDrawerOpen(false)}
+        aria-label="어드민 홈으로"
+        className="block rounded-lg"
+        style={{ margin: "6px 6px 28px" }}
+      >
         <Logo className="h-9 w-auto" />
-      </div>
+      </Link>
 
       {/* Nav */}
       <nav className="flex flex-col gap-1 flex-1">
@@ -99,15 +105,36 @@ export function AdminShell({ tabs, counts, children }: AdminShellProps) {
         })}
       </nav>
 
-      {/* Logout */}
-      <form method="post" action="/admin/logout">
-        <button
-          type="submit"
-          className="flex items-center gap-3 w-full h-[46px] px-[14px] rounded-xl text-[15px] font-medium text-body-strong hover:bg-error-soft hover:text-error transition-colors"
+      {/* Footer: 로그아웃 · 사이트 · 계정 */}
+      <div className="mt-2 pt-3 border-t border-hairline flex flex-col gap-1">
+        {/* 로그아웃 */}
+        <form method="post" action="/admin/logout">
+          <button
+            type="submit"
+            className="flex items-center gap-3 w-full h-[46px] px-[14px] rounded-xl text-[15px] font-medium text-body-strong hover:bg-error-soft hover:text-error transition-colors"
+          >
+            로그아웃
+          </button>
+        </form>
+
+        {/* 공개 사이트 보기 — 새 탭 */}
+        <a
+          href="/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-3 w-full h-[46px] px-[14px] rounded-xl text-[15px] font-medium text-body-strong hover:bg-hairline-soft transition-colors"
         >
-          로그아웃
-        </button>
-      </form>
+          사이트 보기 ↗
+        </a>
+
+        {/* 관리자 — 맨 하단 */}
+        <div className="flex items-center gap-2 h-[46px] px-[14px]">
+          <span className="w-8 h-8 rounded-full bg-surface-strong text-ink font-bold inline-flex items-center justify-center text-[14px]">
+            관
+          </span>
+          <span className="text-[14px] font-semibold text-body-strong">관리자</span>
+        </div>
+      </div>
     </>
   );
 
@@ -166,20 +193,12 @@ export function AdminShell({ tabs, counts, children }: AdminShellProps) {
               <h1 className="text-[24px] font-bold tracking-[-0.4px] text-ink leading-tight">
                 {currentTab.title}
               </h1>
-              <p className="text-[14px] text-muted">{currentTab.desc}</p>
             </div>
           </div>
 
           <div className="flex items-center gap-3">
             {/* Date — hidden below md */}
             <span className="hidden md:block text-[14px] text-muted">{today}</span>
-            {/* Avatar pill */}
-            <div className="flex items-center gap-2">
-              <span className="w-9 h-9 rounded-full bg-surface-strong text-ink font-bold inline-flex items-center justify-center text-[15px]">
-                관
-              </span>
-              <span className="text-[14px] font-semibold text-body-strong">관리자</span>
-            </div>
           </div>
         </header>
 
