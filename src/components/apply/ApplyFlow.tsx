@@ -4,9 +4,9 @@
 // 참조: HANDOFF/ui_kits/website/apply-flow.jsx 전체
 
 import { useEffect, useRef, useState, type RefObject } from "react";
-import { Check } from "@/components/icons";
+import { Check, FileText } from "@/components/icons";
 import type { ApplyInfoView, RecruitStatus } from "@/lib/queries/types";
-import { PHONE_MAIN } from "@/lib/data/site";
+import { PHONE_MAIN, APPLY_FORM_URL, APPLY_FORM_FILENAME } from "@/lib/data/site";
 import { submitApplication } from "@/lib/actions/submit";
 import { formatBirthDateInput, formatPhoneInput } from "@/lib/formatters/input";
 
@@ -79,19 +79,17 @@ function ApplyInfoRow({
   label,
   children,
   last,
-  compact = false,
 }: {
   label: string;
   children: React.ReactNode;
   last?: boolean;
-  compact?: boolean;
 }) {
   return (
     <div
       style={{
         display: "grid",
-        gridTemplateColumns: compact ? "64px 1fr" : "clamp(72px, 23vw, 88px) 1fr",
-        gap: compact ? 8 : 10,
+        gridTemplateColumns: "clamp(72px, 23vw, 88px) 1fr",
+        gap: 10,
         padding: "13px 16px",
         borderBottom: last ? "none" : "1px solid var(--color-hairline)",
         alignItems: "start",
@@ -239,7 +237,7 @@ function ApplyInfoStep({
           </ApplyInfoRow>
         )}
         {applyInfo.applyMethod.length > 0 && (
-          <ApplyInfoRow label="지원방법" compact>
+          <ApplyInfoRow label="지원방법">
             {applyInfo.applyMethod.map((m, i) => (
               <span
                 key={i}
@@ -299,6 +297,18 @@ function ApplyInfoStep({
           </ApplyInfoRow>
         )}
       </div>
+
+      {/* 신청서 다운로드 — 경기도 전액지원 과정(지원방법 안내가 있는 경우)만 노출 */}
+      {applyInfo.applyMethod.length > 0 && (
+        <a
+          href={APPLY_FORM_URL}
+          download={APPLY_FORM_FILENAME}
+          className="inline-flex items-center justify-center gap-2 rounded-button font-semibold leading-none tracking-[-0.2px] whitespace-nowrap transition active:scale-[0.98] w-full h-14 px-[26px] text-[17px] bg-primary-soft text-primary border border-primary-border hover:opacity-90"
+        >
+          <FileText size={20} strokeWidth={2} />
+          신청서 다운로드 (PDF)
+        </a>
+      )}
 
       {applyInfo.exclusions.length > 0 && (
         <details

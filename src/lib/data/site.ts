@@ -8,6 +8,11 @@ export const PHONE_FOOTER = "032-678-3650"; // Footer 표기용(동일)
 // ── 상담 시간 ─────────────────────────────────────────────────────────
 export const CONSULT_HOURS = "평일 9:30~18:00, 점심시간 12:00~13:00";
 
+// ── 수강신청 — 경기도 전액지원 과정 등록신청서(정적 PDF) ──────────────────
+// public/forms/에 정적 파일로 두고 그대로 서빙. download 속성으로 한글 파일명 저장.
+export const APPLY_FORM_URL = "/forms/yoseph-registration-form.pdf";
+export const APPLY_FORM_FILENAME = "성요셉목수학교_등록신청서.pdf";
+
 // ── 주소 ──────────────────────────────────────────────────────────────
 export const ADDRESS = "경기도 부천시 성곡로 69, 2층~4층";
 export const ADDRESS_DETAIL = "경기도 부천시 성곡로 69, 2층~4층";

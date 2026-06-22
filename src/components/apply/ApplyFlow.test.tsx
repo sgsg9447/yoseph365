@@ -2,6 +2,7 @@ import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, it, expect } from "vitest";
 import { ApplyFlow } from "@/components/apply/ApplyFlow";
+import { APPLY_FORM_URL, APPLY_FORM_FILENAME } from "@/lib/data/site";
 import type { ApplyInfoView } from "@/lib/queries/types";
 
 const applyInfo: ApplyInfoView = {
@@ -35,5 +36,24 @@ describe("ApplyFlow", () => {
     render(<ApplyFlow course="주말 건축목공과정" applyInfo={applyInfo} recruitStatus="마감" />);
     expect(screen.queryByRole("button", { name: /신청서 작성하기/ })).not.toBeInTheDocument();
     expect(screen.getByText(/현재 모집 중이 아닙니다/)).toBeInTheDocument();
+  });
+  it("지원방법(신청서 접수)이 있으면 신청서 다운로드 링크를 보여준다", () => {
+    render(
+      <ApplyFlow
+        course="평일 건축목공과정"
+        applyInfo={{
+          ...applyInfo,
+          applyMethod: ["이메일로 접수", "신청서는 아래에서 다운받아 주시기 바랍니다."],
+        }}
+        recruitStatus="모집중"
+      />,
+    );
+    const link = screen.getByRole("link", { name: /신청서 다운로드/ });
+    expect(link).toHaveAttribute("href", APPLY_FORM_URL);
+    expect(link).toHaveAttribute("download", APPLY_FORM_FILENAME);
+  });
+  it("지원방법이 없으면 신청서 다운로드 링크가 없다", () => {
+    render(<ApplyFlow course="주말 건축목공과정" applyInfo={applyInfo} recruitStatus="모집중" />);
+    expect(screen.queryByRole("link", { name: /신청서 다운로드/ })).not.toBeInTheDocument();
   });
 });
