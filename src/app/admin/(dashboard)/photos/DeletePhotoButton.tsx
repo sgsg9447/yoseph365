@@ -39,15 +39,15 @@ export function DeletePhotoButton({ id }: { id: number }) {
         <X size={14} />
       </button>
 
-      <Modal open={open} onClose={() => setOpen(false)} title="훈련사진 삭제">
-        <div className="flex flex-col gap-4">
-          <p className="text-[15px] text-body-strong leading-[1.6]">
+      <Modal open={open} onClose={() => setOpen(false)} title="훈련사진 삭제" hideHeaderBorder>
+        <div className="flex flex-col gap-5">
+          <p className="text-center text-[15px] text-body-strong leading-[1.6]">
             이 사진을 삭제할까요?
             <br />
             삭제하면 되돌릴 수 없습니다.
           </p>
-          {error && <p className="text-[13px] text-error">{error}</p>}
-          <div className="flex justify-end gap-2">
+          {error && <p className="text-center text-[13px] text-error">{error}</p>}
+          <div className="flex justify-center gap-2">
             <Button variant="outline" size="sm" type="button" onClick={() => setOpen(false)}>
               취소
             </Button>

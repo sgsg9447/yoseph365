@@ -8,11 +8,13 @@ interface ModalProps {
   open: boolean;
   onClose: () => void;
   title?: string;
+  /** 헤더 하단 구분선을 숨긴다(확인 다이얼로그 등). */
+  hideHeaderBorder?: boolean;
   children: ReactNode;
 }
 
 /** 중앙 정렬 모달. 오버레이 클릭·Esc·닫기 버튼으로 닫힌다. */
-export function Modal({ open, onClose, title, children }: ModalProps) {
+export function Modal({ open, onClose, title, hideHeaderBorder, children }: ModalProps) {
   useEffect(() => {
     if (!open) return;
     function onKey(e: KeyboardEvent) {
@@ -33,7 +35,7 @@ export function Modal({ open, onClose, title, children }: ModalProps) {
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-label={title}>
       <div className="absolute inset-0 bg-black/40" onClick={onClose} aria-hidden />
       <div className="relative z-10 flex max-h-[85vh] w-full max-w-lg flex-col overflow-hidden rounded-xl border border-hairline bg-surface-card shadow-pop">
-        <div className="flex items-center justify-between gap-3 border-b border-hairline px-5 py-4">
+        <div className={`flex items-center justify-between gap-3 px-5 py-4${hideHeaderBorder ? "" : " border-b border-hairline"}`}>
           {title ? <h2 className="text-[16px] font-bold text-ink">{title}</h2> : <span />}
           <button type="button" onClick={onClose} aria-label="닫기" className="text-muted hover:text-ink">
             <X size={20} />
