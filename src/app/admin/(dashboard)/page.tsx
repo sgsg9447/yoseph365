@@ -22,7 +22,8 @@ export default async function DashboardPage() {
     getCourseFunnel(),
     getDashboardStats(),
   ]);
-  const recent = enrollments.slice(0, 4);
+  // 대시보드는 최신 5건만 미리보기 — 전체는 "전체 →"(/admin/enroll)에서
+  const recent = enrollments.slice(0, 5);
   const totalCourses = courses.length;
   const clickViews = funnel.slice(0, 5);
   const maxViews = Math.max(0, ...clickViews.map((c) => c.views));
@@ -35,24 +36,28 @@ export default async function DashboardPage() {
           value={`${stats.todayViews.toLocaleString()}회`}
           delta="과정 상세 페이지 조회"
           icon={<Users size={18} />}
+          href="/admin/clicks"
         />
         <KpiCard
           label="이번 달 수강신청"
           value={`${stats.monthEnroll}건`}
           delta="이번 달 접수"
           icon={<Clipboard size={18} />}
+          href="/admin/enroll"
         />
         <KpiCard
           label="상담 대기"
           value={`${stats.pendingConsult}건`}
           delta="답변 대기 중"
           icon={<Message size={18} />}
+          href="/admin/consult"
         />
         <KpiCard
           label="모집 중 과정"
           value={`${openCount}개`}
           delta={`전체 ${totalCourses}개 중`}
           icon={<Hammer size={18} />}
+          href="/admin/courses"
         />
       </div>
 
