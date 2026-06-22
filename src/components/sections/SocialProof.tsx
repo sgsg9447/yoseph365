@@ -66,7 +66,7 @@ const trust: AwardHighlightProps[] = [
     img: "/awards/award-molab.png",
   },
   {
-    lines: ["경기도일자리재단 우수훈련기관", "· 경기도지사 표창"],
+    lines: ["경기도일자리재단", "우수훈련기관", "경기도지사 표창"],
     sub: "2023",
     img: "/awards/award-gjf.png",
   },
