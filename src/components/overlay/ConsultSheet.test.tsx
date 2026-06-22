@@ -19,6 +19,11 @@ vi.mock("@/lib/supabase/client", () => ({
   }),
 }));
 
+const refresh = vi.fn();
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({ refresh }),
+}));
+
 describe("ConsultSheet", () => {
   it("consult 모드: 이름·연락처 입력 후 상담 신청하면 완료 메시지 표시", async () => {
     render(<ConsultSheet open mode="consult" onClose={() => {}} />);
@@ -50,5 +55,20 @@ describe("ConsultSheet", () => {
 
     expect(submit).toHaveBeenCalled();
     expect(await screen.findByText(/문의가 등록되었어요/)).toBeInTheDocument();
+  });
+
+  it("inquiry 모드: 문의 등록 성공 시 목록 갱신을 위해 router.refresh를 호출한다", async () => {
+    refresh.mockClear();
+
+    render(<ConsultSheet open mode="inquiry" onClose={() => {}} />);
+
+    await userEvent.type(screen.getByPlaceholderText("문의 제목을 입력해 주세요"), "수업 시간 문의");
+    await userEvent.type(screen.getByPlaceholderText("궁금하신 점을 자유롭게 남겨주세요"), "오후반도 있나요?");
+    await userEvent.type(screen.getByPlaceholderText("홍길동"), "김문의");
+    await userEvent.type(screen.getByPlaceholderText("010-0000-0000"), "010-1111-2222");
+    await userEvent.click(screen.getByRole("button", { name: /문의 등록/ }));
+
+    await screen.findByText(/문의가 등록되었어요/);
+    expect(refresh).toHaveBeenCalled();
   });
 });

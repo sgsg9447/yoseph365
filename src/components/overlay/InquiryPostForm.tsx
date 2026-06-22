@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { Field, ReqLabel } from "@/components/ui/Field";
 import { Lock } from "@/components/icons";
@@ -10,6 +11,7 @@ import { formatPhoneInput } from "@/lib/formatters/input";
 const CATEGORIES = ["국비지원", "과정문의", "기타"] as const;
 
 export function InquiryPostForm({ onDone }: { onDone: () => void }) {
+  const router = useRouter();
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [category, setCategory] = useState<(typeof CATEGORIES)[number]>("과정문의");
@@ -29,8 +31,10 @@ export function InquiryPostForm({ onDone }: { onDone: () => void }) {
       name, phone, category, courseId: "", title, content, email, isSecret, password,
     });
     setPending(false);
-    if (res.ok) onDone();
-    else setError(res.error);
+    if (res.ok) {
+      router.refresh(); // 게시판 목록(서버 컴포넌트) 즉시 갱신
+      onDone();
+    } else setError(res.error);
   };
 
   return (
