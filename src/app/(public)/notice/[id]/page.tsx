@@ -3,7 +3,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import DOMPurify from "isomorphic-dompurify";
+import { sanitizeRichHtml } from "@/lib/notice/sanitize";
 import { getNotices, getNoticeById } from "@/lib/queries/notice";
 
 export const revalidate = 3600;
@@ -100,7 +100,7 @@ export default async function NoticeDetailPage({
             fontSize: 16,
             lineHeight: 1.85,
           }}
-          dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(notice.body) }}
+          dangerouslySetInnerHTML={{ __html: sanitizeRichHtml(notice.body) }}
         />
 
         {notice.tags.length > 0 && (

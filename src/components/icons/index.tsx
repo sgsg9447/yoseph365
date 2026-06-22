@@ -205,6 +205,118 @@ export function Clock({ size = 24, strokeWidth = 1.9, className }: IconProps) {
   );
 }
 
+export function Bold({ size = 24, strokeWidth = 1.9, className }: IconProps) {
+  return (
+    <svg {...svgProps(size, strokeWidth, className)}>
+      <path d="M6 4h8a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z" />
+      <path d="M6 12h9a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z" />
+    </svg>
+  );
+}
+
+export function Italic({ size = 24, strokeWidth = 1.9, className }: IconProps) {
+  return (
+    <svg {...svgProps(size, strokeWidth, className)}>
+      <line x1="19" x2="10" y1="4" y2="4" />
+      <line x1="14" x2="5" y1="20" y2="20" />
+      <line x1="15" x2="9" y1="4" y2="20" />
+    </svg>
+  );
+}
+
+export function Underline({ size = 24, strokeWidth = 1.9, className }: IconProps) {
+  return (
+    <svg {...svgProps(size, strokeWidth, className)}>
+      <path d="M6 4v6a6 6 0 0 0 12 0V4" />
+      <line x1="4" x2="20" y1="20" y2="20" />
+    </svg>
+  );
+}
+
+export function Strikethrough({ size = 24, strokeWidth = 1.9, className }: IconProps) {
+  return (
+    <svg {...svgProps(size, strokeWidth, className)}>
+      <path d="M16 4H9a3 3 0 0 0-2.83 4" />
+      <path d="M14 12a4 4 0 0 1 0 8H6" />
+      <line x1="4" x2="20" y1="12" y2="12" />
+    </svg>
+  );
+}
+
+export function Undo({ size = 24, strokeWidth = 1.9, className }: IconProps) {
+  return (
+    <svg {...svgProps(size, strokeWidth, className)}>
+      <path d="M9 14 4 9l5-5" />
+      <path d="M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5 5.5 5.5 0 0 1-5.5 5.5H11" />
+    </svg>
+  );
+}
+
+export function Redo({ size = 24, strokeWidth = 1.9, className }: IconProps) {
+  return (
+    <svg {...svgProps(size, strokeWidth, className)}>
+      <path d="m15 14 5-5-5-5" />
+      <path d="M20 9H9.5A5.5 5.5 0 0 0 4 14.5 5.5 5.5 0 0 0 9.5 20H13" />
+    </svg>
+  );
+}
+
+export function List({ size = 24, strokeWidth = 1.9, className }: IconProps) {
+  return (
+    <svg {...svgProps(size, strokeWidth, className)}>
+      <line x1="8" x2="21" y1="6" y2="6" />
+      <line x1="8" x2="21" y1="12" y2="12" />
+      <line x1="8" x2="21" y1="18" y2="18" />
+      <line x1="3" x2="3.01" y1="6" y2="6" />
+      <line x1="3" x2="3.01" y1="12" y2="12" />
+      <line x1="3" x2="3.01" y1="18" y2="18" />
+    </svg>
+  );
+}
+
+export function ListOrdered({ size = 24, strokeWidth = 1.9, className }: IconProps) {
+  return (
+    <svg {...svgProps(size, strokeWidth, className)}>
+      <line x1="10" x2="21" y1="6" y2="6" />
+      <line x1="10" x2="21" y1="12" y2="12" />
+      <line x1="10" x2="21" y1="18" y2="18" />
+      <path d="M4 6h1v4" />
+      <path d="M4 10h2" />
+      <path d="M6 18H4c0-1 2-2 2-3s-1-1.5-2-1" />
+    </svg>
+  );
+}
+
+export function AlignLeft({ size = 24, strokeWidth = 1.9, className }: IconProps) {
+  return (
+    <svg {...svgProps(size, strokeWidth, className)}>
+      <line x1="21" x2="3" y1="6" y2="6" />
+      <line x1="15" x2="3" y1="12" y2="12" />
+      <line x1="17" x2="3" y1="18" y2="18" />
+    </svg>
+  );
+}
+
+export function AlignCenter({ size = 24, strokeWidth = 1.9, className }: IconProps) {
+  return (
+    <svg {...svgProps(size, strokeWidth, className)}>
+      <line x1="21" x2="3" y1="6" y2="6" />
+      <line x1="17" x2="7" y1="12" y2="12" />
+      <line x1="19" x2="5" y1="18" y2="18" />
+    </svg>
+  );
+}
+
+export function AlignRight({ size = 24, strokeWidth = 1.9, className }: IconProps) {
+  return (
+    <svg {...svgProps(size, strokeWidth, className)}>
+      <line x1="21" x2="3" y1="6" y2="6" />
+      <line x1="21" x2="9" y1="12" y2="12" />
+      <line x1="21" x2="7" y1="18" y2="18" />
+    </svg>
+  );
+}
+
 export function FileText({ size = 24, strokeWidth = 1.9, className }: IconProps) {
   return (
     <svg {...svgProps(size, strokeWidth, className)}>
