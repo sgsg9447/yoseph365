@@ -1,10 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { Field, ReqLabel } from "@/components/ui/Field";
+import { Select } from "@/components/ui/Select";
 import { Lock } from "@/components/icons";
+import { createClient } from "@/lib/supabase/client";
 import { submitInquiryPost } from "@/lib/actions/submit";
 import { formatPhoneInput } from "@/lib/formatters/input";
 
@@ -15,6 +17,18 @@ export function InquiryPostForm({ onDone }: { onDone: () => void }) {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [category, setCategory] = useState<(typeof CATEGORIES)[number]>("과정문의");
+  const [courseId, setCourseId] = useState("");
+  const [courses, setCourses] = useState<{ id: string; name: string }[]>([]);
+
+  // 과정문의용 과정 목록(모집중 아니어도 전체)
+  useEffect(() => {
+    const sb = createClient();
+    sb.from("course")
+      .select("id, name")
+      .eq("is_deleted", false)
+      .order("sort_order")
+      .then(({ data }) => setCourses(data ?? []));
+  }, []);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [email, setEmail] = useState("");
@@ -28,7 +42,7 @@ export function InquiryPostForm({ onDone }: { onDone: () => void }) {
     setError(null);
     setPending(true);
     const res = await submitInquiryPost({
-      name, phone, category, courseId: "", title, content, email, isSecret, password,
+      name, phone, category, courseId, title, content, email, isSecret, password,
     });
     setPending(false);
     if (res.ok) {
@@ -46,7 +60,11 @@ export function InquiryPostForm({ onDone }: { onDone: () => void }) {
         <ReqLabel>구분</ReqLabel>
         <div className="flex flex-wrap gap-2">
           {CATEGORIES.map((c) => (
-            <button key={c} type="button" onClick={() => setCategory(c)}
+            <button key={c} type="button"
+              onClick={() => {
+                setCategory(c);
+                if (c !== "과정문의") setCourseId("");
+              }}
               className="h-[38px] px-4 rounded-full text-[14px] font-semibold border transition-colors"
               style={{
                 background: c === category ? "var(--color-primary)" : "var(--color-surface-card)",
@@ -58,6 +76,21 @@ export function InquiryPostForm({ onDone }: { onDone: () => void }) {
           ))}
         </div>
       </div>
+
+      {category === "과정문의" && (
+        <div className="flex flex-col gap-[7px]">
+          <ReqLabel optional>어떤 과정이 궁금하세요?</ReqLabel>
+          <Select
+            value={courseId}
+            onChange={setCourseId}
+            ariaLabel="과정 선택"
+            options={[
+              { value: "", label: "과정을 선택해 주세요" },
+              ...courses.map((c) => ({ value: c.id, label: c.name })),
+            ]}
+          />
+        </div>
+      )}
 
       <Field label="문의 내용" as="textarea" required placeholder="궁금하신 점을 자유롭게 남겨주세요"
         value={content} maxLength={1000} onChange={(e) => setContent(e.target.value)} />
