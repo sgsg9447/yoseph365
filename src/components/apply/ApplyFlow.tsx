@@ -235,11 +235,7 @@ function ApplyInfoStep({
         </div>
         {applyInfo.qualifications.length > 0 && (
           <ApplyInfoRow label="신청자격">
-            {applyInfo.qualifications.map((q, i) => (
-              <span key={i} style={{ display: "block" }}>
-                {q}
-              </span>
-            ))}
+            <span>{applyInfo.qualifications.join(", ")}</span>
           </ApplyInfoRow>
         )}
         {applyInfo.applyMethod.length > 0 && (
