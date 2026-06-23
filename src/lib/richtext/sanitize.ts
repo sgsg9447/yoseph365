@@ -1,4 +1,4 @@
-import DOMPurify from "isomorphic-dompurify";
+import sanitizeHtml from "sanitize-html";
 
 /**
  * 리치 텍스트(공지 본문·상담 답변) sanitize 정책.
@@ -7,7 +7,46 @@ import DOMPurify from "isomorphic-dompurify";
  * 저장과 공개 렌더 양쪽에서 같은 정책을 쓴다.
  */
 export function sanitizeRichHtml(html: string): string {
-  return DOMPurify.sanitize(html);
+  return sanitizeHtml(html, {
+    allowedTags: [
+      "a",
+      "b",
+      "blockquote",
+      "br",
+      "code",
+      "div",
+      "em",
+      "h1",
+      "h2",
+      "h3",
+      "hr",
+      "i",
+      "img",
+      "li",
+      "ol",
+      "p",
+      "pre",
+      "s",
+      "span",
+      "strong",
+      "u",
+      "ul",
+    ],
+    allowedAttributes: {
+      a: ["href", "target", "rel"],
+      img: ["src", "alt", "title", "width", "height"],
+      "*": ["style"],
+    },
+    allowedSchemes: ["http", "https", "mailto", "tel"],
+    allowedSchemesByTag: {
+      img: ["http", "https"],
+    },
+    allowedStyles: {
+      "*": {
+        "text-align": [/^left$/, /^right$/, /^center$/, /^justify$/],
+      },
+    },
+  });
 }
 
 /**

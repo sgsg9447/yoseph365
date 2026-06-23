@@ -1,11 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import DOMPurify from "isomorphic-dompurify";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Field } from "@/components/ui/Field";
 import { FileText, X } from "@/components/icons";
+import { sanitizeRichHtml } from "@/lib/richtext/sanitize";
 import {
   type Banner,
   type BannerMode,
@@ -366,7 +366,7 @@ function renderEditor(
           ))}
         {b.mode === "html" &&
           (b.html.trim() ? (
-            <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(b.html) }} />
+            <div dangerouslySetInnerHTML={{ __html: sanitizeRichHtml(b.html) }} />
           ) : (
             <div className="flex flex-col items-center gap-2 text-muted">
               <FileText size={28} />
