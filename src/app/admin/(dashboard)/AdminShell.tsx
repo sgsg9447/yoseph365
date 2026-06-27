@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 import type { AdminTab } from "../nav";
 import { Logo } from "@/components/layout/Logo";
+import { DesktopNotifier } from "@/components/admin/DesktopNotifier";
 import {
   Home,
   TrendingUp,
@@ -197,6 +198,7 @@ export function AdminShell({ tabs, counts, children }: AdminShellProps) {
           </div>
 
           <div className="flex items-center gap-3">
+            <DesktopNotifier />
             {/* Date — hidden below md */}
             <span className="hidden md:block text-[14px] text-muted">{today}</span>
           </div>
