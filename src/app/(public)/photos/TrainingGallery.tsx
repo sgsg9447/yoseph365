@@ -3,7 +3,7 @@
 // 훈련사진 갤러리 — 상단 탭(전체/집수리/인테리어목공/인테리어필름/기능사) + 기능사 하위칩.
 // 비율을 URL 키로 보관해 탭 전환 시에도 justified 배치가 유지된다. 클릭 시 확대.
 
-import { useState, useRef, useEffect, useLayoutEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useLayoutEffect, useCallback, useMemo } from "react";
 import {
   TABS,
   GINEUNGSA_SUBS,
@@ -49,8 +49,11 @@ export function TrainingGallery({ photos }: { photos: GalleryPhoto[] }) {
   const [ratioByUrl, setRatioByUrl] = useState<Record<string, number>>({});
   const [zoom, setZoom] = useState<number | null>(null);
 
-  const visible = photosForTab(photos, tab, tab === "기능사과정" ? sub : null);
-  const urls = visible.map((p) => p.url);
+  const visible = useMemo(
+    () => photosForTab(photos, tab, tab === "기능사과정" ? sub : null),
+    [photos, tab, sub],
+  );
+  const urls = useMemo(() => visible.map((p) => p.url), [visible]);
 
   useLayoutEffect(() => {
     const el = containerRef.current;
@@ -83,7 +86,7 @@ export function TrainingGallery({ photos }: { photos: GalleryPhoto[] }) {
 
   const go = useCallback(
     (d: number) => setZoom((p) => (p === null ? p : (p + d + urls.length) % urls.length)),
-    [urls.length],
+    [urls],
   );
   useEffect(() => {
     if (zoom === null) return;
