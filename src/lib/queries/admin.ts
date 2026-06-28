@@ -488,6 +488,10 @@ export interface AdminPopupView {
   title: string;
   isActive: boolean;
   hideOnMobile: boolean;
+  kind: "renewal" | "image";
+  imageUrl: string;
+  mobileImageUrl: string;
+  linkUrl: string;
 }
 
 /** 어드민 — 관리 대상 팝업 1건(싱글턴). 없으면 null. */
@@ -495,7 +499,7 @@ export async function getAdminPopup(): Promise<AdminPopupView | null> {
   const supabase = await createClient();
   const { data } = await supabase
     .from("popup")
-    .select("id, title, is_active, hide_on_mobile")
+    .select("id, title, is_active, hide_on_mobile, kind, image_url, mobile_image_url, link_url")
     .order("id", { ascending: true })
     .limit(1)
     .maybeSingle();
@@ -505,5 +509,9 @@ export async function getAdminPopup(): Promise<AdminPopupView | null> {
     title: data.title ?? "리뉴얼 안내 팝업",
     isActive: data.is_active,
     hideOnMobile: data.hide_on_mobile,
+    kind: data.kind === "image" ? "image" : "renewal",
+    imageUrl: data.image_url ?? "",
+    mobileImageUrl: data.mobile_image_url ?? "",
+    linkUrl: data.link_url ?? "",
   };
 }

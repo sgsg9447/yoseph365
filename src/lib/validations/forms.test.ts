@@ -447,3 +447,32 @@ describe("popupSettingsSchema", () => {
     ).toBe(false);
   });
 });
+
+describe("popupSettingsSchema — 이미지 타입", () => {
+  const base = { id: 1, isActive: true, hideOnMobile: false };
+
+  it("kind 미지정 시 renewal로 기본 처리되어 통과한다", () => {
+    const r = popupSettingsSchema.safeParse(base);
+    expect(r.success && r.data.kind).toBe("renewal");
+  });
+
+  it("이미지 타입이고 데스크톱 이미지가 있으면 통과한다", () => {
+    expect(
+      popupSettingsSchema.safeParse({
+        ...base,
+        kind: "image",
+        imageUrl: "https://cdn.example.com/a.jpg",
+      }).success,
+    ).toBe(true);
+  });
+
+  it("이미지 타입인데 데스크톱 이미지가 없으면 거부한다", () => {
+    expect(
+      popupSettingsSchema.safeParse({ ...base, kind: "image", imageUrl: "" }).success,
+    ).toBe(false);
+  });
+
+  it("정의되지 않은 kind는 거부한다", () => {
+    expect(popupSettingsSchema.safeParse({ ...base, kind: "video" }).success).toBe(false);
+  });
+});

@@ -233,10 +233,20 @@ export const replacePhotoImageSchema = z.object({
 });
 export type ReplacePhotoImageInput = z.infer<typeof replacePhotoImageSchema>;
 
-// 관리자 — 팝업 노출 설정(사이트 노출 on/off, 모바일 숨김)
-export const popupSettingsSchema = z.object({
-  id: z.number().int().positive(),
-  isActive: z.boolean(),
-  hideOnMobile: z.boolean(),
-});
+// 관리자 — 팝업 설정(노출 on/off·모바일 숨김·유형·이미지)
+const popupUrl = z.string().trim().max(500).optional().default("");
+export const popupSettingsSchema = z
+  .object({
+    id: z.number().int().positive(),
+    isActive: z.boolean(),
+    hideOnMobile: z.boolean(),
+    kind: z.enum(["renewal", "image"]).default("renewal"),
+    imageUrl: popupUrl, // 데스크톱 이미지(공개 URL)
+    mobileImageUrl: popupUrl, // 모바일 전용 이미지(선택)
+    linkUrl: popupUrl, // 클릭 시 이동(선택)
+  })
+  .refine((v) => v.kind !== "image" || v.imageUrl.length > 0, {
+    message: "이미지를 업로드해 주세요",
+    path: ["imageUrl"],
+  });
 export type PopupSettingsInput = z.infer<typeof popupSettingsSchema>;

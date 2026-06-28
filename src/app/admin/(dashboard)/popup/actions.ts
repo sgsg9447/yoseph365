@@ -14,12 +14,20 @@ export async function updatePopupSettings(input: unknown): Promise<PopupResult> 
   if (!parsed.success) {
     return { ok: false, error: parsed.error.issues[0]?.message ?? "입력값을 확인해 주세요." };
   }
-  const { id, isActive, hideOnMobile } = parsed.data;
+  const { id, isActive, hideOnMobile, kind, imageUrl, mobileImageUrl, linkUrl } = parsed.data;
+  const orNull = (s: string) => (s.trim() === "" ? null : s.trim());
 
   const supabase = await createClient();
   const { error } = await supabase
     .from("popup")
-    .update({ is_active: isActive, hide_on_mobile: hideOnMobile })
+    .update({
+      is_active: isActive,
+      hide_on_mobile: hideOnMobile,
+      kind,
+      image_url: orNull(imageUrl),
+      mobile_image_url: orNull(mobileImageUrl),
+      link_url: orNull(linkUrl),
+    })
     .eq("id", id);
   if (error) return { ok: false, error: GENERIC };
 

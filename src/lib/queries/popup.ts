@@ -1,8 +1,15 @@
 import { createPublicClient } from "@/lib/supabase/public";
 
+export type PopupKind = "renewal" | "image";
+
 export interface PopupConfig {
   id: number;
+  kind: PopupKind;
   hideOnMobile: boolean;
+  /** kind === "image"일 때만 사용. */
+  imageUrl: string | null;
+  mobileImageUrl: string | null;
+  linkUrl: string | null;
 }
 
 /**
@@ -14,12 +21,19 @@ export async function getActivePopup(): Promise<PopupConfig | null> {
   const sb = createPublicClient();
   const { data } = await sb
     .from("popup")
-    .select("id, hide_on_mobile")
+    .select("id, kind, hide_on_mobile, image_url, mobile_image_url, link_url")
     .eq("is_active", true)
     .order("sort_order", { ascending: true })
     .order("id", { ascending: true })
     .limit(1)
     .maybeSingle();
   if (!data) return null;
-  return { id: data.id, hideOnMobile: data.hide_on_mobile };
+  return {
+    id: data.id,
+    kind: data.kind === "image" ? "image" : "renewal",
+    hideOnMobile: data.hide_on_mobile,
+    imageUrl: data.image_url,
+    mobileImageUrl: data.mobile_image_url,
+    linkUrl: data.link_url,
+  };
 }

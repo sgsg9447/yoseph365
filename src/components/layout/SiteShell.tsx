@@ -6,6 +6,7 @@ import { Footer } from "./Footer";
 import { StickyBar } from "./StickyBar";
 import { ConsultSheet } from "@/components/overlay/ConsultSheet";
 import { RenewalPopup } from "@/components/overlay/RenewalPopup";
+import { ImagePopup } from "@/components/overlay/ImagePopup";
 import type { PopupConfig } from "@/lib/queries/popup";
 import { usePathname } from "next/navigation";
 
@@ -48,7 +49,12 @@ export function SiteShell({ children, popup = null }: SiteShellProps) {
       {sheetMode && (
         <ConsultSheet open mode={sheetMode} onClose={closeSheet} />
       )}
-      {popup && <RenewalPopup config={popup} openConsult={openConsult} />}
+      {popup &&
+        (popup.kind === "image" ? (
+          <ImagePopup config={popup} />
+        ) : (
+          <RenewalPopup config={popup} openConsult={openConsult} />
+        ))}
     </ConsultContext.Provider>
   );
 }

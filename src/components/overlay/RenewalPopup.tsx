@@ -1,17 +1,13 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Logo } from "@/components/layout/Logo";
 import { Hammer, Clipboard, Message, ChevronRight, X, Check } from "@/components/icons";
-import { shouldShowPopup, hideUntilTimestamp } from "@/lib/popup/visibility";
+import { usePopupGate } from "./usePopupGate";
 import type { PopupConfig } from "@/lib/queries/popup";
 
-const HIDE_KEY = "renewalPopupHideUntil";
-const MOBILE_QUERY = "(max-width: 480px)";
-
 // 리뉴얼 안내 팝업 — 첫 진입 시 자동 노출. 내용은 코드 고정(일회성 안내).
-// 노출 여부(활성·24h억제·모바일숨김)는 shouldShowPopup 순수함수가 판정.
+// 노출/닫기/24h억제는 usePopupGate가 담당(shouldShowPopup 순수함수에 위임).
 // 상담문의 바텀시트는 SiteShell이 openConsult로 주입(순환 import 회피).
 export function RenewalPopup({
   config,
@@ -21,44 +17,7 @@ export function RenewalPopup({
   openConsult: (mode: "consult") => void;
 }) {
   const router = useRouter();
-  const [open, setOpen] = useState(false);
-  const [hideForToday, setHideForToday] = useState(false);
-
-  const close = useCallback(() => {
-    if (hideForToday) {
-      localStorage.setItem(HIDE_KEY, String(hideUntilTimestamp(Date.now())));
-    }
-    setOpen(false);
-  }, [hideForToday]);
-
-  // 마운트 후 브라우저 전용 상태(matchMedia·localStorage)를 읽어 1회 판정.
-  // SSR과 동일한 기본값(false)으로 첫 렌더 후 갱신해 hydration 불일치를 피하는
-  // 의도된 패턴이라 set-state-in-effect 규칙을 이 효과에 한해 끈다.
-  useEffect(() => {
-    /* eslint-disable react-hooks/set-state-in-effect */
-    const isMobile = window.matchMedia(MOBILE_QUERY).matches;
-    const raw = localStorage.getItem(HIDE_KEY);
-    const parsed = raw !== null ? Number(raw) : NaN;
-    const show = shouldShowPopup({
-      isActive: true,
-      hideOnMobile: config.hideOnMobile,
-      isMobile,
-      hideUntil: Number.isFinite(parsed) ? parsed : null,
-      now: Date.now(),
-    });
-    if (show) setOpen(true);
-    /* eslint-enable react-hooks/set-state-in-effect */
-  }, [config.hideOnMobile]);
-
-  // Esc로 닫기.
-  useEffect(() => {
-    if (!open) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") close();
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [open, close]);
+  const { open, close, hideForToday, setHideForToday } = usePopupGate(config.hideOnMobile);
 
   function act(run: () => void) {
     close();

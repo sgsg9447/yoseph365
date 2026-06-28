@@ -531,7 +531,9 @@ export type Database = {
           id: number
           image_url: string | null
           is_active: boolean
+          kind: string
           link_url: string | null
+          mobile_image_url: string | null
           sort_order: number
           start_at: string | null
           title: string | null
@@ -543,7 +545,9 @@ export type Database = {
           id?: never
           image_url?: string | null
           is_active?: boolean
+          kind?: string
           link_url?: string | null
+          mobile_image_url?: string | null
           sort_order?: number
           start_at?: string | null
           title?: string | null
@@ -555,7 +559,9 @@ export type Database = {
           id?: never
           image_url?: string | null
           is_active?: boolean
+          kind?: string
           link_url?: string | null
+          mobile_image_url?: string | null
           sort_order?: number
           start_at?: string | null
           title?: string | null
