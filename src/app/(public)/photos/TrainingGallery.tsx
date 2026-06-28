@@ -1,29 +1,26 @@
 "use client";
 
-// 훈련 사진 갤러리 — 보내주신 사진이 이미 여러 장을 한 장으로 합친 콜라주라,
-// 카테고리로 나누지 않고 하나로 모아 보여준다. 비율이 1.2~4.1로 제각각이라
-// 자르지 않고(justified rows) 행마다 높이를 맞춰 가로폭을 꽉 채운다. 클릭 시 확대.
+// 훈련사진 갤러리 — 상단 탭(전체/집수리/인테리어목공/인테리어필름/기능사) + 기능사 하위칩.
+// 비율을 URL 키로 보관해 탭 전환 시에도 justified 배치가 유지된다. 클릭 시 확대.
 
+import { useState, useRef, useEffect, useLayoutEffect, useCallback, useMemo } from "react";
 import {
-  useState,
-  useRef,
-  useEffect,
-  useLayoutEffect,
-  useCallback,
-} from "react";
+  TABS,
+  GINEUNGSA_SUBS,
+  LEAF_LABELS,
+  photosForTab,
+  type TabKey,
+  type LeafCategory,
+} from "@/lib/gallery/categories";
+import type { GalleryPhoto } from "@/lib/queries/photos";
 
 const GAP = 10;
-const FALLBACK_RATIO = 1.4; // 로드 전 임시 비율(레이아웃 점프 최소화)
-const SINGLE_COL_BP = 560; // 이 폭 미만(모바일)에서는 한 줄에 한 장씩
+const FALLBACK_RATIO = 1.4;
+const SINGLE_COL_BP = 560;
 
 type Cell = { i: number; w: number; h: number };
 
-// 비율 목록을 받아 행 단위로 배치한다. 마지막 행은 늘리지 않고 목표 높이로 둔다.
-function buildRows(
-  ratios: number[],
-  containerW: number,
-  targetH: number,
-): Cell[][] {
+function buildRows(ratios: number[], containerW: number, targetH: number): Cell[][] {
   const rows: Cell[][] = [];
   let row: number[] = [];
   let sumR = 0;
@@ -44,43 +41,41 @@ function buildRows(
   return rows;
 }
 
-export function TrainingGallery({ photos }: { photos: string[] }) {
-  const PHOTOS = photos;
+export function TrainingGallery({ photos }: { photos: GalleryPhoto[] }) {
+  const [tab, setTab] = useState<TabKey>("전체");
+  const [sub, setSub] = useState<LeafCategory | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [width, setWidth] = useState(0);
-  const [ratios, setRatios] = useState<number[]>(() =>
-    PHOTOS.map(() => FALLBACK_RATIO),
-  );
+  const [ratioByUrl, setRatioByUrl] = useState<Record<string, number>>({});
   const [zoom, setZoom] = useState<number | null>(null);
 
-  // 컨테이너 너비 측정 + 리사이즈 추적
+  const visible = useMemo(
+    () => photosForTab(photos, tab, tab === "기능사과정" ? sub : null),
+    [photos, tab, sub],
+  );
+  const urls = useMemo(() => visible.map((p) => p.url), [visible]);
+
   useLayoutEffect(() => {
     const el = containerRef.current;
     if (!el) return;
     setWidth(el.clientWidth);
-    const ro = new ResizeObserver(([entry]) =>
-      setWidth(entry.contentRect.width),
-    );
+    const ro = new ResizeObserver(([entry]) => setWidth(entry.contentRect.width));
     ro.observe(el);
     return () => ro.disconnect();
   }, []);
 
   const onImgLoad = useCallback(
-    (i: number, e: React.SyntheticEvent<HTMLImageElement>) => {
+    (url: string, e: React.SyntheticEvent<HTMLImageElement>) => {
       const img = e.currentTarget;
       const r = img.naturalWidth / img.naturalHeight;
-      setRatios((prev) => {
-        if (Math.abs(prev[i] - r) < 0.001) return prev;
-        const next = [...prev];
-        next[i] = r;
-        return next;
-      });
+      setRatioByUrl((prev) =>
+        Math.abs((prev[url] ?? -1) - r) < 0.001 ? prev : { ...prev, [url]: r },
+      );
     },
     [],
   );
 
-  // 모바일(< SINGLE_COL_BP)은 한 줄에 한 장씩 꽉 채워 보여준다.
-  // 그 이상(태블릿·데스크톱)은 행마다 높이를 맞춘 justified 배치.
+  const ratios = urls.map((u) => ratioByUrl[u] ?? FALLBACK_RATIO);
   const targetH = width < 900 ? 200 : 240;
   const rows =
     width > 0
@@ -89,11 +84,9 @@ export function TrainingGallery({ photos }: { photos: string[] }) {
         : buildRows(ratios, width, targetH)
       : null;
 
-  // 라이트박스: ESC 닫기 / 좌우 이동
   const go = useCallback(
-    (d: number) =>
-      setZoom((p) => (p === null ? p : (p + d + PHOTOS.length) % PHOTOS.length)),
-    [PHOTOS.length],
+    (d: number) => setZoom((p) => (p === null ? p : (p + d + urls.length) % urls.length)),
+    [urls],
   );
   useEffect(() => {
     if (zoom === null) return;
@@ -106,52 +99,92 @@ export function TrainingGallery({ photos }: { photos: string[] }) {
     return () => window.removeEventListener("keydown", onKey);
   }, [zoom, go]);
 
+  function selectTab(t: TabKey) {
+    setTab(t);
+    setSub(null);
+    setZoom(null);
+  }
+
   return (
-    <div ref={containerRef}>
-      {/* justified rows: 너비를 알기 전엔 한 줄에 흘려보내며 자연 로드 → 측정되면 배치 */}
-      <div style={{ display: "flex", flexDirection: "column", gap: GAP }}>
-        {(rows ?? [PHOTOS.map((_, i) => ({ i, w: 0, h: 0 }))]).map((cells, ri) => (
-          <div key={ri} style={{ display: "flex", gap: GAP }}>
-            {cells.map(({ i, w, h }) => (
-              <button
-                key={i}
-                type="button"
-                onClick={() => setZoom(i)}
-                aria-label={`훈련 현장 사진 ${i + 1} 크게 보기`}
-                style={{
-                  width: rows ? w : undefined,
-                  height: rows ? h : undefined,
-                  flexGrow: rows ? 0 : 1,
-                  padding: 0,
-                  border: "none",
-                  borderRadius: 12,
-                  overflow: "hidden",
-                  background: "var(--color-hairline-soft)",
-                  cursor: "zoom-in",
-                  display: "block",
-                }}
-              >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={PHOTOS[i]}
-                  alt={`훈련 현장 사진 ${i + 1}`}
-                  loading="lazy"
-                  onLoad={(e) => onImgLoad(i, e)}
-                  style={{
-                    width: "100%",
-                    height: rows ? "100%" : "auto",
-                    objectFit: "cover",
-                    display: "block",
-                  }}
-                />
-              </button>
-            ))}
-          </div>
+    <div>
+      {/* 상단 탭 */}
+      <div
+        role="tablist"
+        aria-label="훈련사진 분류"
+        style={{ display: "flex", gap: 8, overflowX: "auto", paddingBottom: 4, marginBottom: 14 }}
+      >
+        {TABS.map((t) => (
+          <Chip key={t} active={t === tab} onClick={() => selectTab(t)}>
+            {t}
+          </Chip>
         ))}
       </div>
 
+      {/* 기능사 하위 칩 */}
+      {tab === "기능사과정" && (
+        <div style={{ display: "flex", gap: 8, marginBottom: 14 }}>
+          <Chip small active={sub === null} onClick={() => setSub(null)}>
+            전체
+          </Chip>
+          {GINEUNGSA_SUBS.map((s) => (
+            <Chip key={s} small active={sub === s} onClick={() => setSub(s)}>
+              {LEAF_LABELS[s].replace("기능사 · ", "")}
+            </Chip>
+          ))}
+        </div>
+      )}
+
+      {urls.length === 0 ? (
+        <p className="text-muted text-[15px] text-center" style={{ padding: "40px 0" }}>
+          이 분류에는 아직 등록된 사진이 없습니다.
+        </p>
+      ) : (
+        <div ref={containerRef}>
+          <div style={{ display: "flex", flexDirection: "column", gap: GAP }}>
+            {(rows ?? [urls.map((_, i) => ({ i, w: 0, h: 0 }))]).map((cells, ri) => (
+              <div key={ri} style={{ display: "flex", gap: GAP }}>
+                {cells.map(({ i, w, h }) => (
+                  <button
+                    key={urls[i]}
+                    type="button"
+                    onClick={() => setZoom(i)}
+                    aria-label={`훈련 현장 사진 ${i + 1} 크게 보기`}
+                    style={{
+                      width: rows ? w : undefined,
+                      height: rows ? h : undefined,
+                      flexGrow: rows ? 0 : 1,
+                      padding: 0,
+                      border: "none",
+                      borderRadius: 12,
+                      overflow: "hidden",
+                      background: "var(--color-hairline-soft)",
+                      cursor: "zoom-in",
+                      display: "block",
+                    }}
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={urls[i]}
+                      alt={`훈련 현장 사진 ${i + 1}`}
+                      loading="lazy"
+                      onLoad={(e) => onImgLoad(urls[i], e)}
+                      style={{
+                        width: "100%",
+                        height: rows ? "100%" : "auto",
+                        objectFit: "cover",
+                        display: "block",
+                      }}
+                    />
+                  </button>
+                ))}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* 라이트박스 */}
-      {zoom !== null && (
+      {zoom !== null && urls[zoom] && (
         <div
           onClick={() => setZoom(null)}
           style={{
@@ -185,13 +218,10 @@ export function TrainingGallery({ photos }: { photos: string[] }) {
           >
             ×
           </button>
-          <div
-            onClick={(e) => e.stopPropagation()}
-            style={{ position: "relative", maxWidth: "min(94vw, 1100px)" }}
-          >
+          <div onClick={(e) => e.stopPropagation()} style={{ position: "relative", maxWidth: "min(94vw, 1100px)" }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src={PHOTOS[zoom]}
+              src={urls[zoom]}
               alt={`훈련 현장 사진 ${zoom + 1}`}
               style={{
                 display: "block",
@@ -205,15 +235,8 @@ export function TrainingGallery({ photos }: { photos: string[] }) {
             />
             <NavButton dir="prev" onClick={() => go(-1)} />
             <NavButton dir="next" onClick={() => go(1)} />
-            <p
-              style={{
-                color: "#fff",
-                textAlign: "center",
-                marginTop: 14,
-                fontSize: 14,
-              }}
-            >
-              {zoom + 1} / {PHOTOS.length}
+            <p style={{ color: "#fff", textAlign: "center", marginTop: 14, fontSize: 14 }}>
+              {zoom + 1} / {urls.length}
             </p>
           </div>
         </div>
@@ -222,13 +245,40 @@ export function TrainingGallery({ photos }: { photos: string[] }) {
   );
 }
 
-function NavButton({
-  dir,
+function Chip({
+  children,
+  active,
+  small,
   onClick,
 }: {
-  dir: "prev" | "next";
+  children: React.ReactNode;
+  active: boolean;
+  small?: boolean;
   onClick: () => void;
 }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-pressed={active}
+      className="whitespace-nowrap font-semibold transition active:scale-[0.98]"
+      style={{
+        height: small ? 38 : 44,
+        padding: small ? "0 16px" : "0 20px",
+        fontSize: small ? 14 : 15.5,
+        borderRadius: 9999,
+        border: active ? "1px solid var(--color-ink)" : "1px solid var(--color-hairline-strong)",
+        background: active ? "var(--color-ink)" : "transparent",
+        color: active ? "#fff" : "var(--color-ink)",
+        cursor: "pointer",
+      }}
+    >
+      {children}
+    </button>
+  );
+}
+
+function NavButton({ dir, onClick }: { dir: "prev" | "next"; onClick: () => void }) {
   return (
     <button
       type="button"
@@ -256,17 +306,7 @@ function NavButton({
         } as React.CSSProperties
       }
     >
-      <svg
-        width="22"
-        height="22"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2.4"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        aria-hidden
-      >
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
         <path d={dir === "prev" ? "m15 18-6-6 6-6" : "m9 18 6-6-6-6"} />
       </svg>
     </button>

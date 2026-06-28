@@ -11,6 +11,7 @@ import { SocialProof } from "@/components/sections/SocialProof";
 import { Videos } from "@/components/sections/Videos";
 import { ClosingCTA } from "@/components/sections/ClosingCTA";
 import { getScheduleCourses } from "@/lib/queries/courses";
+import { getFeaturedTrainingPhotos } from "@/lib/queries/photos";
 import type { ScheduleCourse } from "@/lib/queries/types";
 
 export const revalidate = 3600;
@@ -22,13 +23,19 @@ export default async function HomePage() {
   } catch {
     scheduleCourses = [];
   }
+  let featuredPhotos: string[];
+  try {
+    featuredPhotos = await getFeaturedTrainingPhotos();
+  } catch {
+    featuredPhotos = [];
+  }
   return (
     <>
       <Banner />
       <AwardsStrip />
       <HomeIntentSchedule courses={scheduleCourses} />
       <Barriers />
-      <SocialProof />
+      <SocialProof photos={featuredPhotos} />
       <Videos />
       <ClosingCTA />
     </>

@@ -5,7 +5,6 @@
 import Link from "next/link";
 import Image from "next/image";
 import { SectionHeading } from "@/components/ui/SectionHeading";
-import { PhotoSlot } from "@/components/ui/PhotoSlot";
 
 interface AwardHighlightProps {
   lines: string[];
@@ -72,16 +71,7 @@ const trust: AwardHighlightProps[] = [
   },
 ];
 
-const photos = [
-  { src: "/photos/training/training-03.jpg", label: "가벽·아치 목공 실습" },
-  { src: "/photos/training/training-09.jpg", label: "욕실 변기 설치 실습" },
-  { src: "/photos/training/training-07.jpg", label: "벽타일 시공 실습" },
-  { src: "/photos/training/training-08.jpg", label: "바닥재 시공 실습" },
-  { src: "/photos/training/training-06.jpg", label: "집수리 설비 실습" },
-  { src: "/photos/training/training-02.jpg", label: "무늬목 시공 실습" },
-];
-
-export function SocialProof() {
+export function SocialProof({ photos }: { photos: string[] }) {
   return (
     <section className="wrap band">
       <SectionHeading
@@ -98,19 +88,35 @@ export function SocialProof() {
           </span>
         }
       />
-      <div className="grid g-3" style={{ margin: "36px 0 12px" }}>
-        {photos.map((p, i) => (
-          <PhotoSlot key={i} ratio="4 / 3" src={p.src} label={p.label} />
-        ))}
-      </div>
-      <div className="flex justify-center" style={{ margin: "4px 0 34px" }}>
-        <Link
-          href="/photos"
-          className="inline-flex items-center justify-center gap-2 rounded-button font-semibold leading-none tracking-[-0.2px] whitespace-nowrap transition active:scale-[0.98] h-12 px-[22px] text-[17px] bg-transparent text-ink border border-hairline-strong"
-        >
-          훈련 사진 전체보기
-        </Link>
-      </div>
+      {photos.length > 0 && (
+        <>
+          <div className="grid g-3" style={{ margin: "36px 0 12px" }}>
+            {photos.map((src, i) => (
+              <div
+                key={i}
+                className="relative overflow-hidden bg-surface-strong border border-hairline"
+                style={{ aspectRatio: "4 / 3", borderRadius: 12 }}
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={src}
+                  alt="훈련 현장"
+                  loading="lazy"
+                  className="w-full h-full object-cover block"
+                />
+              </div>
+            ))}
+          </div>
+          <div className="flex justify-center" style={{ margin: "4px 0 34px" }}>
+            <Link
+              href="/photos"
+              className="inline-flex items-center justify-center gap-2 rounded-button font-semibold leading-none tracking-[-0.2px] whitespace-nowrap transition active:scale-[0.98] h-12 px-[22px] text-[17px] bg-transparent text-ink border border-hairline-strong"
+            >
+              훈련 사진 전체보기
+            </Link>
+          </div>
+        </>
+      )}
 
       <div
         className="relative overflow-hidden"

@@ -564,9 +564,11 @@ export type Database = {
           category: Database["public"]["Enums"]["post_category"]
           content: string | null
           created_at: string
+          gallery_category: string | null
           id: number
           images: string[]
           is_deleted: boolean
+          is_featured: boolean
           is_published: boolean
           title: string
           updated_at: string
@@ -575,9 +577,11 @@ export type Database = {
           category: Database["public"]["Enums"]["post_category"]
           content?: string | null
           created_at?: string
+          gallery_category?: string | null
           id?: never
           images?: string[]
           is_deleted?: boolean
+          is_featured?: boolean
           is_published?: boolean
           title: string
           updated_at?: string
@@ -586,9 +590,11 @@ export type Database = {
           category?: Database["public"]["Enums"]["post_category"]
           content?: string | null
           created_at?: string
+          gallery_category?: string | null
           id?: never
           images?: string[]
           is_deleted?: boolean
+          is_featured?: boolean
           is_published?: boolean
           title?: string
           updated_at?: string
