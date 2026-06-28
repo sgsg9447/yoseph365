@@ -44,6 +44,14 @@ export function sanitizeRichHtml(html: string): string {
     allowedStyles: {
       "*": {
         "text-align": [/^left$/, /^right$/, /^center$/, /^justify$/],
+        // 에디터의 글자색(프리셋 hex). TipTap이 rgb로 정규화하는 경우까지 허용.
+        color: [
+          /^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/,
+          /^rgb\(\s*\d{1,3}\s*,\s*\d{1,3}\s*,\s*\d{1,3}\s*\)$/,
+          /^rgba\(\s*\d{1,3}\s*,\s*\d{1,3}\s*,\s*\d{1,3}\s*,\s*(?:0|1|0?\.\d+)\s*\)$/,
+        ],
+        // 에디터의 글자 크기(프리셋 px). 1~3자리 px만 허용해 과도한 값 차단.
+        "font-size": [/^\d{1,3}px$/],
       },
     },
   });

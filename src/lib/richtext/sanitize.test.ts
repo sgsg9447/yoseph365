@@ -47,4 +47,21 @@ describe("sanitizeRichHtml", () => {
     const out = sanitizeRichHtml('<a href="javascript:alert(1)">링크</a>');
     expect(out).not.toContain("javascript:");
   });
+
+  it("글자 색상(color, hex) 스타일을 보존한다", () => {
+    const out = sanitizeRichHtml('<span style="color: #e02424">빨강</span>');
+    expect(out).toMatch(/color/);
+    expect(out.toLowerCase()).toContain("#e02424");
+  });
+
+  it("글자 크기(font-size, px) 스타일을 보존한다", () => {
+    const out = sanitizeRichHtml('<span style="font-size: 20px">크게</span>');
+    expect(out).toMatch(/font-size/);
+    expect(out).toContain("20px");
+  });
+
+  it("허용되지 않은 색상 표현식(expression 등)은 제거한다", () => {
+    const out = sanitizeRichHtml('<span style="color: expression(alert(1))">x</span>');
+    expect(out).not.toContain("expression");
+  });
 });
