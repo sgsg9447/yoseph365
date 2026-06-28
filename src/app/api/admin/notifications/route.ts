@@ -29,8 +29,8 @@ export async function GET(request: NextRequest) {
   const apps = appsRes.data ?? [];
   const inquiries = inqRes.data ?? [];
 
+  // 상담문의만 course_id → 과정명 매핑이 필요(수강신청 selected_courses는 이미 과정명).
   const courseIds = new Set<string>();
-  for (const a of apps) for (const c of a.selected_courses) courseIds.add(c);
   for (const q of inquiries) if (q.course_id) courseIds.add(q.course_id);
 
   const courseNames: Record<string, string> = {};
