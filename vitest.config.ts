@@ -8,8 +8,9 @@ export default defineConfig({
     environment: "jsdom",
     globals: true,
     setupFiles: ["./vitest.setup.ts"],
-    // 워크트리(.worktrees/*) 생성물은 별도 브랜치 사본이므로 테스트 수집에서 제외.
-    exclude: [...configDefaults.exclude, "**/.worktrees/**"],
+    // 워크트리 생성물은 별도 브랜치 사본이므로 테스트 수집에서 제외.
+    // (레거시 .worktrees/* + 네이티브 .claude/worktrees/* 둘 다)
+    exclude: [...configDefaults.exclude, "**/.worktrees/**", "**/.claude/worktrees/**"],
   },
   resolve: { alias: { "@": resolve(__dirname, "./src") } },
 });
