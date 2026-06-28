@@ -1,6 +1,7 @@
 import type { Database } from "@/lib/supabase/database.types";
 import { createClient } from "@/lib/supabase/server";
 import { publicUrl } from "@/lib/storage/keys";
+import { isLeafCategory, type LeafCategory } from "@/lib/gallery/categories";
 import { applyInfoRowToView } from "./mappers";
 import type { ApplyInfoView } from "./types";
 
@@ -345,22 +346,32 @@ export interface AdminPhotoView {
   id: number;
   label: string;
   image: string | null;
+  category: LeafCategory | null;
+  isFeatured: boolean;
 }
 
-export async function getTrainingPhotos(): Promise<AdminPhotoView[]> {
+export interface AdminPhotosResult {
+  photos: AdminPhotoView[];
+  featuredCount: number;
+}
+
+export async function getTrainingPhotos(): Promise<AdminPhotosResult> {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("post")
-    .select("id,title,images,category,is_published,is_deleted,created_at")
+    .select("id,title,images,gallery_category,is_featured,is_deleted,created_at")
     .eq("category", "훈련사진")
     .eq("is_deleted", false)
     .order("created_at", { ascending: false });
   if (error) throw error;
-  return (data ?? []).map((p) => ({
+  const photos = (data ?? []).map((p) => ({
     id: p.id,
     label: p.title,
     image: p.images[0] ? publicUrl(p.images[0]) : null,
+    category: isLeafCategory(p.gallery_category) ? p.gallery_category : null,
+    isFeatured: p.is_featured,
   }));
+  return { photos, featuredCount: photos.filter((p) => p.isFeatured).length };
 }
 
 export interface AdminNoticeView {
