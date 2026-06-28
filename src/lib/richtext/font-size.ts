@@ -1,6 +1,6 @@
-// 리치 텍스트 글자 크기 스테퍼용 순수 로직. 기본 크기는 .rich-content 본문(15px) 기준.
+// 리치 텍스트 글자 크기 스테퍼용 순수 로직. 기본 크기는 .rich-content 본문(16px) 기준.
 
-export const BASE_FONT_SIZE = 15;
+export const BASE_FONT_SIZE = 16;
 export const MIN_FONT_SIZE = 12;
 export const MAX_FONT_SIZE = 40;
 const STEP = 1;

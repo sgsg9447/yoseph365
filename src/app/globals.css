@@ -271,7 +271,7 @@
 .scrollbar-clean::-webkit-scrollbar-thumb:hover { background: var(--color-muted-soft); }
 
 /* 리치 본문(공지 에디터·렌더 공용) — Tailwind preflight가 지운 목록·제목 스타일 복원. */
-.rich-content { color: var(--color-body); font-size: 15px; line-height: 1.7; word-break: keep-all; }
+.rich-content { color: var(--color-body); font-size: 16px; line-height: 1.7; word-break: keep-all; }
 .rich-content p { margin: 0 0 0.6em; }
 .rich-content h2 { font-size: 20px; font-weight: 700; color: var(--color-ink); margin: 0.8em 0 0.4em; }
 .rich-content h3 { font-size: 17px; font-weight: 700; color: var(--color-ink); margin: 0.8em 0 0.4em; }
