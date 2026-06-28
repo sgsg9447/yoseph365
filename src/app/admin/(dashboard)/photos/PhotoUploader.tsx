@@ -6,8 +6,14 @@ import { ImageIcon } from "@/components/icons";
 import { validatePhotoFile } from "@/lib/storage/keys";
 import { uploadToTarget } from "@/lib/storage/client";
 import { downscaleImage } from "@/lib/storage/downscale";
+import { Select } from "@/components/ui/Select";
 import { LEAF_CATEGORIES, LEAF_LABELS, type LeafCategory } from "@/lib/gallery/categories";
 import { createUploadTarget, addTrainingPhotos } from "./actions";
+
+const CATEGORY_OPTIONS = [
+  { value: "", label: "카테고리를 선택하세요" },
+  ...LEAF_CATEGORIES.map((c) => ({ value: c, label: LEAF_LABELS[c] })),
+];
 
 export function PhotoUploader() {
   const router = useRouter();
@@ -65,18 +71,14 @@ export function PhotoUploader() {
       <label className="block text-[14px] font-bold text-body-strong mb-2">
         카테고리 선택
       </label>
-      <select
-        value={category}
-        onChange={(e) => setCategory(e.target.value as LeafCategory | "")}
-        className="w-full mb-3 h-11 rounded-lg border border-hairline-strong px-3 text-[15px] bg-white"
-      >
-        <option value="">카테고리를 선택하세요</option>
-        {LEAF_CATEGORIES.map((c) => (
-          <option key={c} value={c}>
-            {LEAF_LABELS[c]}
-          </option>
-        ))}
-      </select>
+      <div className="mb-3">
+        <Select
+          value={category}
+          options={CATEGORY_OPTIONS}
+          onChange={(v) => setCategory(v as LeafCategory | "")}
+          ariaLabel="카테고리 선택"
+        />
+      </div>
 
       <button
         type="button"

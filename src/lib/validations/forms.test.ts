@@ -13,7 +13,7 @@ import {
   trackSaveSchema,
   applyInfoSchema,
   trainingPhotoAddSchema,
-  featuredToggleSchema,
+  setFeaturedSchema,
   inquiryPostSchema,
   verifySecretSchema,
 } from "./forms";
@@ -341,15 +341,19 @@ describe("trainingPhotoAddSchema", () => {
   });
 });
 
-describe("featuredToggleSchema", () => {
-  it("정상 입력 통과", () => {
-    expect(featuredToggleSchema.safeParse({ id: 1, on: true }).success).toBe(true);
+describe("setFeaturedSchema", () => {
+  it("id 목록을 통과시킨다", () => {
+    expect(setFeaturedSchema.safeParse({ ids: [1, 2, 3] }).success).toBe(true);
   });
-  it("id가 양의 정수가 아니면 실패", () => {
-    expect(featuredToggleSchema.safeParse({ id: 0, on: true }).success).toBe(false);
+  it("빈 목록도 통과(메인 비우기)", () => {
+    expect(setFeaturedSchema.safeParse({ ids: [] }).success).toBe(true);
   });
-  it("on이 불리언이 아니면 실패", () => {
-    expect(featuredToggleSchema.safeParse({ id: 1, on: "yes" }).success).toBe(false);
+  it("6장 초과는 실패", () => {
+    expect(setFeaturedSchema.safeParse({ ids: [1, 2, 3, 4, 5, 6, 7] }).success).toBe(false);
+  });
+  it("양의 정수가 아니면 실패", () => {
+    expect(setFeaturedSchema.safeParse({ ids: [0] }).success).toBe(false);
+    expect(setFeaturedSchema.safeParse({ ids: ["a"] }).success).toBe(false);
   });
 });
 

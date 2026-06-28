@@ -4,14 +4,7 @@
 // 비율을 URL 키로 보관해 탭 전환 시에도 justified 배치가 유지된다. 클릭 시 확대.
 
 import { useState, useRef, useEffect, useLayoutEffect, useCallback, useMemo } from "react";
-import {
-  TABS,
-  GINEUNGSA_SUBS,
-  LEAF_LABELS,
-  photosForTab,
-  type TabKey,
-  type LeafCategory,
-} from "@/lib/gallery/categories";
+import { TABS, tabLabel, photosForTab, type TabKey } from "@/lib/gallery/categories";
 import type { GalleryPhoto } from "@/lib/queries/photos";
 
 const GAP = 10;
@@ -43,16 +36,12 @@ function buildRows(ratios: number[], containerW: number, targetH: number): Cell[
 
 export function TrainingGallery({ photos }: { photos: GalleryPhoto[] }) {
   const [tab, setTab] = useState<TabKey>("전체");
-  const [sub, setSub] = useState<LeafCategory | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [width, setWidth] = useState(0);
   const [ratioByUrl, setRatioByUrl] = useState<Record<string, number>>({});
   const [zoom, setZoom] = useState<number | null>(null);
 
-  const visible = useMemo(
-    () => photosForTab(photos, tab, tab === "기능사과정" ? sub : null),
-    [photos, tab, sub],
-  );
+  const visible = useMemo(() => photosForTab(photos, tab), [photos, tab]);
   const urls = useMemo(() => visible.map((p) => p.url), [visible]);
 
   useLayoutEffect(() => {
@@ -101,7 +90,6 @@ export function TrainingGallery({ photos }: { photos: GalleryPhoto[] }) {
 
   function selectTab(t: TabKey) {
     setTab(t);
-    setSub(null);
     setZoom(null);
   }
 
@@ -115,24 +103,10 @@ export function TrainingGallery({ photos }: { photos: GalleryPhoto[] }) {
       >
         {TABS.map((t) => (
           <Chip key={t} active={t === tab} onClick={() => selectTab(t)}>
-            {t}
+            {tabLabel(t)}
           </Chip>
         ))}
       </div>
-
-      {/* 기능사 하위 칩 */}
-      {tab === "기능사과정" && (
-        <div style={{ display: "flex", gap: 8, marginBottom: 14 }}>
-          <Chip small active={sub === null} onClick={() => setSub(null)}>
-            전체
-          </Chip>
-          {GINEUNGSA_SUBS.map((s) => (
-            <Chip key={s} small active={sub === s} onClick={() => setSub(s)}>
-              {LEAF_LABELS[s].replace("기능사 · ", "")}
-            </Chip>
-          ))}
-        </div>
-      )}
 
       {urls.length === 0 ? (
         <p className="text-muted text-[15px] text-center" style={{ padding: "40px 0" }}>
@@ -248,12 +222,10 @@ export function TrainingGallery({ photos }: { photos: GalleryPhoto[] }) {
 function Chip({
   children,
   active,
-  small,
   onClick,
 }: {
   children: React.ReactNode;
   active: boolean;
-  small?: boolean;
   onClick: () => void;
 }) {
   return (
@@ -263,9 +235,9 @@ function Chip({
       aria-pressed={active}
       className="whitespace-nowrap font-semibold transition active:scale-[0.98]"
       style={{
-        height: small ? 38 : 44,
-        padding: small ? "0 16px" : "0 20px",
-        fontSize: small ? 14 : 15.5,
+        height: 44,
+        padding: "0 20px",
+        fontSize: 15.5,
         borderRadius: 9999,
         border: active ? "1px solid var(--color-ink)" : "1px solid var(--color-hairline-strong)",
         background: active ? "var(--color-ink)" : "transparent",

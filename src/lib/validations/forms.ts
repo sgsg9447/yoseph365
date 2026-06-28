@@ -218,9 +218,10 @@ export const trainingPhotoAddSchema = z.object({
 });
 export type TrainingPhotoAddInput = z.infer<typeof trainingPhotoAddSchema>;
 
-// 관리자 — 훈련사진 메인 노출 토글
-export const featuredToggleSchema = z.object({
-  id: z.number().int().positive(),
-  on: z.boolean(),
+// 관리자 — 메인 노출 사진 세트 저장(선택한 id 목록, 최대 6장)
+export const setFeaturedSchema = z.object({
+  ids: z
+    .array(z.number().int().positive())
+    .max(6, "메인 사진은 최대 6장까지 선택할 수 있습니다"),
 });
-export type FeaturedToggleInput = z.infer<typeof featuredToggleSchema>;
+export type SetFeaturedInput = z.infer<typeof setFeaturedSchema>;

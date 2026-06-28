@@ -3,8 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { createUploadTarget as makeTarget, removeObjects } from "@/lib/storage/server";
-import { trainingPhotoAddSchema, featuredToggleSchema } from "@/lib/validations/forms";
-import { featuredLimitReached } from "@/lib/gallery/categories";
+import { trainingPhotoAddSchema, setFeaturedSchema } from "@/lib/validations/forms";
 import type { UploadTarget } from "@/lib/storage/types";
 
 export type PhotoResult = { ok: true } | { ok: false; error: string };
@@ -71,36 +70,33 @@ export async function deleteTrainingPhoto(id: number): Promise<PhotoResult> {
   return { ok: true };
 }
 
-/** 메인 노출 토글 — 켤 때 최대 6장 cap 검증. */
-export async function toggleFeatured(input: unknown): Promise<PhotoResult> {
-  const parsed = featuredToggleSchema.safeParse(input);
-  if (!parsed.success) return { ok: false, error: "잘못된 요청입니다." };
-  const { id, on } = parsed.data;
+/** 메인 노출 사진 세트 저장 — 선택한 id만 featured, 나머지는 해제. */
+export async function setFeaturedPhotos(input: unknown): Promise<PhotoResult> {
+  const parsed = setFeaturedSchema.safeParse(input);
+  if (!parsed.success) {
+    return { ok: false, error: parsed.error.issues[0]?.message ?? "잘못된 요청입니다." };
+  }
+  const { ids } = parsed.data;
 
   const supabase = await createClient();
 
-  if (on) {
-    const { count, error: cErr } = await supabase
-      .from("post")
-      .select("id", { count: "exact", head: true })
-      .eq("category", "훈련사진")
-      .eq("is_deleted", false)
-      .eq("is_featured", true);
-    if (cErr) return { ok: false, error: GENERIC };
-    if (featuredLimitReached(count ?? 0)) {
-      return {
-        ok: false,
-        error: "메인 사진은 최대 6장까지 선택할 수 있습니다. 다른 사진을 먼저 해제해 주세요.",
-      };
-    }
-  }
-
-  const { error } = await supabase
+  // 1) 기존 메인 노출 전부 해제
+  const clear = await supabase
     .from("post")
-    .update({ is_featured: on })
-    .eq("id", id)
-    .eq("category", "훈련사진");
-  if (error) return { ok: false, error: GENERIC };
+    .update({ is_featured: false })
+    .eq("category", "훈련사진")
+    .eq("is_featured", true);
+  if (clear.error) return { ok: false, error: GENERIC };
+
+  // 2) 선택한 사진만 메인 노출
+  if (ids.length > 0) {
+    const set = await supabase
+      .from("post")
+      .update({ is_featured: true })
+      .eq("category", "훈련사진")
+      .in("id", ids);
+    if (set.error) return { ok: false, error: GENERIC };
+  }
 
   revalidatePath("/admin/photos");
   revalidatePath("/photos");

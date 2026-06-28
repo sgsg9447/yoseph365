@@ -10,34 +10,11 @@ export const LEAF_CATEGORIES = [
 ] as const;
 export type LeafCategory = (typeof LEAF_CATEGORIES)[number];
 
-/** 사용자 화면 상단 탭. "전체"는 모든 카테고리를 모으는 가상 탭. */
-export type TabKey =
-  | "전체"
-  | "집수리과정"
-  | "인테리어목공과정"
-  | "인테리어필름과정"
-  | "기능사과정";
+/** 상단 탭 = "전체" + 각 leaf(1:1). */
+export type TabKey = "전체" | LeafCategory;
+export const TABS: TabKey[] = ["전체", ...LEAF_CATEGORIES];
 
-export const TABS: TabKey[] = [
-  "전체",
-  "집수리과정",
-  "인테리어목공과정",
-  "인테리어필름과정",
-  "기능사과정",
-];
-
-/** 기능사 탭 하위 칩(leaf). */
-export const GINEUNGSA_SUBS: LeafCategory[] = ["목공기능사", "도장기능사"];
-
-const LEAF_TO_TAB: Record<LeafCategory, Exclude<TabKey, "전체">> = {
-  집수리: "집수리과정",
-  인테리어목공: "인테리어목공과정",
-  인테리어필름: "인테리어필름과정",
-  목공기능사: "기능사과정",
-  도장기능사: "기능사과정",
-};
-
-/** 어드민 드롭다운·카드 뱃지용 라벨. */
+/** 어드민 드롭다운·카드 뱃지·공개 탭 라벨. */
 export const LEAF_LABELS: Record<LeafCategory, string> = {
   집수리: "집수리과정",
   인테리어목공: "인테리어목공과정",
@@ -46,30 +23,45 @@ export const LEAF_LABELS: Record<LeafCategory, string> = {
   도장기능사: "기능사 · 도장기능사",
 };
 
-export function leafToTab(leaf: LeafCategory): Exclude<TabKey, "전체"> {
-  return LEAF_TO_TAB[leaf];
+/** 상단 탭 표시 라벨. */
+export function tabLabel(tab: TabKey): string {
+  return tab === "전체" ? "전체" : LEAF_LABELS[tab];
 }
 
 export function isLeafCategory(v: unknown): v is LeafCategory {
   return typeof v === "string" && (LEAF_CATEGORIES as readonly string[]).includes(v);
 }
 
-/** 활성 탭(+기능사 하위)에 보일 사진만 거른다. */
+/** 활성 탭에 보일 사진만 거른다. */
 export function photosForTab<T extends { category: LeafCategory }>(
   photos: T[],
   tab: TabKey,
-  sub?: LeafCategory | null,
 ): T[] {
   if (tab === "전체") return photos;
-  if (tab === "기능사과정") {
-    if (sub) return photos.filter((p) => p.category === sub);
-    return photos.filter((p) => GINEUNGSA_SUBS.includes(p.category));
-  }
-  return photos.filter((p) => leafToTab(p.category) === tab);
+  return photos.filter((p) => p.category === tab);
 }
 
 /** 메인 노출 최대 장수. */
 export const FEATURED_MAX = 6;
 export function featuredLimitReached(currentCount: number): boolean {
   return currentCount >= FEATURED_MAX;
+}
+
+/** 저장 가능 여부 — 정확히 FEATURED_MAX장 선택했을 때만 저장 허용. */
+export function canSaveFeatured(selectedCount: number): boolean {
+  return selectedCount === FEATURED_MAX;
+}
+
+/**
+ * 메인 노출 선택 토글. 이미 있으면 제거, 없으면 추가.
+ * max에 도달한 상태에서 새로 추가하려 하면 변경 없이 같은 배열(ref)을 그대로 돌려준다.
+ */
+export function toggleSelection(
+  selected: number[],
+  id: number,
+  max = FEATURED_MAX,
+): number[] {
+  if (selected.includes(id)) return selected.filter((x) => x !== id);
+  if (selected.length >= max) return selected;
+  return [...selected, id];
 }
