@@ -6,11 +6,11 @@ export interface Award {
   label: string;
 }
 
-// 공유 데이터: AwardsStrip + Footer 양쪽에서 import
+// 공유 데이터: AwardsStrip + Footer 양쪽에서 import. 최신 연도부터(역순) 노출.
 export const AWARDS: Award[] = [
-  { year: "2022", label: "고용노동부 우수훈련기관" },
-  { year: "2023", label: "경기도일자리재단 우수훈련기관" },
-  { year: "2023", label: "경기도지사표창 훈련기관" },
-  { year: "2024", label: "이수자평가 A등급" },
   { year: "2025", label: "고용노동부 3년인증 · 이수자평가 A등급" },
+  { year: "2024", label: "이수자평가 A등급" },
+  { year: "2023", label: "경기도지사표창 훈련기관" },
+  { year: "2023", label: "경기도일자리재단 우수훈련기관" },
+  { year: "2022", label: "고용노동부 우수훈련기관" },
 ];
