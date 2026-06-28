@@ -25,6 +25,20 @@ const LEAVES = ["집수리", "인테리어목공", "인테리어필름", "목공
 
 const sb = createClient(url, key, { auth: { persistSession: false } });
 
+// 일시적 전송 오류(Gateway Timeout 등)에 대비한 재시도 래퍼.
+async function withRetry(label, fn, tries = 4) {
+  for (let i = 1; i <= tries; i++) {
+    const res = await fn();
+    if (!res.error) return res;
+    if (i === tries) {
+      console.error(`${label} 실패:`, res.error.message);
+      process.exit(1);
+    }
+    console.warn(`  재시도 ${label} (${i}/${tries - 1}): ${res.error.message}`);
+    await new Promise((r) => setTimeout(r, 1500 * i));
+  }
+}
+
 console.log(`대상: ${url}`);
 
 // 1) 기존 행 삭제
@@ -65,24 +79,20 @@ for (const leaf of LEAVES) {
   for (const f of files) {
     const buf = await readFile(join(dir, f));
     const objectKey = `${randomUUID()}.jpg`;
-    const up = await sb.storage
-      .from(BUCKET)
-      .upload(objectKey, buf, { contentType: "image/jpeg", upsert: false });
-    if (up.error) {
-      console.error(`업로드 실패 ${leaf}/${f}:`, up.error.message);
-      process.exit(1);
-    }
-    const ins = await sb.from("post").insert({
-      category: "훈련사진",
-      gallery_category: leaf,
-      title: "훈련 현장 사진",
-      images: [objectKey],
-      is_featured: false,
-    });
-    if (ins.error) {
-      console.error(`행 생성 실패 ${leaf}/${f}:`, ins.error.message);
-      process.exit(1);
-    }
+    await withRetry(`업로드 ${leaf}/${f}`, () =>
+      sb.storage
+        .from(BUCKET)
+        .upload(objectKey, buf, { contentType: "image/jpeg", upsert: true }),
+    );
+    await withRetry(`행 생성 ${leaf}/${f}`, () =>
+      sb.from("post").insert({
+        category: "훈련사진",
+        gallery_category: leaf,
+        title: "훈련 현장 사진",
+        images: [objectKey],
+        is_featured: false,
+      }),
+    );
     total++;
   }
   console.log(`✓ ${leaf}: ${files.length}장`);
