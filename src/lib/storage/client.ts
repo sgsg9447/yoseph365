@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/client";
 import type { UploadTarget } from "./types";
 
-/** 업로드 대상에 파일을 직접 업로드. 드라이버별 분기. */
+/** 업로드 대상에 파일을 직접 업로드. 드라이버별 분기. (편집본 Blob도 허용 — File ⊂ Blob) */
 export async function uploadToTarget(target: UploadTarget, file: Blob): Promise<void> {
   switch (target.driver) {
     case "supabase": {

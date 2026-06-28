@@ -2,7 +2,7 @@
 const MAX_EDGE = 1600;
 const QUALITY = 0.8;
 
-export async function downscaleImage(file: File): Promise<Blob> {
+export async function downscaleImage(file: Blob): Promise<Blob> {
   if (typeof document === "undefined") return file;
   try {
     const bitmap = await createImageBitmap(file);
