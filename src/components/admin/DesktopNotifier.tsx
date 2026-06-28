@@ -84,6 +84,7 @@ export function DesktopNotifier() {
         const n = new Notification(TITLE[item.type], {
           body: item.label,
           tag: `${item.type}-${item.id}`,
+          icon: "/notification-icon.png",
         });
         n.onclick = () => {
           window.focus();
