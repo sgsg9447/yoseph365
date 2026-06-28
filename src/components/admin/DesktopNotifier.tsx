@@ -115,6 +115,8 @@ export function DesktopNotifier() {
         if (!isBaseline && data.items.length > 0) {
           data.items.forEach(fire);
           playBeep();
+          // 서버 컴포넌트(사이드바 카운트·현재 목록)를 다시 불러와 새로고침 없이 뱃지 갱신.
+          router.refresh();
         }
         setStatus("ok");
       } catch {
@@ -128,7 +130,7 @@ export function DesktopNotifier() {
       cancelled = true;
       clearInterval(timer);
     };
-  }, [enabled, fire, playBeep]);
+  }, [enabled, fire, playBeep, router]);
 
   const enable = useCallback(async () => {
     if (!("Notification" in window)) return;
