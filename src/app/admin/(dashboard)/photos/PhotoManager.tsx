@@ -16,6 +16,7 @@ import {
 } from "@/lib/gallery/categories";
 import type { AdminPhotoView } from "@/lib/queries/admin";
 import { DeletePhotoButton } from "./DeletePhotoButton";
+import { EditPhotoButton } from "./EditPhotoButton";
 import { setFeaturedPhotos } from "./actions";
 
 type Filter = "전체" | LeafCategory;
@@ -206,6 +207,9 @@ export function PhotoManager({ photos }: { photos: AdminPhotoView[] }) {
                   <span className="absolute bottom-2 left-2 bg-black/55 text-white text-[12px] font-medium rounded-md px-2 py-1">
                     {photo.category ? LEAF_LABELS[photo.category] : "미분류"}
                   </span>
+                  {photo.image !== null && (
+                    <EditPhotoButton id={photo.id} image={photo.image} label={photo.label} />
+                  )}
                   <DeletePhotoButton id={photo.id} />
                 </div>
               );

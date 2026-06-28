@@ -225,3 +225,10 @@ export const setFeaturedSchema = z.object({
     .max(6, "메인 사진은 최대 6장까지 선택할 수 있습니다"),
 });
 export type SetFeaturedInput = z.infer<typeof setFeaturedSchema>;
+
+// 관리자 — 기존 사진 이미지 교체(모자이크 편집본 업로드 후 키 교체)
+export const replacePhotoImageSchema = z.object({
+  id: z.number().int().positive(),
+  key: z.string().trim().min(1).max(200),
+});
+export type ReplacePhotoImageInput = z.infer<typeof replacePhotoImageSchema>;

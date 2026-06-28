@@ -14,6 +14,7 @@ import {
   applyInfoSchema,
   trainingPhotoAddSchema,
   setFeaturedSchema,
+  replacePhotoImageSchema,
   inquiryPostSchema,
   verifySecretSchema,
 } from "./forms";
@@ -354,6 +355,18 @@ describe("setFeaturedSchema", () => {
   it("양의 정수가 아니면 실패", () => {
     expect(setFeaturedSchema.safeParse({ ids: [0] }).success).toBe(false);
     expect(setFeaturedSchema.safeParse({ ids: ["a"] }).success).toBe(false);
+  });
+});
+
+describe("replacePhotoImageSchema", () => {
+  it("id + key 통과", () => {
+    expect(replacePhotoImageSchema.safeParse({ id: 1, key: "abc.jpg" }).success).toBe(true);
+  });
+  it("id가 양의 정수가 아니면 실패", () => {
+    expect(replacePhotoImageSchema.safeParse({ id: 0, key: "abc.jpg" }).success).toBe(false);
+  });
+  it("key가 비면 실패", () => {
+    expect(replacePhotoImageSchema.safeParse({ id: 1, key: "" }).success).toBe(false);
   });
 });
 

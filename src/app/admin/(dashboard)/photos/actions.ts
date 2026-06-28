@@ -3,7 +3,11 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { createUploadTarget as makeTarget, removeObjects } from "@/lib/storage/server";
-import { trainingPhotoAddSchema, setFeaturedSchema } from "@/lib/validations/forms";
+import {
+  trainingPhotoAddSchema,
+  setFeaturedSchema,
+  replacePhotoImageSchema,
+} from "@/lib/validations/forms";
 import type { UploadTarget } from "@/lib/storage/types";
 
 export type PhotoResult = { ok: true } | { ok: false; error: string };
@@ -97,6 +101,36 @@ export async function setFeaturedPhotos(input: unknown): Promise<PhotoResult> {
       .in("id", ids);
     if (set.error) return { ok: false, error: GENERIC };
   }
+
+  revalidatePath("/admin/photos");
+  revalidatePath("/photos");
+  revalidatePath("/");
+  return { ok: true };
+}
+
+/** 기존 사진 이미지 교체 — 새 키로 교체하고 옛 객체는 제거(id·카테고리·메인노출 유지). */
+export async function replacePhotoImage(input: unknown): Promise<PhotoResult> {
+  const parsed = replacePhotoImageSchema.safeParse(input);
+  if (!parsed.success) return { ok: false, error: "잘못된 요청입니다." };
+  const { id, key } = parsed.data;
+
+  const supabase = await createClient();
+  const { data: row } = await supabase
+    .from("post")
+    .select("images")
+    .eq("id", id)
+    .eq("category", "훈련사진")
+    .single();
+
+  const { error } = await supabase
+    .from("post")
+    .update({ images: [key] })
+    .eq("id", id)
+    .eq("category", "훈련사진");
+  if (error) return { ok: false, error: GENERIC };
+
+  const oldKey = row?.images?.[0];
+  if (oldKey && oldKey !== key) await removeObjects([oldKey]);
 
   revalidatePath("/admin/photos");
   revalidatePath("/photos");
