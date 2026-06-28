@@ -1,9 +1,11 @@
 import { SiteShell } from "@/components/layout/SiteShell";
+import { getActivePopup } from "@/lib/queries/popup";
 
-export default function PublicLayout({
+export default async function PublicLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return <SiteShell>{children}</SiteShell>;
+  const popup = await getActivePopup();
+  return <SiteShell popup={popup}>{children}</SiteShell>;
 }

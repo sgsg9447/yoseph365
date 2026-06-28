@@ -5,6 +5,8 @@ import { Header } from "./Header";
 import { Footer } from "./Footer";
 import { StickyBar } from "./StickyBar";
 import { ConsultSheet } from "@/components/overlay/ConsultSheet";
+import { RenewalPopup } from "@/components/overlay/RenewalPopup";
+import type { PopupConfig } from "@/lib/queries/popup";
 import { usePathname } from "next/navigation";
 
 // ── ConsultContext ─────────────────────────────────────────────────────────────
@@ -27,9 +29,10 @@ export function useConsult(): ConsultContextValue {
 
 interface SiteShellProps {
   children: React.ReactNode;
+  popup?: PopupConfig | null;
 }
 
-export function SiteShell({ children }: SiteShellProps) {
+export function SiteShell({ children, popup = null }: SiteShellProps) {
   const [sheetMode, setSheetMode] = useState<SheetMode | null>(null);
   const pathname = usePathname();
 
@@ -45,6 +48,7 @@ export function SiteShell({ children }: SiteShellProps) {
       {sheetMode && (
         <ConsultSheet open mode={sheetMode} onClose={closeSheet} />
       )}
+      {popup && <RenewalPopup config={popup} openConsult={openConsult} />}
     </ConsultContext.Provider>
   );
 }

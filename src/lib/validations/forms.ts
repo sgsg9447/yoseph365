@@ -232,3 +232,11 @@ export const replacePhotoImageSchema = z.object({
   key: z.string().trim().min(1).max(200),
 });
 export type ReplacePhotoImageInput = z.infer<typeof replacePhotoImageSchema>;
+
+// 관리자 — 팝업 노출 설정(사이트 노출 on/off, 모바일 숨김)
+export const popupSettingsSchema = z.object({
+  id: z.number().int().positive(),
+  isActive: z.boolean(),
+  hideOnMobile: z.boolean(),
+});
+export type PopupSettingsInput = z.infer<typeof popupSettingsSchema>;

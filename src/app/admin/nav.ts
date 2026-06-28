@@ -17,4 +17,5 @@ export const ADMIN_TABS: AdminTab[] = [
   // { key: "banner", href: "/admin/banner", label: "배너 관리", title: "배너 관리" },
   { key: "photo", href: "/admin/photos", label: "훈련 사진", title: "훈련 사진" },
   { key: "notice", href: "/admin/notice", label: "공지사항", title: "공지사항 게시판" },
+  { key: "popup", href: "/admin/popup", label: "팝업 관리", title: "팝업 관리" },
 ];

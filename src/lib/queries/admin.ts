@@ -482,3 +482,28 @@ export async function getOpenCourseCount(): Promise<number> {
     .eq("recruit_status", "모집중");
   return count ?? 0;
 }
+
+export interface AdminPopupView {
+  id: number;
+  title: string;
+  isActive: boolean;
+  hideOnMobile: boolean;
+}
+
+/** 어드민 — 관리 대상 팝업 1건(싱글턴). 없으면 null. */
+export async function getAdminPopup(): Promise<AdminPopupView | null> {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("popup")
+    .select("id, title, is_active, hide_on_mobile")
+    .order("id", { ascending: true })
+    .limit(1)
+    .maybeSingle();
+  if (!data) return null;
+  return {
+    id: data.id,
+    title: data.title ?? "리뉴얼 안내 팝업",
+    isActive: data.is_active,
+    hideOnMobile: data.hide_on_mobile,
+  };
+}

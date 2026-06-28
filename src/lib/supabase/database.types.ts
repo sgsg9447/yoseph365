@@ -527,6 +527,7 @@ export type Database = {
         Row: {
           created_at: string
           end_at: string | null
+          hide_on_mobile: boolean
           id: number
           image_url: string | null
           is_active: boolean
@@ -538,6 +539,7 @@ export type Database = {
         Insert: {
           created_at?: string
           end_at?: string | null
+          hide_on_mobile?: boolean
           id?: never
           image_url?: string | null
           is_active?: boolean
@@ -549,6 +551,7 @@ export type Database = {
         Update: {
           created_at?: string
           end_at?: string | null
+          hide_on_mobile?: boolean
           id?: never
           image_url?: string | null
           is_active?: boolean

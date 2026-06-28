@@ -17,6 +17,7 @@ import {
   replacePhotoImageSchema,
   inquiryPostSchema,
   verifySecretSchema,
+  popupSettingsSchema,
 } from "./forms";
 
 describe("applyInfoSchema", () => {
@@ -421,5 +422,28 @@ describe("verifySecretSchema", () => {
     expect(verifySecretSchema.safeParse({ id: 1, password: "12" }).success).toBe(false);
     expect(verifySecretSchema.safeParse({ id: 1, password: "abcd" }).success).toBe(false);
     expect(verifySecretSchema.safeParse({ id: 0, password: "1234" }).success).toBe(false);
+  });
+});
+
+describe("popupSettingsSchema", () => {
+  it("올바른 토글 입력을 통과시킨다", () => {
+    expect(
+      popupSettingsSchema.safeParse({ id: 1, isActive: true, hideOnMobile: false }).success,
+    ).toBe(true);
+  });
+
+  it("id가 양의 정수가 아니면 거부한다", () => {
+    expect(
+      popupSettingsSchema.safeParse({ id: 0, isActive: true, hideOnMobile: false }).success,
+    ).toBe(false);
+    expect(
+      popupSettingsSchema.safeParse({ id: -3, isActive: true, hideOnMobile: false }).success,
+    ).toBe(false);
+  });
+
+  it("토글이 boolean이 아니면 거부한다", () => {
+    expect(
+      popupSettingsSchema.safeParse({ id: 1, isActive: "yes", hideOnMobile: false }).success,
+    ).toBe(false);
   });
 });
