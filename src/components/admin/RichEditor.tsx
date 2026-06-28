@@ -5,6 +5,7 @@ import { useEditor, EditorContent, type Editor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import TextAlign from "@tiptap/extension-text-align";
 import Image from "@tiptap/extension-image";
+import { TextStyle, Color, FontSize } from "@tiptap/extension-text-style";
 import {
   ImageIcon,
   Bold,
@@ -75,6 +76,9 @@ export function RichEditor({
       }),
       TextAlign.configure({ types: ["heading", "paragraph"] }),
       Image,
+      TextStyle,
+      Color,
+      FontSize,
     ],
     content: value,
     immediatelyRender: false, // Next SSR
@@ -236,6 +240,10 @@ function Toolbar({
         <AlignRight size={16} />
       </Btn>
       <Divider />
+      <SizeControls editor={editor} />
+      <Divider />
+      <ColorControls editor={editor} />
+      <Divider />
       <Btn active={editor.isActive("link")} onClick={editLink}>
         링크
       </Btn>
@@ -257,5 +265,73 @@ function Toolbar({
         }}
       />
     </div>
+  );
+}
+
+// 글자 크기 — 프리셋 단계. '보통'은 크기 해제(기본 크기 상속).
+const FONT_SIZES: { label: string; value: string }[] = [
+  { label: "작게", value: "14px" },
+  { label: "크게", value: "20px" },
+  { label: "더크게", value: "26px" },
+];
+
+function SizeControls({ editor }: { editor: Editor }) {
+  const current = editor.getAttributes("textStyle").fontSize as string | undefined;
+  return (
+    <>
+      <Btn title="기본 크기" active={!current} onClick={() => editor.chain().focus().unsetFontSize().run()}>
+        보통
+      </Btn>
+      {FONT_SIZES.map((s) => (
+        <Btn
+          key={s.value}
+          title={`${s.label} (${s.value})`}
+          active={current === s.value}
+          onClick={() => editor.chain().focus().setFontSize(s.value).run()}
+        >
+          {s.label}
+        </Btn>
+      ))}
+    </>
+  );
+}
+
+// 글자 색상 — 프리셋 팔레트. '기본'은 색 해제(기본 글자색 상속).
+const FONT_COLORS: { name: string; hex: string }[] = [
+  { name: "빨강", hex: "#e02424" },
+  { name: "주황", hex: "#ea580c" },
+  { name: "초록", hex: "#16803c" },
+  { name: "파랑", hex: "#2563eb" },
+  { name: "보라", hex: "#7c3aed" },
+  { name: "회색", hex: "#6b7280" },
+];
+
+function ColorControls({ editor }: { editor: Editor }) {
+  const current = editor.getAttributes("textStyle").color as string | undefined;
+  return (
+    <>
+      <Btn title="기본 색" active={!current} onClick={() => editor.chain().focus().unsetColor().run()}>
+        기본색
+      </Btn>
+      {FONT_COLORS.map((c) => (
+        <button
+          key={c.hex}
+          type="button"
+          title={`${c.name} 글자색`}
+          aria-label={`${c.name} 글자색`}
+          onMouseDown={(e) => e.preventDefault()}
+          onClick={() => editor.chain().focus().setColor(c.hex).run()}
+          className={[
+            "inline-flex h-8 w-8 items-center justify-center rounded-md",
+            current === c.hex ? "ring-2 ring-primary" : "hover:bg-hairline-soft",
+          ].join(" ")}
+        >
+          <span
+            className="h-4 w-4 rounded-full border border-hairline"
+            style={{ backgroundColor: c.hex }}
+          />
+        </button>
+      ))}
+    </>
   );
 }
