@@ -7,6 +7,12 @@ import TextAlign from "@tiptap/extension-text-align";
 import Image from "@tiptap/extension-image";
 import { TextStyle, Color, FontSize } from "@tiptap/extension-text-style";
 import {
+  MIN_FONT_SIZE,
+  MAX_FONT_SIZE,
+  parseFontSize,
+  stepFontSize,
+} from "@/lib/richtext/font-size";
+import {
   ImageIcon,
   Bold,
   Italic,
@@ -268,42 +274,51 @@ function Toolbar({
   );
 }
 
-// 글자 크기 — 프리셋 단계. '보통'은 크기 해제(기본 크기 상속).
-const FONT_SIZES: { label: string; value: string }[] = [
-  { label: "작게", value: "14px" },
-  { label: "크게", value: "20px" },
-  { label: "더크게", value: "26px" },
-];
-
+// 글자 크기 — [기본] [−] 숫자 [+] 스테퍼. '기본'은 크기 해제(본문 기본 크기 상속).
 function SizeControls({ editor }: { editor: Editor }) {
-  const current = editor.getAttributes("textStyle").fontSize as string | undefined;
+  const sizeAttr = editor.getAttributes("textStyle").fontSize as string | undefined;
+  const current = parseFontSize(sizeAttr);
+  const apply = (delta: number) =>
+    editor.chain().focus().setFontSize(`${stepFontSize(current, delta)}px`).run();
   return (
     <>
-      <Btn title="기본 크기" active={!current} onClick={() => editor.chain().focus().unsetFontSize().run()}>
-        보통
+      <Btn
+        title="기본 크기"
+        active={!sizeAttr}
+        onClick={() => editor.chain().focus().unsetFontSize().run()}
+      >
+        기본
       </Btn>
-      {FONT_SIZES.map((s) => (
-        <Btn
-          key={s.value}
-          title={`${s.label} (${s.value})`}
-          active={current === s.value}
-          onClick={() => editor.chain().focus().setFontSize(s.value).run()}
-        >
-          {s.label}
-        </Btn>
-      ))}
+      <Btn title="글자 작게" disabled={current <= MIN_FONT_SIZE} onClick={() => apply(-1)}>
+        −
+      </Btn>
+      <span
+        className="inline-flex h-8 min-w-8 items-center justify-center px-1 text-[13px] font-semibold tabular-nums text-body-strong"
+        aria-label={`현재 글자 크기 ${current}`}
+      >
+        {current}
+      </span>
+      <Btn title="글자 크게" disabled={current >= MAX_FONT_SIZE} onClick={() => apply(1)}>
+        +
+      </Btn>
     </>
   );
 }
 
 // 글자 색상 — 프리셋 팔레트. '기본'은 색 해제(기본 글자색 상속).
 const FONT_COLORS: { name: string; hex: string }[] = [
+  { name: "검정", hex: "#1a1a18" },
+  { name: "회색", hex: "#6b7280" },
   { name: "빨강", hex: "#e02424" },
   { name: "주황", hex: "#ea580c" },
+  { name: "노랑", hex: "#ca8a04" },
   { name: "초록", hex: "#16803c" },
+  { name: "청록", hex: "#0d9488" },
   { name: "파랑", hex: "#2563eb" },
+  { name: "남색", hex: "#1e3a8a" },
   { name: "보라", hex: "#7c3aed" },
-  { name: "회색", hex: "#6b7280" },
+  { name: "자홍", hex: "#c026d3" },
+  { name: "분홍", hex: "#db2777" },
 ];
 
 function ColorControls({ editor }: { editor: Editor }) {
