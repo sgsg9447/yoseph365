@@ -347,6 +347,19 @@ function ColorControls({ editor }: { editor: Editor }) {
           />
         </button>
       ))}
+      <label
+        title="더 많은 색 직접 선택"
+        className="inline-flex h-8 cursor-pointer items-center gap-1.5 rounded-md px-2 text-[13px] font-semibold text-body-strong hover:bg-hairline-soft"
+      >
+        더많은색
+        <input
+          type="color"
+          aria-label="글자색 직접 선택"
+          defaultValue="#000000"
+          onChange={(e) => editor.chain().focus().setColor(e.target.value).run()}
+          className="h-4 w-4 cursor-pointer rounded border border-hairline p-0"
+        />
+      </label>
     </>
   );
 }
