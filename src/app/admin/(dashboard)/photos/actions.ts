@@ -3,7 +3,8 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { createUploadTarget as makeTarget, removeObjects } from "@/lib/storage/server";
-import { trainingPhotoAddSchema } from "@/lib/validations/forms";
+import { trainingPhotoAddSchema, featuredToggleSchema } from "@/lib/validations/forms";
+import { featuredLimitReached } from "@/lib/gallery/categories";
 import type { UploadTarget } from "@/lib/storage/types";
 
 export type PhotoResult = { ok: true } | { ok: false; error: string };
@@ -27,6 +28,7 @@ export async function addTrainingPhotos(input: unknown): Promise<PhotoResult> {
   }
   const rows = parsed.data.photos.map((p) => ({
     category: "훈련사진" as const,
+    gallery_category: parsed.data.galleryCategory,
     title: p.label || "훈련 현장 사진",
     images: [p.key],
   }));
@@ -37,6 +39,7 @@ export async function addTrainingPhotos(input: unknown): Promise<PhotoResult> {
 
   revalidatePath("/admin/photos");
   revalidatePath("/photos");
+  revalidatePath("/");
   return { ok: true };
 }
 
@@ -64,5 +67,43 @@ export async function deleteTrainingPhoto(id: number): Promise<PhotoResult> {
 
   revalidatePath("/admin/photos");
   revalidatePath("/photos");
+  revalidatePath("/");
+  return { ok: true };
+}
+
+/** 메인 노출 토글 — 켤 때 최대 6장 cap 검증. */
+export async function toggleFeatured(input: unknown): Promise<PhotoResult> {
+  const parsed = featuredToggleSchema.safeParse(input);
+  if (!parsed.success) return { ok: false, error: "잘못된 요청입니다." };
+  const { id, on } = parsed.data;
+
+  const supabase = await createClient();
+
+  if (on) {
+    const { count, error: cErr } = await supabase
+      .from("post")
+      .select("id", { count: "exact", head: true })
+      .eq("category", "훈련사진")
+      .eq("is_deleted", false)
+      .eq("is_featured", true);
+    if (cErr) return { ok: false, error: GENERIC };
+    if (featuredLimitReached(count ?? 0)) {
+      return {
+        ok: false,
+        error: "메인 사진은 최대 6장까지 선택할 수 있습니다. 다른 사진을 먼저 해제해 주세요.",
+      };
+    }
+  }
+
+  const { error } = await supabase
+    .from("post")
+    .update({ is_featured: on })
+    .eq("id", id)
+    .eq("category", "훈련사진");
+  if (error) return { ok: false, error: GENERIC };
+
+  revalidatePath("/admin/photos");
+  revalidatePath("/photos");
+  revalidatePath("/");
   return { ok: true };
 }
