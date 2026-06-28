@@ -10,6 +10,8 @@ const eslintConfig = defineConfig([
     // Default ignores of eslint-config-next:
     ".next/**",
     ".worktrees/**",
+    // 네이티브 워크트리(.claude/worktrees/*)는 별도 브랜치 사본이므로 린트 제외.
+    ".claude/worktrees/**",
     "out/**",
     "build/**",
     "next-env.d.ts",
