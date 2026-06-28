@@ -13,6 +13,7 @@ import {
   trackSaveSchema,
   applyInfoSchema,
   trainingPhotoAddSchema,
+  featuredToggleSchema,
   inquiryPostSchema,
   verifySecretSchema,
 } from "./forms";
@@ -309,23 +310,46 @@ describe("consultSchema", () => {
 });
 
 describe("trainingPhotoAddSchema", () => {
-  it("키·라벨 목록을 통과시킨다", () => {
-    const r = trainingPhotoAddSchema.safeParse({
-      photos: [{ key: "a.jpg", label: "현장" }, { key: "b.png", label: "" }],
-    });
-    expect(r.success).toBe(true);
+  const ok = {
+    galleryCategory: "집수리",
+    photos: [{ key: "a.jpg", label: "현장" }],
+  };
+  it("카테고리+사진이 있으면 통과", () => {
+    expect(trainingPhotoAddSchema.safeParse(ok).success).toBe(true);
   });
-  it("빈 배열은 거부", () => {
-    expect(trainingPhotoAddSchema.safeParse({ photos: [] }).success).toBe(false);
+  it("카테고리 누락은 실패", () => {
+    const { galleryCategory, ...rest } = ok;
+    void galleryCategory;
+    expect(trainingPhotoAddSchema.safeParse(rest).success).toBe(false);
   });
-  it("key 누락은 거부", () => {
+  it("허용 외 카테고리는 실패", () => {
     expect(
-      trainingPhotoAddSchema.safeParse({ photos: [{ label: "x" }] }).success,
+      trainingPhotoAddSchema.safeParse({ ...ok, galleryCategory: "기능사과정" }).success,
+    ).toBe(false);
+  });
+  it("사진이 없으면 실패", () => {
+    expect(trainingPhotoAddSchema.safeParse({ ...ok, photos: [] }).success).toBe(false);
+  });
+  it("key 없으면 실패", () => {
+    expect(
+      trainingPhotoAddSchema.safeParse({ ...ok, photos: [{ label: "x" }] }).success,
     ).toBe(false);
   });
   it("50장 초과는 거부", () => {
     const photos = Array.from({ length: 51 }, (_, i) => ({ key: `${i}.jpg`, label: "" }));
-    expect(trainingPhotoAddSchema.safeParse({ photos }).success).toBe(false);
+    expect(trainingPhotoAddSchema.safeParse({ ...ok, photos }).success).toBe(false);
+  });
+});
+
+describe("featuredToggleSchema", () => {
+  it("정상 입력 통과", () => {
+    expect(featuredToggleSchema.safeParse({ id: 1, on: true }).success).toBe(true);
+  });
+  it("id가 양의 정수가 아니면 실패", () => {
+    expect(featuredToggleSchema.safeParse({ id: 0, on: true }).success).toBe(false);
+  });
+  it("on이 불리언이 아니면 실패", () => {
+    expect(featuredToggleSchema.safeParse({ id: 1, on: "yes" }).success).toBe(false);
   });
 });
 

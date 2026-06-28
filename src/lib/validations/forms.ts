@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { LEAF_CATEGORIES } from "@/lib/gallery/categories";
 
 // 한국 휴대전화: 하이픈 선택
 const phoneRe = /^01[016789]-?\d{3,4}-?\d{4}$/;
@@ -202,8 +203,9 @@ export const trackEventSchema = z.object({
 });
 export type TrackEventInput = z.infer<typeof trackEventSchema>;
 
-// 관리자 — 훈련사진 추가(업로드 완료된 객체 키 목록)
+// 관리자 — 훈련사진 추가(업로드 완료된 객체 키 목록 + 카테고리)
 export const trainingPhotoAddSchema = z.object({
+  galleryCategory: z.enum(LEAF_CATEGORIES),
   photos: z
     .array(
       z.object({
@@ -215,3 +217,10 @@ export const trainingPhotoAddSchema = z.object({
     .max(50, "한 번에 최대 50장까지 올릴 수 있습니다"),
 });
 export type TrainingPhotoAddInput = z.infer<typeof trainingPhotoAddSchema>;
+
+// 관리자 — 훈련사진 메인 노출 토글
+export const featuredToggleSchema = z.object({
+  id: z.number().int().positive(),
+  on: z.boolean(),
+});
+export type FeaturedToggleInput = z.infer<typeof featuredToggleSchema>;
