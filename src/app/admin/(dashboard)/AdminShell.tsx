@@ -17,6 +17,7 @@ import {
   Star,
   ImageIcon,
   FileText,
+  Bell,
   Menu,
   X,
 } from "@/components/icons";
@@ -36,6 +37,7 @@ const TAB_ICONS: Record<string, ReactNode> = {
   banner: <Star size={18} />,
   photo: <ImageIcon size={18} />,
   notice: <FileText size={18} />,
+  popup: <Bell size={18} />,
 };
 
 function useActiveTab() {

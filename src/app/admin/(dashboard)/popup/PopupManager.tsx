@@ -109,14 +109,15 @@ function ToggleRow({
         aria-label={label}
         onClick={onChange}
         className={[
-          "w-10 h-6 rounded-full relative transition shrink-0 mt-0.5",
+          "relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors mt-0.5",
           checked ? "bg-primary" : "bg-hairline-strong",
         ].join(" ")}
       >
         <span
+          aria-hidden
           className={[
-            "absolute top-0.5 w-5 h-5 rounded-full bg-white transition-transform",
-            checked ? "translate-x-[18px]" : "translate-x-0.5",
+            "inline-block h-5 w-5 rounded-full bg-white shadow-sm transition-transform duration-200",
+            checked ? "translate-x-[22px]" : "translate-x-0.5",
           ].join(" ")}
         />
       </button>
