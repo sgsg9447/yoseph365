@@ -34,7 +34,7 @@ export function sanitizeRichHtml(html: string): string {
     ],
     allowedAttributes: {
       a: ["href", "target", "rel"],
-      img: ["src", "alt", "title", "width", "height"],
+      img: ["src", "alt", "title", "width", "height", "data-align"],
       "*": ["style"],
     },
     allowedSchemes: ["http", "https", "mailto", "tel"],
@@ -52,6 +52,8 @@ export function sanitizeRichHtml(html: string): string {
         ],
         // 에디터의 글자 크기(프리셋 px). 1~3자리 px만 허용해 과도한 값 차단.
         "font-size": [/^\d{1,3}px$/],
+        // 본문 이미지 너비(%). 컨테이너 대비 비율만 허용, px 고정값은 차단.
+        width: [/^\d{1,3}%$/],
       },
     },
   });

@@ -64,4 +64,20 @@ describe("sanitizeRichHtml", () => {
     const out = sanitizeRichHtml('<span style="color: expression(alert(1))">x</span>');
     expect(out).not.toContain("expression");
   });
+
+  it("이미지 너비(style width, %) 를 보존한다", () => {
+    const out = sanitizeRichHtml('<img src="https://cdn.example.com/a.jpg" style="width: 50%">');
+    expect(out).toMatch(/width/);
+    expect(out).toContain("50%");
+  });
+
+  it("이미지 정렬(data-align) 속성을 보존한다", () => {
+    const out = sanitizeRichHtml('<img src="https://cdn.example.com/a.jpg" data-align="center">');
+    expect(out).toContain('data-align="center"');
+  });
+
+  it("이미지 너비는 % 만 허용하고 px 등은 제거한다", () => {
+    const out = sanitizeRichHtml('<img src="https://cdn.example.com/a.jpg" style="width: 9999px">');
+    expect(out).not.toContain("9999px");
+  });
 });

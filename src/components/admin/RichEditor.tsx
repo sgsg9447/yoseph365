@@ -1,7 +1,14 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
-import { useEditor, EditorContent, type Editor } from "@tiptap/react";
+import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
+import {
+  useEditor,
+  EditorContent,
+  ReactNodeViewRenderer,
+  NodeViewWrapper,
+  type Editor,
+  type NodeViewProps,
+} from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import TextAlign from "@tiptap/extension-text-align";
 import Image from "@tiptap/extension-image";
@@ -12,6 +19,7 @@ import {
   parseFontSize,
   stepFontSize,
 } from "@/lib/richtext/font-size";
+import { nextWidthPercent } from "@/lib/richtext/image-size";
 import {
   ImageIcon,
   Bold,
@@ -34,6 +42,167 @@ import { createImageUploadTarget } from "@/lib/storage/actions";
 function imageFilesFrom(dt: DataTransfer | null): File[] {
   if (!dt) return [];
   return Array.from(dt.files).filter((f) => f.type.startsWith("image/"));
+}
+
+/**
+ * 본문 이미지에 크기(%)·정렬 속성을 추가한 Image 확장.
+ * - width: 컨테이너 대비 % (style="width: N%") — 렌더/새니타이저와 정책 일치.
+ * - align: data-align="left|center|right" — CSS(.rich-content img[data-align])로 정렬.
+ * 에디터에서는 NodeView로 모서리 드래그 리사이즈 + 정렬 툴바를 제공한다.
+ */
+const RichImage = Image.extend({
+  addAttributes() {
+    return {
+      ...this.parent?.(),
+      width: {
+        default: null,
+        parseHTML: (el) => {
+          const m = /^(\d{1,3})%$/.exec(el.style.width || "");
+          return m ? Number(m[1]) : null;
+        },
+        renderHTML: (attrs) =>
+          attrs.width ? { style: `width: ${attrs.width}%` } : {},
+      },
+      align: {
+        default: null,
+        parseHTML: (el) => el.getAttribute("data-align"),
+        renderHTML: (attrs) => (attrs.align ? { "data-align": attrs.align } : {}),
+      },
+    };
+  },
+  addNodeView() {
+    return ReactNodeViewRenderer(ImageNodeView);
+  },
+});
+
+type ImgAlign = "left" | "center" | "right";
+const IMG_ALIGNS: { value: ImgAlign; label: string; Icon: typeof AlignLeft }[] = [
+  { value: "left", label: "왼쪽 정렬", Icon: AlignLeft },
+  { value: "center", label: "가운데 정렬", Icon: AlignCenter },
+  { value: "right", label: "오른쪽 정렬", Icon: AlignRight },
+];
+
+// 이미지 NodeView — 선택 시 네 모서리 드래그로 크기 조절, 상단 정렬 툴바. 드래그 중엔
+// 로컬 상태로 부드럽게 미리보고, 놓을 때 한 번만 width 속성에 반영(undo 1스텝).
+function ImageNodeView({ node, updateAttributes, selected, editor }: NodeViewProps) {
+  const width = (node.attrs.width as number | null) ?? null;
+  const align = ((node.attrs.align as string | null) ?? "left") as ImgAlign;
+  const imgRef = useRef<HTMLImageElement>(null);
+  const [dragPct, setDragPct] = useState<number | null>(null);
+  const shownWidth = dragPct ?? width;
+
+  function beginResize(dir: 1 | -1, e: React.PointerEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+    const img = imgRef.current;
+    if (!img) return;
+    const containerPx = editor.view.dom.clientWidth || img.getBoundingClientRect().width;
+    const startPx = img.getBoundingClientRect().width;
+    const startX = e.clientX;
+    let last = width ?? nextWidthPercent(startPx, 0, containerPx);
+    const onMove = (ev: PointerEvent) => {
+      last = nextWidthPercent(startPx, (ev.clientX - startX) * dir, containerPx);
+      setDragPct(last);
+    };
+    const onUp = () => {
+      window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("pointerup", onUp);
+      setDragPct(null);
+      updateAttributes({ width: last });
+    };
+    window.addEventListener("pointermove", onMove);
+    window.addEventListener("pointerup", onUp);
+  }
+
+  const handle = (extra: CSSProperties): CSSProperties => ({
+    position: "absolute",
+    width: 14,
+    height: 14,
+    background: "#fff",
+    border: "2px solid var(--color-primary)",
+    borderRadius: 3,
+    touchAction: "none",
+    zIndex: 2,
+    ...extra,
+  });
+
+  return (
+    <NodeViewWrapper
+      as="div"
+      style={{
+        display: "block",
+        width: shownWidth ? `${shownWidth}%` : "fit-content",
+        maxWidth: "100%",
+        margin: `0.6em ${align === "right" ? "0" : "auto"} 0.6em ${align === "left" ? "0" : "auto"}`,
+        position: "relative",
+        lineHeight: 0,
+      }}
+    >
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        ref={imgRef}
+        src={node.attrs.src as string}
+        alt={(node.attrs.alt as string) ?? ""}
+        draggable={false}
+        style={{
+          width: "100%",
+          height: "auto",
+          display: "block",
+          borderRadius: "var(--radius-md)",
+          outline: selected ? "2px solid var(--color-primary)" : "none",
+        }}
+      />
+      {selected && (
+        <>
+          <div
+            contentEditable={false}
+            style={{
+              position: "absolute",
+              top: 6,
+              left: "50%",
+              transform: "translateX(-50%)",
+              display: "flex",
+              gap: 2,
+              padding: 3,
+              background: "#fff",
+              borderRadius: 8,
+              boxShadow: "0 1px 6px rgba(0,0,0,0.18)",
+              zIndex: 3,
+            }}
+          >
+            {IMG_ALIGNS.map(({ value, label, Icon }) => (
+              <button
+                key={value}
+                type="button"
+                title={label}
+                aria-label={label}
+                onMouseDown={(e) => e.preventDefault()}
+                onClick={() => updateAttributes({ align: value })}
+                style={{
+                  display: "inline-flex",
+                  width: 28,
+                  height: 28,
+                  alignItems: "center",
+                  justifyContent: "center",
+                  border: "none",
+                  borderRadius: 6,
+                  cursor: "pointer",
+                  background: align === value ? "var(--color-primary-soft)" : "transparent",
+                  color: align === value ? "var(--color-primary)" : "var(--color-body-strong)",
+                }}
+              >
+                <Icon size={16} />
+              </button>
+            ))}
+          </div>
+          <span style={handle({ top: -7, left: -7, cursor: "nwse-resize" })} onPointerDown={(e) => beginResize(-1, e)} />
+          <span style={handle({ top: -7, right: -7, cursor: "nesw-resize" })} onPointerDown={(e) => beginResize(1, e)} />
+          <span style={handle({ bottom: -7, left: -7, cursor: "nesw-resize" })} onPointerDown={(e) => beginResize(-1, e)} />
+          <span style={handle({ bottom: -7, right: -7, cursor: "nwse-resize" })} onPointerDown={(e) => beginResize(1, e)} />
+        </>
+      )}
+    </NodeViewWrapper>
+  );
 }
 
 /** 리치 텍스트 에디터(Tiptap). 공지 본문·상담 답변 공용. HTML 문자열을 value/onChange로 주고받는다. */
@@ -81,7 +250,7 @@ export function RichEditor({
         link: { openOnClick: false, HTMLAttributes: { rel: "noopener", target: "_blank" } },
       }),
       TextAlign.configure({ types: ["heading", "paragraph"] }),
-      Image,
+      RichImage,
       TextStyle,
       Color,
       FontSize,
