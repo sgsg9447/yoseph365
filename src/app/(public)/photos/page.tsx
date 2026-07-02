@@ -5,7 +5,7 @@ import type { Metadata } from "next";
 import { PageHero } from "@/components/sections/PageHero";
 import { TrainingGallery } from "./TrainingGallery";
 import { PhotosEmptyCta } from "./PhotosEmptyCta";
-import { getTrainingGalleryPhotos } from "@/lib/queries/photos";
+import { getTrainingGalleryPhotos, type GalleryPhoto } from "@/lib/queries/photos";
 
 export const metadata: Metadata = {
   title: "훈련 사진 — 성요셉목수학교",
@@ -14,7 +14,12 @@ export const metadata: Metadata = {
 };
 
 export default async function PhotosPage() {
-  const photos = await getTrainingGalleryPhotos();
+  let photos: GalleryPhoto[];
+  try {
+    photos = await getTrainingGalleryPhotos();
+  } catch {
+    photos = [];
+  }
 
   return (
     <>
